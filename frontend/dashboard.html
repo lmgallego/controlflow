@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | PowerUp Analytics</title>
+    <link rel="stylesheet" href="css/app.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+</head>
+<body>
+    <div class="app-layout">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h3>PowerUp</h3>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-view="wellness"><a>Bienestar</a></li>
+                <li class="nav-item" data-view="activities"><a>Actividades</a></li>
+                <li class="nav-item" data-view="analysis"><a>Análisis</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <ul class="nav-menu">
+                     <li class="nav-item" data-view="settings"><a>Configuración</a></li>
+                </ul>
+                <a href="#" id="logout-btn">Cerrar Sesión</a>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <header class="app-header">
+                <div class="controls">
+                    <label for="athlete-select">Atleta:</label>
+                    <select id="athlete-select">
+                        <option>Cargando...</option>
+                    </select>
+                </div>
+                <div class="user-profile">
+                    <span id="user-email">Cargando...</span>
+                </div>
+            </header>
+
+            <div class="view-container" id="app-view">
+                </div>
+        </main>
+    </div>
+
+    <script src="js/firebase-init.js" type="module"></script>
+    
+    <script src="js/apiService.js" type="module"></script>
+    <script src="js/charts.js" type="module"></script>
+    <script src="js/components/WellnessPanel.js" type="module"></script>
+    <script src="js/components/ActivityFeed.js" type="module"></script>
+    <script src="js/components/SettingsPanel.js" type="module"></script> <script src="js/app.js" type="module"></script>
+</body>
+</html>

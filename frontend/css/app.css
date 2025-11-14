@@ -1,0 +1,184 @@
+/* --- Reseteo Básico --- */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #1a1a1a; /* Fondo oscuro para la app */
+    color: #f1f1f1;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Evitar scroll en el body */
+}
+a { cursor: pointer; }
+
+/* --- Estructura Principal de la App --- */
+.app-layout {
+    display: flex;
+    height: 100vh;
+}
+
+/* --- Barra Lateral (Sidebar) --- */
+.sidebar {
+    width: 240px;
+    background-color: #111;
+    border-right: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+}
+.sidebar-header {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #333;
+}
+.sidebar-header h3 { margin: 0; color: #4A90E2; }
+.nav-menu {
+    list-style: none;
+    padding: 20px 0;
+    margin: 0;
+}
+.sidebar-footer {
+    padding-top: 20px;
+    border-top: 1px solid #333;
+    margin-top: auto; /* Empuja el footer hacia abajo */
+}
+.nav-item a {
+    display: block;
+    padding: 15px 20px;
+    color: #AAA;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+}
+.nav-item a:hover {
+    background-color: #222;
+    color: #FFF;
+}
+.nav-item.active a {
+    color: #FFF;
+    border-left-color: #4A90E2;
+}
+.sidebar-footer a {
+    display: block;
+    text-align: center;
+    padding: 15px 20px;
+    color: #888;
+    text-decoration: none;
+}
+.sidebar-footer a:hover { color: #FFF; }
+
+
+/* --- Contenido Principal --- */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Oculta el scroll principal */
+}
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #1E1E1E;
+    border-bottom: 1px solid #333;
+    min-height: 77px; /* Altura fija para el header */
+}
+.controls label { font-weight: 500; margin-right: 10px; }
+.controls select {
+    background-color: #333;
+    color: #f1f1f1;
+    border: 1px solid #555;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+.user-profile { font-weight: 600; font-size: 0.9rem; }
+
+/* --- Contenedor de Vistas --- */
+.view-container {
+    padding: 20px;
+    overflow-y: auto; /* Scroll solo para el contenido */
+    flex-grow: 1;
+}
+
+/* --- Estilos de Componentes (Wellness) --- */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+.chart-container {
+    background-color: #1E1E1E;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    min-height: 350px; 
+}
+.chart-container h3 { margin-top: 0; }
+
+.data-table {
+    grid-column: 1 / -1; /* Ocupa todo el ancho */
+    background-color: #1E1E1E;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+.data-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.data-table th, .data-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #333;
+}
+.data-table th { color: #AAA; }
+.data-table td .na { color: #555; }
+
+/* --- Estilos para Configuración (NUEVO) --- */
+.settings-form {
+    max-width: 600px;
+    background-color: #1E1E1E;
+    padding: 30px;
+    border: 1px solid #333;
+    border-radius: 8px;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #AAA;
+}
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    background-color: #121212;
+    border: 1px solid #333;
+    color: #E0E0E0;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+.btn {
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+.btn-primary {
+    background-color: #4A90E2;
+    color: #FFF;
+}
+.btn-primary:hover { background-color: #357ABD; }
+.status-message {
+    margin-top: 15px;
+    font-weight: 500;
+}
+.status-message.success { color: #34C759; }
+.status-message.error { color: #FF453A; }

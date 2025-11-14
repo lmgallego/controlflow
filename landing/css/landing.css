@@ -1,0 +1,193 @@
+/* --- Reseteo Básico --- */
+*, *::before, *::after { box-sizing: border-box; }
+body, h1, h2, h3, p, ul { margin: 0; padding: 0; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #121212; /* Modo oscuro */
+    color: #E0E0E0;
+    line-height: 1.6;
+}
+
+/* --- Estructura y Contenedor --- */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* --- Header y Navegación --- */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 0;
+    border-bottom: 1px solid #333;
+}
+.logo { font-size: 1.5rem; font-weight: bold; }
+.logo a { color: #E0E0E0; text-decoration: none; }
+.header nav { display: flex; align-items: center; gap: 25px; }
+.header nav a {
+    text-decoration: none;
+    color: #AAA;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+.header nav a:hover { color: #FFF; }
+.intervals-logo {
+    font-weight: 600;
+    color: #4A90E2; /* Color de Intervals */
+}
+
+/* --- Botones --- */
+.btn {
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+.btn-primary {
+    background-color: #4A90E2;
+    color: #FFF;
+}
+.btn-primary:hover { background-color: #357ABD; }
+.btn-secondary {
+    background-color: transparent;
+    color: #E0E0E0;
+    border: 1px solid #555;
+}
+.btn-secondary:hover { background-color: #222; }
+.btn-large { padding: 15px 30px; font-size: 1.1rem; }
+
+/* --- Hero Section --- */
+.hero {
+    text-align: center;
+    padding: 100px 0;
+}
+.hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+.hero .highlight {
+    /* Texto con gradiente */
+    background: linear-gradient(90deg, #4A90E2, #68D3FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.hero p {
+    font-size: 1.25rem;
+    color: #AAA;
+    max-width: 600px;
+    margin: 0 auto 30px auto;
+}
+
+/* --- Features Grid --- */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    padding: 50px 0;
+}
+.feature-card {
+    background-color: #1E1E1E;
+    border: 1px solid #333;
+    padding: 30px;
+    border-radius: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+.feature-card h3 {
+    color: #FFF;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+.feature-card p { color: #AAA; }
+
+/* --- Footer --- */
+.footer {
+    text-align: center;
+    padding: 40px 0;
+    border-top: 1px solid #333;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+/* --- Página de Precios --- */
+.pricing-header { text-align: center; padding: 60px 0 40px 0; }
+.pricing-header h2 { font-size: 2.5rem; margin-bottom: 10px; }
+.pricing-header p { font-size: 1.1rem; color: #AAA; }
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 50px;
+}
+.plan-card {
+    background-color: #1E1E1E;
+    border: 1px solid #333;
+    padding: 30px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+.plan-card.popular {
+    border-color: #4A90E2;
+    border-width: 2px;
+    transform: scale(1.05);
+}
+.plan-card h3 { font-size: 1.5rem; color: #FFF; }
+.plan-card .price {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #FFF;
+    margin: 20px 0;
+}
+.plan-card .price span {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #AAA;
+}
+.plan-card ul {
+    list-style: none;
+    margin: 20px 0;
+    flex-grow: 1;
+}
+.plan-card ul li {
+    padding: 10px 0;
+    border-bottom: 1px solid #333;
+}
+.plan-card .btn { text-align: center; }
+
+/* --- Página de Login --- */
+.login-container {
+    max-width: 400px;
+    margin: 60px auto;
+    background-color: #1E1E1E;
+    padding: 30px;
+    border: 1px solid #333;
+    border-radius: 10px;
+}
+.login-container h2 { text-align: center; margin-bottom: 25px; }
+.form-group { margin-bottom: 20px; }
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #AAA;
+}
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    background-color: #121212;
+    border: 1px solid #333;
+    color: #E0E0E0;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+.login-container .btn { width: 100%; }

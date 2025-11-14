@@ -1,0 +1,24 @@
+# --- Archivos de Entorno Virtual de Python ---
+# Ignora toda la carpeta del entorno virtual
+backend/venv/
+
+# --- Archivos Secretos y de Configuración ---
+# ¡MUY IMPORTANTE! Ignora el archivo con tus claves
+backend/.env
+
+# ¡MUY IMPORTANTE! Ignora la clave de servicio de Firebase
+backend/serviceAccountKey.json
+
+# --- Archivos de Caché de Python ---
+# Ignora las carpetas de caché
+__pycache__/
+backend/__pycache__/
+backend/api/__pycache__/
+backend/core/__pycache__/
+
+# --- Archivos compilados de Python ---
+*.pyc
+
+# --- Archivos del S.O. (Opcional pero recomendado) ---
+.DS_Store
+Thumbs.db
