@@ -1,12 +1,15 @@
 # --- Archivos de Entorno Virtual de Python ---
 # Ignora toda la carpeta del entorno virtual
+venv/
 backend/venv/
 
 # --- Archivos Secretos y de Configuración ---
 # ¡MUY IMPORTANTE! Ignora el archivo con tus claves
+.env
 backend/.env
 
 # ¡MUY IMPORTANTE! Ignora la clave de servicio de Firebase
+serviceAccountKey.json
 backend/serviceAccountKey.json
 
 # --- Archivos de Caché de Python ---
