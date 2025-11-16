@@ -428,25 +428,48 @@ function createBlocksSection(blocks, dates) {
     };
 
     section.innerHTML = `
-        <h3 class="bpe-blocks-title">Bloques Detectados (${blocks.length})</h3>
-        <div class="bpe-blocks-list">
+        <h3 class="bpe-blocks-title">${t('wellness.bpe.table.title')} (${blocks.length})</h3>
+        <div class="bpe-blocks-table">
             ${blocks.map((block, index) => {
                 const startDate = new Date(dates[block.startIndex]).toLocaleDateString();
                 const endDate = new Date(dates[block.endIndex]).toLocaleDateString();
 
                 return `
-                    <div class="bpe-block-item bpe-block-${block.type}">
+                    <div class="bpe-block-card bpe-block-${block.type}">
                         <div class="bpe-block-header">
-                            <span class="bpe-block-icon">${typeIcons[block.type]}</span>
-                            <span class="bpe-block-type">${typeTranslations[block.type]}</span>
-                            <span class="bpe-block-dates">${startDate} - ${endDate}</span>
+                            <div class="bpe-block-type-badge">
+                                <span class="bpe-block-icon">${typeIcons[block.type]}</span>
+                                <span class="bpe-block-type-text">${typeTranslations[block.type]}</span>
+                            </div>
+                            <div class="bpe-block-index">#${index + 1}</div>
                         </div>
                         <div class="bpe-block-body">
-                            <p class="bpe-block-description">${typeDescriptions[block.type]}</p>
-                            <div class="bpe-block-details">
-                                <span>Duración: ${block.duration} días</span>
-                                <span>Intensidad: ${block.intensity.toFixed(2)}</span>
-                                <span>Variables: ${block.activeVariables.map(v => variableNames[v]).join(', ')}</span>
+                            <div class="bpe-block-info-row">
+                                <div class="bpe-block-info-item">
+                                    <span class="bpe-info-label">${t('wellness.bpe.table.period')}</span>
+                                    <span class="bpe-info-value">${startDate} - ${endDate}</span>
+                                </div>
+                            </div>
+                            <div class="bpe-block-info-row">
+                                <div class="bpe-block-info-item">
+                                    <span class="bpe-info-label">${t('wellness.bpe.table.duration')}</span>
+                                    <span class="bpe-info-value">${block.duration} ${t('wellness.bpe.table.days')}</span>
+                                </div>
+                                <div class="bpe-block-info-item">
+                                    <span class="bpe-info-label">${t('wellness.bpe.table.intensity')}</span>
+                                    <span class="bpe-info-value">${block.intensity.toFixed(2)}</span>
+                                </div>
+                            </div>
+                            <div class="bpe-block-info-row">
+                                <div class="bpe-block-info-item bpe-variables-item">
+                                    <span class="bpe-info-label">${t('wellness.bpe.table.variables')}</span>
+                                    <div class="bpe-variables-badges">
+                                        ${block.activeVariables.map(v => `<span class="bpe-variable-badge">${variableNames[v]}</span>`).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bpe-block-description">
+                                ${typeDescriptions[block.type]}
                             </div>
                         </div>
                     </div>

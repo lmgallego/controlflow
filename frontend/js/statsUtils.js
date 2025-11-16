@@ -191,46 +191,46 @@ export function secondsToHours(seconds) {
 /**
  * Evalúa el estado del HRV basado en el Z-Score
  * @param {number} zScore - Z-Score del HRV
- * @returns {Object} - {status, color, description}
+ * @returns {Object} - {statusKey, color, descriptionKey}
  */
 export function evaluateHRVStatus(zScore) {
     if (zScore === null || zScore === undefined) {
         return {
-            status: 'Sin datos',
+            statusKey: 'noData',
             color: '#94a3b8',
-            description: 'No hay datos suficientes'
+            descriptionKey: 'noData'
         };
     }
 
     if (zScore > 1) {
         return {
-            status: 'Muy Alto',
+            statusKey: 'veryHigh',
             color: '#10b981',
-            description: 'Excelente recuperación'
+            descriptionKey: 'veryHigh'
         };
     } else if (zScore > 0.5) {
         return {
-            status: 'Alto',
+            statusKey: 'high',
             color: '#3b82f6',
-            description: 'Buena recuperación'
+            descriptionKey: 'high'
         };
     } else if (zScore > -0.5) {
         return {
-            status: 'Normal',
+            statusKey: 'normal',
             color: '#f59e0b',
-            description: 'Recuperación normal'
+            descriptionKey: 'normal'
         };
     } else if (zScore > -1) {
         return {
-            status: 'Bajo',
+            statusKey: 'low',
             color: '#f97316',
-            description: 'Recuperación baja'
+            descriptionKey: 'low'
         };
     } else {
         return {
-            status: 'Muy Bajo',
+            statusKey: 'veryLow',
             color: '#ef4444',
-            description: 'Fatiga significativa'
+            descriptionKey: 'veryLow'
         };
     }
 }

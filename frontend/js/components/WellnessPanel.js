@@ -375,7 +375,7 @@ function renderHRVCard(data) {
             <div class="metric-card-header">
                 <h3 data-i18n="wellness.hrv.title">${t('wellness.hrv.title')}</h3>
                 <div class="metric-badge" style="background-color: ${hrv.status.color}20; color: ${hrv.status.color};">
-                    ${t('wellness.hrv.status.' + hrv.status.status.toLowerCase().replace(' ', ''))}
+                    ${t('wellness.hrv.status.' + hrv.status.statusKey)}
                 </div>
             </div>
             <div class="metric-card-body">
@@ -396,7 +396,7 @@ function renderHRVCard(data) {
                     </div>
                 </div>
                 <div class="metric-status-text">
-                    ${t('wellness.hrv.description.' + hrv.status.status.toLowerCase().replace(' ', ''))}
+                    ${t('wellness.hrv.description.' + hrv.status.descriptionKey)}
                 </div>
                 <div class="metric-chart-container">
                     <button class="chart-fullscreen-btn" data-chart="hrv" title="${t('wellness.chart.fullscreen')}">⛶</button>
@@ -582,7 +582,7 @@ function renderSummaryCard(data) {
                 <div class="summary-item">
                     <span class="summary-label" data-i18n="wellness.summary.hrvStatus">${t('wellness.summary.hrvStatus')}</span>
                     <span class="summary-value" style="color: ${data.hrv.status.color};">
-                        ${t('wellness.hrv.status.' + data.hrv.status.status.toLowerCase().replace(' ', ''))}
+                        ${t('wellness.hrv.status.' + data.hrv.status.statusKey)}
                     </span>
                 </div>
                 <div class="summary-item">

@@ -150,6 +150,14 @@ const translations = {
                     intensity: 'Intensidad Promedio',
                     biomarcadores: 'Biomarcadores Activos'
                 },
+                table: {
+                    title: 'Bloques Detectados',
+                    duration: 'Duración',
+                    intensity: 'Intensidad',
+                    variables: 'Variables',
+                    days: 'días',
+                    period: 'Período'
+                },
                 info: {
                     tooltip: 'Más información sobre BPE',
                     title: '¿Qué son los Bloques de Patrón Específico?',
@@ -355,6 +363,14 @@ const translations = {
                     duration: 'Average Duration',
                     intensity: 'Average Intensity',
                     biomarcadores: 'Active Biomarkers'
+                },
+                table: {
+                    title: 'Detected Blocks',
+                    duration: 'Duration',
+                    intensity: 'Intensity',
+                    variables: 'Variables',
+                    days: 'days',
+                    period: 'Period'
                 },
                 info: {
                     tooltip: 'More information about SPB',
