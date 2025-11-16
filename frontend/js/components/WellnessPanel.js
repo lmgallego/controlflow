@@ -80,6 +80,11 @@ function renderWellnessPanelContent(container, data) {
             </div>
             <div class="date-range-selector">
                 <label data-i18n="wellness.dateRange">${t('wellness.dateRange')}:</label>
+                <div class="quick-date-buttons">
+                    <button class="quick-date-btn" data-days="15">15${t('wellness.daysShort')}</button>
+                    <button class="quick-date-btn active" data-days="30">30${t('wellness.daysShort')}</button>
+                    <button class="quick-date-btn" data-days="90">90${t('wellness.daysShort')}</button>
+                </div>
                 <div class="date-inputs">
                     <input type="date" id="wellness-date-from" value="${getDateDaysAgo(30)}">
                     <span>-</span>
@@ -124,7 +129,10 @@ function renderWellnessPanelContent(container, data) {
         <!-- Modal para gráficos en pantalla completa -->
         <div id="chart-modal" class="chart-modal">
             <div class="chart-modal-content">
-                <button class="chart-modal-close" data-i18n="wellness.chart.close">${t('wellness.chart.close')}</button>
+                <div class="chart-modal-header">
+                    <button class="chart-modal-download" id="download-chart-btn" title="${t('wellness.chart.download')}">⬇</button>
+                    <button class="chart-modal-close" data-i18n="wellness.chart.close">${t('wellness.chart.close')}</button>
+                </div>
                 <div class="chart-modal-body">
                     <canvas id="modal-chart"></canvas>
                 </div>
@@ -161,6 +169,33 @@ function renderWellnessPanelContent(container, data) {
  * Configura event listeners para el panel
  */
 function setupEventListeners(container) {
+    // Quick date buttons
+    const quickDateBtns = container.querySelectorAll('.quick-date-btn');
+    quickDateBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const days = parseInt(btn.dataset.days);
+            const fromInput = container.querySelector('#wellness-date-from');
+            const toInput = container.querySelector('#wellness-date-to');
+
+            // Update active button
+            quickDateBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Set date inputs
+            const today = new Date();
+            const oldest = new Date();
+            oldest.setDate(today.getDate() - days);
+
+            fromInput.value = oldest.toISOString().split('T')[0];
+            toInput.value = today.toISOString().split('T')[0];
+
+            // Load data
+            if (currentAthleteId) {
+                loadWellnessData(container, currentAthleteId, oldest, today);
+            }
+        });
+    });
+
     // Date range selector
     const applyDateBtn = container.querySelector('#apply-date-range');
     applyDateBtn?.addEventListener('click', () => {
@@ -171,6 +206,10 @@ function setupEventListeners(container) {
         const endDate = new Date(toInput.value);
 
         if (startDate && endDate && currentAthleteId) {
+            // Remove active from quick buttons
+            const quickDateBtns = container.querySelectorAll('.quick-date-btn');
+            quickDateBtns.forEach(b => b.classList.remove('active'));
+
             loadWellnessData(container, currentAthleteId, startDate, endDate);
         }
     });
@@ -181,9 +220,14 @@ function setupEventListeners(container) {
     // Modal close
     const modal = container.querySelector('#chart-modal');
     const closeBtn = container.querySelector('.chart-modal-close');
+    const downloadBtn = container.querySelector('#download-chart-btn');
 
     closeBtn?.addEventListener('click', () => {
         modal.classList.remove('active');
+    });
+
+    downloadBtn?.addEventListener('click', () => {
+        downloadChart();
     });
 
     modal?.addEventListener('click', (e) => {
@@ -260,6 +304,21 @@ function showChartFullscreen(chartType) {
     });
 
     modal.classList.add('active');
+}
+
+/**
+ * Descarga el gráfico actual del modal como imagen PNG
+ */
+function downloadChart() {
+    const canvas = document.getElementById('modal-chart');
+    if (!canvas) return;
+
+    // Crear un enlace temporal para descargar
+    const link = document.createElement('a');
+    const timestamp = new Date().toISOString().split('T')[0];
+    link.download = `wellness-chart-${timestamp}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
 }
 
 /**

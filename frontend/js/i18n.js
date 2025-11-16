@@ -33,6 +33,14 @@ const translations = {
             from: 'Desde',
             to: 'Hasta',
             apply: 'Aplicar',
+            daysShort: 'd',
+
+            // Chart Actions
+            chart: {
+                fullscreen: 'Pantalla Completa',
+                close: 'Cerrar',
+                download: 'Descargar gráfico'
+            },
 
             // Tabs
             tabs: {
@@ -233,12 +241,6 @@ const translations = {
                     interpretTitle: 'Cómo Interpretarlo',
                     interpret: 'Los bloques coloreados en el gráfico indican períodos donde se detectaron patrones. La intensidad representa qué tan fuerte es la desviación respecto a tu baseline normal.'
                 }
-            },
-
-            // Chart Actions
-            chart: {
-                fullscreen: 'Pantalla Completa',
-                close: 'Cerrar'
             }
         },
 
@@ -310,6 +312,14 @@ const translations = {
             from: 'From',
             to: 'To',
             apply: 'Apply',
+            daysShort: 'd',
+
+            // Chart Actions
+            chart: {
+                fullscreen: 'Fullscreen',
+                close: 'Close',
+                download: 'Download chart'
+            },
 
             // Tabs
             tabs: {
@@ -510,12 +520,6 @@ const translations = {
                     interpretTitle: 'How to Interpret',
                     interpret: 'Colored blocks on the chart indicate periods where patterns were detected. Intensity represents how strong the deviation is from your normal baseline.'
                 }
-            },
-
-            // Chart Actions
-            chart: {
-                fullscreen: 'Fullscreen',
-                close: 'Close'
             }
         },
 

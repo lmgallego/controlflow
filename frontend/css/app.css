@@ -1161,6 +1161,39 @@ a {
     transform: translateY(-1px);
 }
 
+/* Quick Date Selector Buttons */
+.quick-date-buttons {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.quick-date-btn {
+    padding: 6px 14px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.quick-date-btn:hover {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.quick-date-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
 /* Fullscreen Chart Modal */
 .chart-modal {
     display: none;
