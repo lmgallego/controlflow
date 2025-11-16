@@ -15,7 +15,7 @@ import {
 } from '../statsUtils.js';
 import { t } from '../i18n.js';
 import { createBPEPanel } from './BPEPanel.js';
-import { createPatternAnalysisPanel } from './PatternAnalysisPanel.js';
+import { createPatternAnalysisPanel, patternChartInstances } from './PatternAnalysisPanel.js';
 
 // Variables globales para el panel
 let currentAthleteId = null;
@@ -244,8 +244,8 @@ function showChartFullscreen(chartType) {
         chartInstances.modalChart.destroy();
     }
 
-    // Clonar configuración del gráfico original
-    const originalChart = chartInstances[chartType + 'Chart'];
+    // Buscar gráfico original en chartInstances (métricas) o patternChartInstances (patrones)
+    let originalChart = chartInstances[chartType + 'Chart'] || patternChartInstances[chartType];
     if (!originalChart) return;
 
     const ctx = modalCanvas.getContext('2d');

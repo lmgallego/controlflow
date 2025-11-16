@@ -1,6 +1,9 @@
 import { pearsonCorrelation, linearRegression } from '../statsUtils.js';
 import { t } from '../i18n.js';
 
+// Almacenar instancias de gráficos para acceso externo
+export const patternChartInstances = {};
+
 /**
  * Crea el panel de análisis de patrones con gráficos de correlación
  * @param {Object} data - Datos procesados de wellness
@@ -94,6 +97,7 @@ function renderCorrelationCard(id, title, correlation, chartId) {
                 </div>
             </div>
             <div class="correlation-chart-container">
+                <button class="chart-fullscreen-btn" data-chart="${chartId}" title="${t('wellness.chart.fullscreen')}">⛶</button>
                 <canvas id="${chartId}"></canvas>
             </div>
             <div class="correlation-footer">
@@ -162,7 +166,12 @@ function renderCorrelationChart(canvasId, xData, yData, xLabel, yLabel, correlat
     const textColor = theme === 'light' ? '#0f172a' : '#f1f5f9';
     const gridColor = theme === 'light' ? 'rgba(148, 163, 184, 0.2)' : 'rgba(148, 163, 184, 0.1)';
 
-    new Chart(ctx, {
+    // Destruir gráfico anterior si existe
+    if (patternChartInstances[canvasId]) {
+        patternChartInstances[canvasId].destroy();
+    }
+
+    patternChartInstances[canvasId] = new Chart(ctx, {
         type: 'scatter',
         data: {
             datasets: [

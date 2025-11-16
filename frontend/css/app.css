@@ -2108,6 +2108,7 @@ a {
 .correlation-chart-container {
     margin: 20px 0;
     min-height: 300px;
+    position: relative;
 }
 
 .correlation-footer {
