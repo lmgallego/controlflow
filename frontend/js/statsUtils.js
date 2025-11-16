@@ -281,3 +281,94 @@ export function calculateReadiness(zScore) {
         };
     }
 }
+
+/**
+ * Calcula el coeficiente de correlación de Pearson entre dos variables
+ * @param {number[]} x - Primera variable
+ * @param {number[]} y - Segunda variable
+ * @returns {number} - Coeficiente de correlación (-1 a 1)
+ */
+export function pearsonCorrelation(x, y) {
+    // Filtrar valores nulos y emparejar datos
+    const pairs = [];
+    for (let i = 0; i < Math.min(x.length, y.length); i++) {
+        if (x[i] !== null && x[i] !== undefined && !isNaN(x[i]) &&
+            y[i] !== null && y[i] !== undefined && !isNaN(y[i])) {
+            pairs.push({ x: x[i], y: y[i] });
+        }
+    }
+
+    if (pairs.length < 2) return null;
+
+    const n = pairs.length;
+    const xValues = pairs.map(p => p.x);
+    const yValues = pairs.map(p => p.y);
+
+    const meanX = mean(xValues);
+    const meanY = mean(yValues);
+
+    let numerator = 0;
+    let sumXSquared = 0;
+    let sumYSquared = 0;
+
+    for (let i = 0; i < n; i++) {
+        const dx = xValues[i] - meanX;
+        const dy = yValues[i] - meanY;
+        numerator += dx * dy;
+        sumXSquared += dx * dx;
+        sumYSquared += dy * dy;
+    }
+
+    const denominator = Math.sqrt(sumXSquared * sumYSquared);
+
+    if (denominator === 0) return null;
+
+    return numerator / denominator;
+}
+
+/**
+ * Calcula la línea de regresión lineal (y = mx + b)
+ * @param {number[]} x - Variable independiente
+ * @param {number[]} y - Variable dependiente
+ * @returns {Object} - {slope, intercept, predict}
+ */
+export function linearRegression(x, y) {
+    // Filtrar valores nulos y emparejar datos
+    const pairs = [];
+    for (let i = 0; i < Math.min(x.length, y.length); i++) {
+        if (x[i] !== null && x[i] !== undefined && !isNaN(x[i]) &&
+            y[i] !== null && y[i] !== undefined && !isNaN(y[i])) {
+            pairs.push({ x: x[i], y: y[i] });
+        }
+    }
+
+    if (pairs.length < 2) return null;
+
+    const n = pairs.length;
+    const xValues = pairs.map(p => p.x);
+    const yValues = pairs.map(p => p.y);
+
+    const meanX = mean(xValues);
+    const meanY = mean(yValues);
+
+    let numerator = 0;
+    let denominator = 0;
+
+    for (let i = 0; i < n; i++) {
+        const dx = xValues[i] - meanX;
+        const dy = yValues[i] - meanY;
+        numerator += dx * dy;
+        denominator += dx * dx;
+    }
+
+    if (denominator === 0) return null;
+
+    const slope = numerator / denominator;
+    const intercept = meanY - slope * meanX;
+
+    return {
+        slope,
+        intercept,
+        predict: (xVal) => slope * xVal + intercept
+    };
+}

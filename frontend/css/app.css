@@ -2039,3 +2039,181 @@ a {
         font-size: 1rem;
     }
 }
+
+/* ==================== Pattern Analysis Panel ==================== */
+
+.patterns-panel {
+    padding: 20px 0;
+}
+
+.patterns-header {
+    margin-bottom: 32px;
+}
+
+.patterns-header h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+}
+
+.patterns-subtitle {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.patterns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.correlation-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.correlation-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.correlation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.correlation-header h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.correlation-badge {
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.correlation-chart-container {
+    margin: 20px 0;
+    min-height: 300px;
+}
+
+.correlation-footer {
+    text-align: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+.correlation-strength {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Pattern Insights */
+.patterns-insights {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 28px;
+    margin-top: 32px;
+}
+
+.patterns-insights h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 20px 0;
+}
+
+.insights-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.insight-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border-radius: var(--radius-lg);
+    border-left: 4px solid;
+}
+
+.insight-card.insight-positive {
+    background: rgba(16, 185, 129, 0.1);
+    border-left-color: #10b981;
+}
+
+.insight-card.insight-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-left-color: #f59e0b;
+}
+
+.insight-card.insight-info {
+    background: rgba(59, 130, 246, 0.1);
+    border-left-color: #3b82f6;
+}
+
+.insight-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.insight-text {
+    flex: 1;
+    font-size: 1rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .correlation-card {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .correlation-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Responsive patterns */
+@media (max-width: 768px) {
+    .patterns-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .patterns-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .patterns-subtitle {
+        font-size: 0.95rem;
+    }
+
+    .correlation-card {
+        padding: 20px;
+    }
+
+    .correlation-chart-container {
+        min-height: 250px;
+    }
+
+    .patterns-insights {
+        padding: 20px;
+    }
+
+    .insight-text {
+        font-size: 0.95rem;
+    }
+}

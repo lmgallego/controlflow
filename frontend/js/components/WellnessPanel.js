@@ -15,6 +15,7 @@ import {
 } from '../statsUtils.js';
 import { t } from '../i18n.js';
 import { createBPEPanel } from './BPEPanel.js';
+import { createPatternAnalysisPanel } from './PatternAnalysisPanel.js';
 
 // Variables globales para el panel
 let currentAthleteId = null;
@@ -112,10 +113,7 @@ function renderWellnessPanelContent(container, data) {
 
         <!-- Tab 2: Patrones -->
         <div id="tab-patterns" class="wellness-tab-content">
-            <div class="patterns-placeholder">
-                <h3 data-i18n="wellness.patterns.title">Análisis de Patrones</h3>
-                <p data-i18n="wellness.patterns.comingSoon">Esta sección mostrará correlaciones entre variables...</p>
-            </div>
+            <div id="patterns-container"></div>
         </div>
 
         <!-- Tab 3: BPE -->
@@ -143,6 +141,11 @@ function renderWellnessPanelContent(container, data) {
     chartInstances.rhrChart = renderRestingHRChart(data);
     chartInstances.sleepDurationChart = renderSleepDurationChart(data);
     chartInstances.sleepScoreChart = renderSleepScoreChart(data);
+
+    // Añadir panel de Patrones
+    const patternsContainer = container.querySelector('#patterns-container');
+    const patternsPanel = createPatternAnalysisPanel(data);
+    patternsContainer.appendChild(patternsPanel);
 
     // Añadir panel BPE
     const bpeContainer = container.querySelector('#bpe-container');

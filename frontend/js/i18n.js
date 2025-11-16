@@ -44,7 +44,30 @@ const translations = {
             // Patterns Tab
             patterns: {
                 title: 'Análisis de Patrones',
-                comingSoon: 'Esta sección mostrará correlaciones entre variables y patrones de rendimiento...'
+                subtitle: 'Correlaciones entre variables clave de rendimiento y recuperación',
+                dataPoints: 'Puntos de datos',
+                trendLine: 'Línea de tendencia',
+                correlations: {
+                    hrvRhr: 'HRV vs Frecuencia Cardíaca en Reposo',
+                    hrvSleep: 'HRV vs Calidad de Sueño',
+                    sleepQuality: 'Duración vs Calidad de Sueño'
+                },
+                strength: {
+                    strong: 'Correlación Fuerte',
+                    moderate: 'Correlación Moderada',
+                    weak: 'Correlación Débil',
+                    veryWeak: 'Correlación Muy Débil',
+                    none: 'Sin Correlación'
+                },
+                insights: {
+                    title: 'Interpretación de Patrones',
+                    hrvRhrNegative: 'Correlación negativa HRV-RHR: A mayor HRV, menor frecuencia cardíaca. Indicador positivo de buena recuperación.',
+                    hrvRhrPositive: 'Correlación positiva HRV-RHR inusual: Podría indicar estrés o adaptación al entrenamiento.',
+                    hrvSleepPositive: 'Buena calidad de sueño mejora tu HRV: Prioriza el descanso para optimizar la recuperación.',
+                    sleepQualityStrong: 'Fuerte relación entre duración y calidad del sueño: Dormir más horas mejora tu recuperación.',
+                    sleepQualityWeak: 'Baja correlación duración-calidad: La calidad del sueño importa más que la cantidad.',
+                    noSignificant: 'No se detectaron patrones significativos con los datos actuales.'
+                }
             },
 
             // HRV Card
@@ -298,7 +321,30 @@ const translations = {
             // Patterns Tab
             patterns: {
                 title: 'Pattern Analysis',
-                comingSoon: 'This section will show correlations between variables and performance patterns...'
+                subtitle: 'Correlations between key performance and recovery variables',
+                dataPoints: 'Data points',
+                trendLine: 'Trend line',
+                correlations: {
+                    hrvRhr: 'HRV vs Resting Heart Rate',
+                    hrvSleep: 'HRV vs Sleep Quality',
+                    sleepQuality: 'Sleep Duration vs Sleep Quality'
+                },
+                strength: {
+                    strong: 'Strong Correlation',
+                    moderate: 'Moderate Correlation',
+                    weak: 'Weak Correlation',
+                    veryWeak: 'Very Weak Correlation',
+                    none: 'No Correlation'
+                },
+                insights: {
+                    title: 'Pattern Interpretation',
+                    hrvRhrNegative: 'Negative HRV-RHR correlation: Higher HRV, lower heart rate. Positive indicator of good recovery.',
+                    hrvRhrPositive: 'Unusual positive HRV-RHR correlation: Could indicate stress or training adaptation.',
+                    hrvSleepPositive: 'Good sleep quality improves your HRV: Prioritize rest to optimize recovery.',
+                    sleepQualityStrong: 'Strong relationship between sleep duration and quality: More sleep hours improve your recovery.',
+                    sleepQualityWeak: 'Low duration-quality correlation: Sleep quality matters more than quantity.',
+                    noSignificant: 'No significant patterns detected with current data.'
+                }
             },
 
             // HRV Card
