@@ -1,4 +1,4 @@
-import { getWellnessData } from '../apiService.js';
+import { getWellnessData, getActivityData } from '../apiService.js';
 import {
     calculateLnRMSSD,
     mean,
@@ -21,6 +21,7 @@ import { createPatternAnalysisPanel, patternChartInstances } from './PatternAnal
 let currentAthleteId = null;
 let currentProcessedData = null;
 let chartInstances = {};
+let currentActiveTab = 'metrics'; // Guardar pestaña activa
 
 /**
  * Renderiza el panel profesional de wellness con análisis avanzado de HRV
@@ -46,18 +47,22 @@ async function loadWellnessData(container, athleteId, startDate, endDate) {
     const newestISO = endDate.toISOString().split('T')[0];
 
     try {
-        const data = await getWellnessData(athleteId, oldestISO, newestISO);
+        // Obtener datos de wellness y actividades en paralelo
+        const [wellnessData, activitiesData] = await Promise.all([
+            getWellnessData(athleteId, oldestISO, newestISO),
+            getActivityData(athleteId, oldestISO, newestISO).catch(() => null) // No fallar si no hay actividades
+        ]);
 
-        if (!data || data.length === 0) {
+        if (!wellnessData || wellnessData.length === 0) {
             container.innerHTML = `<div class="loading">${t('wellness.noData')}</div>`;
             return;
         }
 
         // Ordenar datos por fecha (más antiguos primero)
-        const sortedData = [...data].sort((a, b) => new Date(a.id) - new Date(b.id));
+        const sortedData = [...wellnessData].sort((a, b) => new Date(a.id) - new Date(b.id));
 
-        // Procesar datos para análisis
-        currentProcessedData = processWellnessData(sortedData);
+        // Procesar datos para análisis (incluir actividades si existen)
+        currentProcessedData = processWellnessData(sortedData, activitiesData);
 
         // Renderizar panel completo
         renderWellnessPanelContent(container, currentProcessedData);
@@ -81,6 +86,7 @@ function renderWellnessPanelContent(container, data) {
             <div class="date-range-selector">
                 <label data-i18n="wellness.dateRange">${t('wellness.dateRange')}:</label>
                 <div class="quick-date-buttons">
+                    <button class="quick-date-btn" data-days="7">7${t('wellness.daysShort')}</button>
                     <button class="quick-date-btn" data-days="15">15${t('wellness.daysShort')}</button>
                     <button class="quick-date-btn active" data-days="30">30${t('wellness.daysShort')}</button>
                     <button class="quick-date-btn" data-days="90">90${t('wellness.daysShort')}</button>
@@ -96,13 +102,13 @@ function renderWellnessPanelContent(container, data) {
 
         <!-- Tab Navigation -->
         <div class="wellness-tabs">
-            <button class="wellness-tab active" data-tab="metrics" data-i18n="wellness.tabs.metrics">Métricas</button>
-            <button class="wellness-tab" data-tab="patterns" data-i18n="wellness.tabs.patterns">Patrones</button>
-            <button class="wellness-tab" data-tab="bpe" data-i18n="wellness.tabs.bpe">BPE</button>
+            <button class="wellness-tab ${currentActiveTab === 'metrics' ? 'active' : ''}" data-tab="metrics" data-i18n="wellness.tabs.metrics">Métricas</button>
+            <button class="wellness-tab ${currentActiveTab === 'patterns' ? 'active' : ''}" data-tab="patterns" data-i18n="wellness.tabs.patterns">Patrones</button>
+            <button class="wellness-tab ${currentActiveTab === 'bpe' ? 'active' : ''}" data-tab="bpe" data-i18n="wellness.tabs.bpe">BPE</button>
         </div>
 
         <!-- Tab 1: Métricas -->
-        <div id="tab-metrics" class="wellness-tab-content active">
+        <div id="tab-metrics" class="wellness-tab-content ${currentActiveTab === 'metrics' ? 'active' : ''}"
             <div class="wellness-metrics-grid">
                 ${renderHRVCard(data)}
                 ${renderRestingHRCard(data)}
@@ -117,12 +123,12 @@ function renderWellnessPanelContent(container, data) {
         </div>
 
         <!-- Tab 2: Patrones -->
-        <div id="tab-patterns" class="wellness-tab-content">
+        <div id="tab-patterns" class="wellness-tab-content ${currentActiveTab === 'patterns' ? 'active' : ''}">
             <div id="patterns-container"></div>
         </div>
 
         <!-- Tab 3: BPE -->
-        <div id="tab-bpe" class="wellness-tab-content">
+        <div id="tab-bpe" class="wellness-tab-content ${currentActiveTab === 'bpe' ? 'active' : ''}">
             <div id="bpe-container"></div>
         </div>
 
@@ -235,6 +241,14 @@ function setupEventListeners(container) {
             modal.classList.remove('active');
         }
     });
+
+    // Listener para eventos de fullscreen de gráficos de patrones
+    document.addEventListener('pattern-chart-fullscreen', (e) => {
+        showChartFullscreen(e.detail.chartType);
+    });
+
+    // Exponer función showChartFullscreen para PatternAnalysisPanel
+    window.showPatternChartFullscreen = showChartFullscreen;
 }
 
 /**
@@ -247,6 +261,9 @@ function setupTabListeners(container) {
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             const targetTab = button.dataset.tab;
+
+            // Guardar pestaña activa
+            currentActiveTab = targetTab;
 
             // Remover clase active de todos los botones y contenidos
             tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -374,12 +391,18 @@ function getDateDaysAgo(days) {
 /**
  * Procesa los datos de wellness para análisis estadístico
  */
-function processWellnessData(data) {
+function processWellnessData(data, activities = null) {
     const dates = data.map(d => d.id);
     const hrvRaw = data.map(d => d.hrv);
     const restingHR = data.map(d => d.restingHR);
     const sleepSecs = data.map(d => d.sleepSecs);
     const sleepScoreValues = data.map(d => d.sleepScore);
+
+    // Procesar carga de entrenamiento si hay actividades disponibles
+    let trainingLoadData = null;
+    if (activities && activities.length > 0) {
+        trainingLoadData = processTrainingLoad(dates, activities);
+    }
 
     // Calcular LnRMSSD para HRV
     const hrvLnRMSSD = hrvRaw.map(h => calculateLnRMSSD(h));
@@ -470,7 +493,41 @@ function processWellnessData(data) {
             evaluation: sleepEvaluation,
             trend: sleepScoreTrend
         },
-        readiness: readiness
+        readiness: readiness,
+        trainingLoad: trainingLoadData
+    };
+}
+
+/**
+ * Procesa las cargas de entrenamiento de las actividades y las alinea con las fechas de wellness
+ * @param {string[]} dates - Fechas de los datos de wellness
+ * @param {Object[]} activities - Array de actividades del API
+ * @returns {Object} - Datos procesados de carga de entrenamiento
+ */
+function processTrainingLoad(dates, activities) {
+    // Crear mapa de carga por fecha
+    const loadByDate = {};
+
+    activities.forEach(activity => {
+        if (activity.start_date_local && activity.icu_training_load) {
+            // Extraer solo la fecha (YYYY-MM-DD)
+            const dateStr = activity.start_date_local.split('T')[0];
+
+            // Si hay múltiples actividades en un día, sumar las cargas
+            if (loadByDate[dateStr]) {
+                loadByDate[dateStr] += activity.icu_training_load;
+            } else {
+                loadByDate[dateStr] = activity.icu_training_load;
+            }
+        }
+    });
+
+    // Alinear con las fechas de wellness (usar 0 para días sin actividad)
+    const values = dates.map(date => loadByDate[date] || 0);
+
+    return {
+        values,
+        loadByDate
     };
 }
 

@@ -33,6 +33,14 @@ export function createPatternAnalysisPanel(data) {
                 t('wellness.patterns.correlations.hrvSleep'),
                 correlations.hrvSleep,
                 'hrv-sleep-chart')}
+            ${renderCorrelationCard('hrv-sleep-duration',
+                t('wellness.patterns.correlations.hrvSleepDuration'),
+                correlations.hrvSleepDuration,
+                'hrv-sleep-duration-chart')}
+            ${correlations.hrvLoad ? renderCorrelationCard('hrv-load',
+                t('wellness.patterns.correlations.hrvLoad'),
+                correlations.hrvLoad,
+                'hrv-load-chart') : ''}
             ${renderCorrelationCard('sleep-quality',
                 t('wellness.patterns.correlations.sleepQuality'),
                 correlations.sleepQuality,
@@ -50,11 +58,23 @@ export function createPatternAnalysisPanel(data) {
     // Renderizar gráficos después de insertar en el DOM
     setTimeout(() => {
         renderCorrelationChart('hrv-rhr-chart', data.hrv.raw, data.rhr.values,
-            'HRV (ms)', 'RHR (bpm)', correlations.hrvRhr);
+            'HRV (ms)', t('wellness.rhr.abbrev') || 'RHR (bpm)', correlations.hrvRhr);
         renderCorrelationChart('hrv-sleep-chart', data.hrv.raw, data.sleepScore.values,
             'HRV (ms)', t('wellness.sleepScore.title'), correlations.hrvSleep);
+        renderCorrelationChart('hrv-sleep-duration-chart', data.hrv.raw, data.sleepDuration.hours,
+            'HRV (ms)', t('wellness.sleepDuration.title') + ' (h)', correlations.hrvSleepDuration);
+
+        // Renderizar HRV vs Carga si hay datos disponibles
+        if (correlations.hrvLoad && data.trainingLoad) {
+            renderCorrelationChart('hrv-load-chart', data.hrv.raw, data.trainingLoad.values,
+                'HRV (ms)', 'Carga (TSS)', correlations.hrvLoad);
+        }
+
         renderCorrelationChart('sleep-quality-chart', data.sleepDuration.hours, data.sleepScore.values,
             t('wellness.sleepDuration.title') + ' (h)', t('wellness.sleepScore.title'), correlations.sleepQuality);
+
+        // Configurar event listeners para botones de fullscreen después de renderizar
+        setupPatternFullscreenButtons();
     }, 100);
 
     return panel;
@@ -64,7 +84,7 @@ export function createPatternAnalysisPanel(data) {
  * Calcula todas las correlaciones entre variables
  */
 function calculateCorrelations(data) {
-    return {
+    const correlations = {
         hrvRhr: {
             r: pearsonCorrelation(data.hrv.raw, data.rhr.values),
             regression: linearRegression(data.hrv.raw, data.rhr.values)
@@ -73,11 +93,25 @@ function calculateCorrelations(data) {
             r: pearsonCorrelation(data.hrv.raw, data.sleepScore.values),
             regression: linearRegression(data.hrv.raw, data.sleepScore.values)
         },
+        hrvSleepDuration: {
+            r: pearsonCorrelation(data.hrv.raw, data.sleepDuration.hours),
+            regression: linearRegression(data.hrv.raw, data.sleepDuration.hours)
+        },
         sleepQuality: {
             r: pearsonCorrelation(data.sleepDuration.hours, data.sleepScore.values),
             regression: linearRegression(data.sleepDuration.hours, data.sleepScore.values)
         }
     };
+
+    // Añadir correlación HRV vs Carga si hay datos de actividades
+    if (data.trainingLoad && data.trainingLoad.values) {
+        correlations.hrvLoad = {
+            r: pearsonCorrelation(data.hrv.raw, data.trainingLoad.values),
+            regression: linearRegression(data.hrv.raw, data.trainingLoad.values)
+        };
+    }
+
+    return correlations;
 }
 
 /**
@@ -279,7 +313,34 @@ function generateInsights(correlations) {
         }
     }
 
-    // Insight 3: Sleep Duration vs Quality
+    // Insight 3: HRV vs Sleep Duration
+    if (correlations.hrvSleepDuration && correlations.hrvSleepDuration.r !== null) {
+        const r = correlations.hrvSleepDuration.r;
+        if (r > 0.4) {
+            insights.push({
+                type: 'positive',
+                text: t('wellness.patterns.insights.hrvSleepDurationPositive')
+            });
+        }
+    }
+
+    // Insight 4: HRV vs Training Load
+    if (correlations.hrvLoad && correlations.hrvLoad.r !== null) {
+        const r = correlations.hrvLoad.r;
+        if (r < -0.4) {
+            insights.push({
+                type: 'info',
+                text: t('wellness.patterns.insights.hrvLoadNegative')
+            });
+        } else if (r > 0.3) {
+            insights.push({
+                type: 'positive',
+                text: t('wellness.patterns.insights.hrvLoadPositive')
+            });
+        }
+    }
+
+    // Insight 5: Sleep Duration vs Quality
     if (correlations.sleepQuality.r !== null) {
         const r = correlations.sleepQuality.r;
         if (r > 0.5) {
@@ -320,4 +381,31 @@ function getInsightIcon(type) {
         info: 'ℹ️'
     };
     return icons[type] || 'ℹ️';
+}
+
+/**
+ * Configura los event listeners para los botones de fullscreen en gráficos de patrones
+ */
+function setupPatternFullscreenButtons() {
+    const patternFullscreenBtns = document.querySelectorAll('.patterns-panel .chart-fullscreen-btn');
+
+    patternFullscreenBtns.forEach(btn => {
+        // Remover listeners anteriores si existen
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.addEventListener('click', (e) => {
+            const chartType = newBtn.dataset.chart;
+            // Buscar función de fullscreen en el scope global o en WellnessPanel
+            if (window.showPatternChartFullscreen) {
+                window.showPatternChartFullscreen(chartType);
+            } else {
+                // Dispatch evento personalizado para que WellnessPanel lo maneje
+                const event = new CustomEvent('pattern-chart-fullscreen', {
+                    detail: { chartType }
+                });
+                document.dispatchEvent(event);
+            }
+        });
+    });
 }
