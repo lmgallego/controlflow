@@ -26,10 +26,20 @@ def get_athletes():
         summary_data = client.get_athlete_summary()
         if isinstance(summary_data, tuple):
             return jsonify(summary_data[0]), summary_data[1]
-        athletes_list = [
-            {"id": athlete["athlete_id"], "name": athlete["athlete_name"]}
-            for athlete in summary_data
-        ]
+
+        # Eliminar duplicados usando un diccionario (mantiene el primer atleta de cada ID)
+        unique_athletes = {}
+        for athlete in summary_data:
+            athlete_id = athlete["athlete_id"]
+            if athlete_id not in unique_athletes:
+                unique_athletes[athlete_id] = {
+                    "id": athlete_id,
+                    "name": athlete["athlete_name"]
+                }
+
+        # Convertir a lista y ordenar por nombre
+        athletes_list = sorted(unique_athletes.values(), key=lambda x: x["name"])
+
         return jsonify(athletes_list)
     except Exception as e:
         return jsonify({"error": str(e)}), 400
