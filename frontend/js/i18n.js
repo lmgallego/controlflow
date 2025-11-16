@@ -125,10 +125,15 @@ const translations = {
                 subtitle: 'Análisis avanzado de patrones fisiológicos',
                 zThreshold: 'Umbral Z-Score',
                 window: 'Ventana de Detección',
-                minVariables: 'Variables Mínimas',
+                variables: 'Variables a Analizar',
+                sleepVar: 'Sueño',
+                sleepScoreVar: 'Calidad Sueño',
                 days: 'días',
+                detect: 'Detectar Patrones',
                 detecting: 'Detectando patrones...',
+                viewBlocks: 'Ver Bloques',
                 noPatterns: 'No se detectaron patrones BPE en el período seleccionado',
+                selectAtLeastOne: 'Selecciona al menos una variable para analizar',
                 types: {
                     fatigue: 'Fatiga Aguda',
                     recovery: 'Recuperación',
@@ -144,6 +149,18 @@ const translations = {
                     duration: 'Duración Promedio',
                     intensity: 'Intensidad Promedio',
                     biomarcadores: 'Biomarcadores Activos'
+                },
+                info: {
+                    tooltip: 'Más información sobre BPE',
+                    title: '¿Qué son los Bloques de Patrón Específico?',
+                    what: 'Los BPE son períodos donde múltiples biomarcadores muestran desviaciones significativas simultáneas, indicando cambios en el estado fisiológico del atleta.',
+                    how: 'El sistema analiza las variables usando Z-Scores adaptativos en ventanas móviles, detectando patrones que persisten durante varios días consecutivos.',
+                    typesTitle: 'Tipos de Patrones',
+                    fatigueDesc: 'HRV baja, frecuencia cardíaca elevada y sueño reducido. Indica acumulación de fatiga.',
+                    recoveryDesc: 'HRV alta, frecuencia cardíaca baja y sueño de calidad. Indica recuperación óptima.',
+                    disruptionDesc: 'Patrones mixtos o atípicos que no se clasifican claramente como fatiga o recuperación.',
+                    interpretTitle: 'Cómo Interpretarlo',
+                    interpret: 'Los bloques coloreados en el gráfico indican períodos donde se detectaron patrones. La intensidad representa qué tan fuerte es la desviación respecto a tu baseline normal.'
                 }
             },
 
@@ -314,10 +331,15 @@ const translations = {
                 subtitle: 'Advanced physiological pattern analysis',
                 zThreshold: 'Z-Score Threshold',
                 window: 'Detection Window',
-                minVariables: 'Minimum Variables',
+                variables: 'Variables to Analyze',
+                sleepVar: 'Sleep',
+                sleepScoreVar: 'Sleep Quality',
                 days: 'days',
+                detect: 'Detect Patterns',
                 detecting: 'Detecting patterns...',
+                viewBlocks: 'View Blocks',
                 noPatterns: 'No SPB patterns detected in selected period',
+                selectAtLeastOne: 'Select at least one variable to analyze',
                 types: {
                     fatigue: 'Acute Fatigue',
                     recovery: 'Recovery',
@@ -333,6 +355,18 @@ const translations = {
                     duration: 'Average Duration',
                     intensity: 'Average Intensity',
                     biomarcadores: 'Active Biomarkers'
+                },
+                info: {
+                    tooltip: 'More information about SPB',
+                    title: 'What are Specific Pattern Blocks?',
+                    what: 'SPBs are periods where multiple biomarkers show simultaneous significant deviations, indicating changes in the athlete\'s physiological state.',
+                    how: 'The system analyzes variables using adaptive Z-Scores in rolling windows, detecting patterns that persist for several consecutive days.',
+                    typesTitle: 'Pattern Types',
+                    fatigueDesc: 'Low HRV, elevated heart rate and reduced sleep. Indicates fatigue accumulation.',
+                    recoveryDesc: 'High HRV, low heart rate and quality sleep. Indicates optimal recovery.',
+                    disruptionDesc: 'Mixed or atypical patterns that are not clearly classified as fatigue or recovery.',
+                    interpretTitle: 'How to Interpret',
+                    interpret: 'Colored blocks on the chart indicate periods where patterns were detected. Intensity represents how strong the deviation is from your normal baseline.'
                 }
             },
 

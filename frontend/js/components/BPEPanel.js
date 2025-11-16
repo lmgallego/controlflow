@@ -18,9 +18,9 @@ export function createBPEPanel(wellnessData) {
 
     // Configuración por defecto
     const defaultConfig = {
-        threshold: 1.5,
-        detectionWindow: 5,
-        minVariables: 2,
+        threshold: 1.0,
+        detectionWindow: 3,
+        selectedVariables: ['hrv', 'rhr', 'sleep', 'sleepScore'],
         optimizeThreshold: false,
         adaptiveWindow: 14
     };
@@ -30,25 +30,56 @@ export function createBPEPanel(wellnessData) {
     header.className = 'bpe-header';
     header.innerHTML = `
         <div class="bpe-title-section">
-            <h2 class="bpe-title" data-i18n="wellness.bpe.title">${t('wellness.bpe.title')}</h2>
+            <div class="bpe-title-row">
+                <h2 class="bpe-title" data-i18n="wellness.bpe.title">${t('wellness.bpe.title')}</h2>
+                <button class="bpe-info-btn" id="bpe-info-btn" title="${t('wellness.bpe.info.tooltip')}">
+                    <span class="info-icon">ℹ️</span>
+                </button>
+            </div>
             <p class="bpe-subtitle" data-i18n="wellness.bpe.subtitle">${t('wellness.bpe.subtitle')}</p>
         </div>
         <div class="bpe-controls">
-            <div class="bpe-control-group">
-                <label data-i18n="wellness.bpe.zThreshold">${t('wellness.bpe.zThreshold')}:</label>
-                <input type="number" id="bpe-threshold" min="0.5" max="3" step="0.25" value="${defaultConfig.threshold}">
+            <div class="bpe-control-group bpe-slider-group">
+                <label for="bpe-threshold">
+                    <span data-i18n="wellness.bpe.zThreshold">${t('wellness.bpe.zThreshold')}</span>:
+                    <span id="bpe-threshold-value">${defaultConfig.threshold}</span>
+                </label>
+                <input type="range" id="bpe-threshold" min="0.5" max="3" step="0.1" value="${defaultConfig.threshold}">
             </div>
-            <div class="bpe-control-group">
-                <label data-i18n="wellness.bpe.window">${t('wellness.bpe.window')}:</label>
-                <input type="number" id="bpe-window" min="3" max="10" step="1" value="${defaultConfig.detectionWindow}">
-                <span data-i18n="wellness.bpe.days">${t('wellness.bpe.days')}</span>
+            <div class="bpe-control-group bpe-slider-group">
+                <label for="bpe-window">
+                    <span data-i18n="wellness.bpe.window">${t('wellness.bpe.window')}</span>:
+                    <span id="bpe-window-value">${defaultConfig.detectionWindow}</span>
+                    <span data-i18n="wellness.bpe.days">${t('wellness.bpe.days')}</span>
+                </label>
+                <input type="range" id="bpe-window" min="3" max="10" step="1" value="${defaultConfig.detectionWindow}">
             </div>
-            <div class="bpe-control-group">
-                <label data-i18n="wellness.bpe.minVariables">${t('wellness.bpe.minVariables')}:</label>
-                <input type="number" id="bpe-min-vars" min="1" max="4" step="1" value="${defaultConfig.minVariables}">
+            <div class="bpe-control-group bpe-variables-group">
+                <label data-i18n="wellness.bpe.variables">${t('wellness.bpe.variables')}:</label>
+                <div class="bpe-checkboxes">
+                    <label class="bpe-checkbox-label">
+                        <input type="checkbox" class="bpe-var-checkbox" value="hrv" checked>
+                        <span>HRV</span>
+                    </label>
+                    <label class="bpe-checkbox-label">
+                        <input type="checkbox" class="bpe-var-checkbox" value="rhr" checked>
+                        <span>RHR</span>
+                    </label>
+                    <label class="bpe-checkbox-label">
+                        <input type="checkbox" class="bpe-var-checkbox" value="sleep" checked>
+                        <span data-i18n="wellness.bpe.sleepVar">${t('wellness.bpe.sleepVar')}</span>
+                    </label>
+                    <label class="bpe-checkbox-label">
+                        <input type="checkbox" class="bpe-var-checkbox" value="sleepScore" checked>
+                        <span data-i18n="wellness.bpe.sleepScoreVar">${t('wellness.bpe.sleepScoreVar')}</span>
+                    </label>
+                </div>
             </div>
-            <button id="bpe-detect-btn" class="bpe-detect-btn" data-i18n="wellness.bpe.detecting">
-                ${t('wellness.bpe.detecting')}
+            <button id="bpe-detect-btn" class="bpe-detect-btn" data-i18n="wellness.bpe.detect">
+                ${t('wellness.bpe.detect')}
+            </button>
+            <button id="bpe-blocks-btn" class="bpe-blocks-btn" style="display:none;" data-i18n="wellness.bpe.viewBlocks">
+                ${t('wellness.bpe.viewBlocks')}
             </button>
         </div>
     `;
@@ -64,22 +95,51 @@ export function createBPEPanel(wellnessData) {
     // Realizar análisis inicial
     performBPEAnalysis(wellnessData, defaultConfig, resultsContainer);
 
+    // Event listeners para sliders (actualizar valores mostrados)
+    const thresholdSlider = header.querySelector('#bpe-threshold');
+    const windowSlider = header.querySelector('#bpe-window');
+    const thresholdValue = header.querySelector('#bpe-threshold-value');
+    const windowValue = header.querySelector('#bpe-window-value');
+
+    thresholdSlider.addEventListener('input', (e) => {
+        thresholdValue.textContent = parseFloat(e.target.value).toFixed(1);
+    });
+
+    windowSlider.addEventListener('input', (e) => {
+        windowValue.textContent = e.target.value;
+    });
+
     // Event listener para el botón de detección
     const detectBtn = header.querySelector('#bpe-detect-btn');
     detectBtn.addEventListener('click', () => {
         const threshold = parseFloat(document.getElementById('bpe-threshold').value);
         const detectionWindow = parseInt(document.getElementById('bpe-window').value);
-        const minVariables = parseInt(document.getElementById('bpe-min-vars').value);
+
+        // Obtener variables seleccionadas
+        const checkboxes = header.querySelectorAll('.bpe-var-checkbox:checked');
+        const selectedVariables = Array.from(checkboxes).map(cb => cb.value);
+
+        if (selectedVariables.length < 1) {
+            alert(t('wellness.bpe.selectAtLeastOne'));
+            return;
+        }
 
         const config = {
             threshold,
             detectionWindow,
-            minVariables,
+            selectedVariables,
+            minVariables: Math.min(2, selectedVariables.length),
             optimizeThreshold: false,
             adaptiveWindow: 14
         };
 
         performBPEAnalysis(wellnessData, config, resultsContainer);
+    });
+
+    // Event listener para botón de info
+    const infoBtn = header.querySelector('#bpe-info-btn');
+    infoBtn?.addEventListener('click', () => {
+        showBPEInfo();
     });
 
     return panel;
@@ -207,6 +267,33 @@ function createTimelineSection(result) {
 }
 
 /**
+ * Obtiene colores según el tema actual para gráficos
+ */
+function getBPEThemeColors() {
+    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+
+    if (theme === 'light') {
+        return {
+            text: '#0f172a',
+            textSecondary: '#475569',
+            grid: 'rgba(148, 163, 184, 0.2)',
+            tooltipBg: 'rgba(255, 255, 255, 0.95)',
+            tooltipBorder: '#cbd5e1',
+            tooltipText: '#0f172a'
+        };
+    } else {
+        return {
+            text: '#f1f5f9',
+            textSecondary: '#cbd5e1',
+            grid: 'rgba(148, 163, 184, 0.1)',
+            tooltipBg: 'rgba(0, 0, 0, 0.9)',
+            tooltipBorder: 'rgba(99, 102, 241, 0.5)',
+            tooltipText: '#ffffff'
+        };
+    }
+}
+
+/**
  * Renderiza el gráfico de timeline con bloques
  * @param {HTMLCanvasElement} canvas - Canvas para el gráfico
  * @param {Object} result - Resultado del análisis
@@ -214,6 +301,7 @@ function createTimelineSection(result) {
 function renderTimelineChart(canvas, result) {
     const ctx = canvas.getContext('2d');
     const annotations = blocksToChartAnnotations(result.blocks, result.dates);
+    const colors = getBPEThemeColors();
 
     // Preparar datos para el gráfico (mostrar intensidad de cada bloque)
     const blockIntensities = new Array(result.dates.length).fill(null);
@@ -250,15 +338,15 @@ function renderTimelineChart(canvas, result) {
                 legend: {
                     display: true,
                     labels: {
-                        color: 'var(--text-primary)',
+                        color: colors.text,
                         font: { size: 12 }
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    titleColor: '#fff',
-                    bodyColor: '#fff',
-                    borderColor: 'rgba(99, 102, 241, 0.5)',
+                    backgroundColor: colors.tooltipBg,
+                    titleColor: colors.tooltipText,
+                    bodyColor: colors.tooltipText,
+                    borderColor: colors.tooltipBorder,
                     borderWidth: 1,
                     padding: 12,
                     displayColors: true
@@ -277,10 +365,10 @@ function renderTimelineChart(canvas, result) {
                         }
                     },
                     grid: {
-                        color: 'rgba(148, 163, 184, 0.1)'
+                        color: colors.grid
                     },
                     ticks: {
-                        color: 'var(--text-secondary)',
+                        color: colors.textSecondary,
                         maxRotation: 45,
                         minRotation: 0
                     }
@@ -288,15 +376,15 @@ function renderTimelineChart(canvas, result) {
                 y: {
                     beginAtZero: true,
                     grid: {
-                        color: 'rgba(148, 163, 184, 0.1)'
+                        color: colors.grid
                     },
                     ticks: {
-                        color: 'var(--text-secondary)'
+                        color: colors.textSecondary
                     },
                     title: {
                         display: true,
                         text: 'Intensidad (Z-Score)',
-                        color: 'var(--text-secondary)'
+                        color: colors.textSecondary
                     }
                 }
             }
@@ -371,6 +459,40 @@ function createBlocksSection(blocks, dates) {
 }
 
 /**
+ * Muestra popup con información sobre BPE
+ */
+function showBPEInfo() {
+    const modal = document.createElement('div');
+    modal.className = 'bpe-info-modal';
+    modal.innerHTML = `
+        <div class="bpe-info-content">
+            <button class="bpe-info-close">&times;</button>
+            <h3 data-i18n="wellness.bpe.info.title">${t('wellness.bpe.info.title')}</h3>
+            <div class="bpe-info-body">
+                <p data-i18n="wellness.bpe.info.what">${t('wellness.bpe.info.what')}</p>
+                <p data-i18n="wellness.bpe.info.how">${t('wellness.bpe.info.how')}</p>
+                <h4 data-i18n="wellness.bpe.info.typesTitle">${t('wellness.bpe.info.typesTitle')}</h4>
+                <ul>
+                    <li><strong data-i18n="wellness.bpe.types.fatigue">${t('wellness.bpe.types.fatigue')}</strong>: ${t('wellness.bpe.info.fatigueDesc')}</li>
+                    <li><strong data-i18n="wellness.bpe.types.recovery">${t('wellness.bpe.types.recovery')}</strong>: ${t('wellness.bpe.info.recoveryDesc')}</li>
+                    <li><strong data-i18n="wellness.bpe.types.disruption">${t('wellness.bpe.types.disruption')}</strong>: ${t('wellness.bpe.info.disruptionDesc')}</li>
+                </ul>
+                <h4 data-i18n="wellness.bpe.info.interpretTitle">${t('wellness.bpe.info.interpretTitle')}</h4>
+                <p data-i18n="wellness.bpe.info.interpret">${t('wellness.bpe.info.interpret')}</p>
+            </div>
+        </div>
+    `;
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal || e.target.classList.contains('bpe-info-close')) {
+            modal.remove();
+        }
+    });
+
+    document.body.appendChild(modal);
+}
+
+/**
  * Actualiza el panel BPE con nuevos datos
  * @param {Object} wellnessData - Nuevos datos de wellness
  */
@@ -381,12 +503,15 @@ export function updateBPEPanel(wellnessData) {
     const resultsContainer = document.getElementById('bpe-results');
     const threshold = parseFloat(document.getElementById('bpe-threshold').value);
     const detectionWindow = parseInt(document.getElementById('bpe-window').value);
-    const minVariables = parseInt(document.getElementById('bpe-min-vars').value);
+
+    const checkboxes = document.querySelectorAll('.bpe-var-checkbox:checked');
+    const selectedVariables = Array.from(checkboxes).map(cb => cb.value);
 
     const config = {
         threshold,
         detectionWindow,
-        minVariables,
+        selectedVariables,
+        minVariables: Math.min(2, selectedVariables.length),
         optimizeThreshold: false,
         adaptiveWindow: 14
     };

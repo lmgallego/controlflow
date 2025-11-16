@@ -823,9 +823,36 @@ function renderSleepScoreChart(data) {
 }
 
 /**
+ * Obtiene colores según el tema actual
+ */
+function getThemeColors() {
+    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+
+    if (theme === 'light') {
+        return {
+            text: '#0f172a',
+            textSecondary: '#475569',
+            grid: 'rgba(148, 163, 184, 0.2)',
+            tooltipBg: 'rgba(255, 255, 255, 0.95)',
+            tooltipBorder: '#cbd5e1'
+        };
+    } else {
+        return {
+            text: '#f1f5f9',
+            textSecondary: '#cbd5e1',
+            grid: 'rgba(148, 163, 184, 0.1)',
+            tooltipBg: 'rgba(15, 23, 42, 0.95)',
+            tooltipBorder: '#334155'
+        };
+    }
+}
+
+/**
  * Opciones comunes de Chart.js
  */
 function getChartOptions(unit = '') {
+    const colors = getThemeColors();
+
     return {
         responsive: true,
         maintainAspectRatio: false,
@@ -835,13 +862,16 @@ function getChartOptions(unit = '') {
         },
         plugins: {
             legend: {
-                display: false
+                display: false,
+                labels: {
+                    color: colors.text
+                }
             },
             tooltip: {
-                backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                titleColor: '#f1f5f9',
-                bodyColor: '#cbd5e1',
-                borderColor: '#334155',
+                backgroundColor: colors.tooltipBg,
+                titleColor: colors.text,
+                bodyColor: colors.textSecondary,
+                borderColor: colors.tooltipBorder,
                 borderWidth: 1,
                 padding: 12,
                 displayColors: true,
@@ -862,10 +892,10 @@ function getChartOptions(unit = '') {
         scales: {
             x: {
                 grid: {
-                    color: 'rgba(148, 163, 184, 0.1)'
+                    color: colors.grid
                 },
                 ticks: {
-                    color: 'var(--text-secondary)',
+                    color: colors.textSecondary,
                     maxRotation: 45,
                     minRotation: 45,
                     font: {
@@ -875,10 +905,10 @@ function getChartOptions(unit = '') {
             },
             y: {
                 grid: {
-                    color: 'rgba(148, 163, 184, 0.1)'
+                    color: colors.grid
                 },
                 ticks: {
-                    color: 'var(--text-secondary)',
+                    color: colors.textSecondary,
                     callback: function(value) {
                         return value.toFixed(1) + ' ' + unit;
                     }

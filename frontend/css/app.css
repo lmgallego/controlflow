@@ -206,6 +206,13 @@ a {
     gap: 12px;
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: nowrap;
+}
+
 .controls label {
     font-weight: 600;
     font-size: 0.9rem;
