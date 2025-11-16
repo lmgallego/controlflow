@@ -34,6 +34,19 @@ const translations = {
             to: 'Hasta',
             apply: 'Aplicar',
 
+            // Tabs
+            tabs: {
+                metrics: 'Métricas',
+                patterns: 'Patrones',
+                bpe: 'BPE'
+            },
+
+            // Patterns Tab
+            patterns: {
+                title: 'Análisis de Patrones',
+                comingSoon: 'Esta sección mostrará correlaciones entre variables y patrones de rendimiento...'
+            },
+
             // HRV Card
             hrv: {
                 title: 'Variabilidad Cardíaca (HRV)',
@@ -247,6 +260,19 @@ const translations = {
             from: 'From',
             to: 'To',
             apply: 'Apply',
+
+            // Tabs
+            tabs: {
+                metrics: 'Metrics',
+                patterns: 'Patterns',
+                bpe: 'SPB'
+            },
+
+            // Patterns Tab
+            patterns: {
+                title: 'Pattern Analysis',
+                comingSoon: 'This section will show correlations between variables and performance patterns...'
+            },
 
             // HRV Card
             hrv: {

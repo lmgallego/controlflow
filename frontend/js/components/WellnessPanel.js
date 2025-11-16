@@ -87,18 +87,39 @@ function renderWellnessPanelContent(container, data) {
             </div>
         </div>
 
-        <div class="wellness-metrics-grid">
-            ${renderHRVCard(data)}
-            ${renderRestingHRCard(data)}
-            ${renderSleepDurationCard(data)}
-            ${renderSleepScoreCard(data)}
+        <!-- Tab Navigation -->
+        <div class="wellness-tabs">
+            <button class="wellness-tab active" data-tab="metrics" data-i18n="wellness.tabs.metrics">Métricas</button>
+            <button class="wellness-tab" data-tab="patterns" data-i18n="wellness.tabs.patterns">Patrones</button>
+            <button class="wellness-tab" data-tab="bpe" data-i18n="wellness.tabs.bpe">BPE</button>
         </div>
 
-        <div class="wellness-summary-grid">
-            ${renderSummaryCard(data)}
+        <!-- Tab 1: Métricas -->
+        <div id="tab-metrics" class="wellness-tab-content active">
+            <div class="wellness-metrics-grid">
+                ${renderHRVCard(data)}
+                ${renderRestingHRCard(data)}
+                ${renderSleepDurationCard(data)}
+                ${renderSleepScoreCard(data)}
+            </div>
+
+            <div class="wellness-summary-grid">
+                ${renderSummaryCard(data)}
+            </div>
         </div>
 
-        <div id="bpe-container"></div>
+        <!-- Tab 2: Patrones -->
+        <div id="tab-patterns" class="wellness-tab-content">
+            <div class="patterns-placeholder">
+                <h3 data-i18n="wellness.patterns.title">Análisis de Patrones</h3>
+                <p data-i18n="wellness.patterns.comingSoon">Esta sección mostrará correlaciones entre variables...</p>
+            </div>
+        </div>
+
+        <!-- Tab 3: BPE -->
+        <div id="tab-bpe" class="wellness-tab-content">
+            <div id="bpe-container"></div>
+        </div>
 
         <!-- Modal para gráficos en pantalla completa -->
         <div id="chart-modal" class="chart-modal">
@@ -115,7 +136,7 @@ function renderWellnessPanelContent(container, data) {
     Object.values(chartInstances).forEach(chart => chart?.destroy());
     chartInstances = {};
 
-    // Renderizar todos los gráficos
+    // Renderizar gráficos de la pestaña Métricas
     chartInstances.hrvChart = renderHRVChart(data);
     chartInstances.rhrChart = renderRestingHRChart(data);
     chartInstances.sleepDurationChart = renderSleepDurationChart(data);
@@ -128,6 +149,7 @@ function renderWellnessPanelContent(container, data) {
 
     // Event listeners
     setupEventListeners(container);
+    setupTabListeners(container);
 }
 
 /**
@@ -163,6 +185,29 @@ function setupEventListeners(container) {
         if (e.target === modal) {
             modal.classList.remove('active');
         }
+    });
+}
+
+/**
+ * Configura event listeners para las pestañas
+ */
+function setupTabListeners(container) {
+    const tabButtons = container.querySelectorAll('.wellness-tab');
+    const tabContents = container.querySelectorAll('.wellness-tab-content');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTab = button.dataset.tab;
+
+            // Remover clase active de todos los botones y contenidos
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Añadir clase active al botón y contenido seleccionado
+            button.classList.add('active');
+            const targetContent = container.querySelector(`#tab-${targetTab}`);
+            targetContent?.classList.add('active');
+        });
     });
 }
 
