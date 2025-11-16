@@ -642,7 +642,7 @@ function renderReadinessCard(data) {
                 <div class="readiness-intensity">
                     <span class="intensity-label" data-i18n="wellness.readiness.recommended">${t('wellness.readiness.recommended')}:</span>
                     <span class="intensity-value" style="color: ${readiness.color};">
-                        ${t('wellness.readiness.intensities.' + readiness.intensityKey)}
+                        ${readiness.intensityKey === 'noData' ? 'N/A' : readiness.intensityKey.toUpperCase()}
                     </span>
                 </div>
             </div>
