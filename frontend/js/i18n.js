@@ -125,6 +125,33 @@ const translations = {
                 sleepQuality: 'Calidad Sueño'
             },
 
+            // Readiness Card
+            readiness: {
+                title: 'PREPARACIÓN',
+                recommended: 'Recomendado',
+                levels: {
+                    rest: 'DESCANSO',
+                    lit: 'BAJA INTENSIDAD',
+                    normal: 'INTENSIDAD NORMAL',
+                    hiit: 'ALTA INTENSIDAD',
+                    noData: 'SIN DATOS'
+                },
+                descriptions: {
+                    rest: 'Tu cuerpo necesita recuperación. Evita entrenamientos intensos.',
+                    lit: 'Tu recuperación está comprometida. Mantén la intensidad baja.',
+                    normal: 'Estás listo para entrenamientos de intensidad moderada.',
+                    hiit: 'Excelente estado de recuperación. Puedes entrenar a máxima intensidad.',
+                    noData: 'No hay datos suficientes para evaluar tu preparación.'
+                },
+                intensities: {
+                    rest: 'Descanso activo o día libre',
+                    lit: 'Cardio ligero, yoga, movilidad',
+                    normal: 'Entrenamiento de fuerza o cardio moderado',
+                    hiit: 'HIIT, series de velocidad, entrenamiento de alta intensidad',
+                    noData: 'N/A'
+                }
+            },
+
             // Trends
             trends: {
                 increasing: 'Tendencia al alza',
@@ -350,6 +377,33 @@ const translations = {
                 rhrAverage: 'RHR Average',
                 sleepAverage: 'Sleep Average',
                 sleepQuality: 'Sleep Quality'
+            },
+
+            // Readiness Card
+            readiness: {
+                title: 'READINESS',
+                recommended: 'Recommended',
+                levels: {
+                    rest: 'REST',
+                    lit: 'LOW INTENSITY',
+                    normal: 'NORMAL INTENSITY',
+                    hiit: 'HIGH INTENSITY',
+                    noData: 'NO DATA'
+                },
+                descriptions: {
+                    rest: 'Your body needs recovery. Avoid intense workouts.',
+                    lit: 'Your recovery is compromised. Keep intensity low.',
+                    normal: 'You are ready for moderate intensity workouts.',
+                    hiit: 'Excellent recovery state. You can train at maximum intensity.',
+                    noData: 'Insufficient data to assess your readiness.'
+                },
+                intensities: {
+                    rest: 'Active rest or day off',
+                    lit: 'Light cardio, yoga, mobility',
+                    normal: 'Strength training or moderate cardio',
+                    hiit: 'HIIT, speed intervals, high-intensity training',
+                    noData: 'N/A'
+                }
             },
 
             // Trends

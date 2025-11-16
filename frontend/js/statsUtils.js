@@ -234,3 +234,50 @@ export function evaluateHRVStatus(zScore) {
         };
     }
 }
+
+/**
+ * Calcula el nivel de preparación basado en el Z-Score del HRV
+ * Determina si el atleta debe hacer REST, LIT, NORMAL o HIIT
+ * @param {number} zScore - Z-Score del HRV
+ * @returns {Object} - {levelKey, color, emoji, description}
+ */
+export function calculateReadiness(zScore) {
+    if (zScore === null || zScore === undefined) {
+        return {
+            levelKey: 'noData',
+            color: '#94a3b8',
+            emoji: '❓',
+            intensityKey: 'noData'
+        };
+    }
+
+    if (zScore < -1.5) {
+        return {
+            levelKey: 'rest',
+            color: '#ef4444',
+            emoji: '🛌',
+            intensityKey: 'rest'
+        };
+    } else if (zScore < -0.5) {
+        return {
+            levelKey: 'lit',
+            color: '#f59e0b',
+            emoji: '🚶',
+            intensityKey: 'lit'
+        };
+    } else if (zScore < 0.5) {
+        return {
+            levelKey: 'normal',
+            color: '#3b82f6',
+            emoji: '🏃',
+            intensityKey: 'normal'
+        };
+    } else {
+        return {
+            levelKey: 'hiit',
+            color: '#10b981',
+            emoji: '🔥',
+            intensityKey: 'hiit'
+        };
+    }
+}

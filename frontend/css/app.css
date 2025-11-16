@@ -1910,3 +1910,132 @@ a {
         font-size: 1rem;
     }
 }
+
+/* ==================== Readiness Card (PREPARACIÓN) ==================== */
+
+.readiness-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-left: 6px solid var(--primary-color);
+    border-radius: var(--radius-xl);
+    padding: 28px 32px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.readiness-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.readiness-header h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    margin: 0 0 20px 0;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.readiness-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+}
+
+.readiness-emoji {
+    font-size: 4.5rem;
+    line-height: 1;
+    margin: 8px 0;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.readiness-level {
+    font-size: 2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 8px 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.readiness-description {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 400px;
+    margin: 4px 0 12px 0;
+}
+
+.readiness-intensity {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 16px 24px;
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.intensity-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.intensity-value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .readiness-card {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .readiness-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Responsive readiness card */
+@media (max-width: 768px) {
+    .readiness-card {
+        padding: 20px 24px;
+    }
+
+    .readiness-emoji {
+        font-size: 3.5rem;
+    }
+
+    .readiness-level {
+        font-size: 1.5rem;
+    }
+
+    .readiness-description {
+        font-size: 0.95rem;
+    }
+
+    .readiness-intensity {
+        padding: 12px 20px;
+    }
+
+    .intensity-value {
+        font-size: 1rem;
+    }
+}

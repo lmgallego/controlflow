@@ -10,7 +10,8 @@ import {
     evaluateSleepScore,
     formatSleepHours,
     secondsToHours,
-    evaluateHRVStatus
+    evaluateHRVStatus,
+    calculateReadiness
 } from '../statsUtils.js';
 import { t } from '../i18n.js';
 import { createBPEPanel } from './BPEPanel.js';
@@ -104,6 +105,7 @@ function renderWellnessPanelContent(container, data) {
             </div>
 
             <div class="wellness-summary-grid">
+                ${renderReadinessCard(data)}
                 ${renderSummaryCard(data)}
             </div>
         </div>
@@ -340,6 +342,7 @@ function processWellnessData(data) {
     const latestHRV = hrvRaw[hrvRaw.length - 1];
     const latestZScore = hrvZScores[hrvZScores.length - 1];
     const hrvStatus = evaluateHRVStatus(latestZScore);
+    const readiness = calculateReadiness(latestZScore);
 
     const latestSleepScore = sleepScoreValues[sleepScoreValues.length - 1];
     const sleepEvaluation = evaluateSleepScore(latestSleepScore);
@@ -404,7 +407,8 @@ function processWellnessData(data) {
             latest: latestSleepScore,
             evaluation: sleepEvaluation,
             trend: sleepScoreTrend
-        }
+        },
+        readiness: readiness
     };
 }
 
@@ -610,6 +614,36 @@ function renderSleepScoreCard(data) {
                         <span class="legend-color" style="background-color: #ef4444;"></span>
                         <span class="legend-text" data-i18n="wellness.sleepScore.legend.poor">${t('wellness.sleepScore.legend.poor')}</span>
                     </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Card de PREPARACIÓN basado en HRV Z-score
+ */
+function renderReadinessCard(data) {
+    const { readiness } = data;
+
+    return `
+        <div class="readiness-card" style="border-left-color: ${readiness.color};">
+            <div class="readiness-header">
+                <h3 data-i18n="wellness.readiness.title">${t('wellness.readiness.title')}</h3>
+            </div>
+            <div class="readiness-content">
+                <div class="readiness-emoji">${readiness.emoji}</div>
+                <div class="readiness-level" style="color: ${readiness.color};">
+                    ${t('wellness.readiness.levels.' + readiness.levelKey)}
+                </div>
+                <div class="readiness-description">
+                    ${t('wellness.readiness.descriptions.' + readiness.levelKey)}
+                </div>
+                <div class="readiness-intensity">
+                    <span class="intensity-label" data-i18n="wellness.readiness.recommended">${t('wellness.readiness.recommended')}:</span>
+                    <span class="intensity-value" style="color: ${readiness.color};">
+                        ${t('wellness.readiness.intensities.' + readiness.intensityKey)}
+                    </span>
                 </div>
             </div>
         </div>
