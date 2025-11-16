@@ -520,20 +520,12 @@ function renderSleepScoreCard(data) {
     const evaluation = sleepScore.evaluation;
     const trendIcon = renderTrendIcon(sleepScore.trend, true);
 
-    // Traducir categoría
-    let categoryKey = evaluation.category.toLowerCase();
-    if (categoryKey === 'sin datos') categoryKey = 'noData';
-    else if (categoryKey === 'excelente') categoryKey = 'excellent';
-    else if (categoryKey === 'bueno') categoryKey = 'good';
-    else if (categoryKey === 'aceptable') categoryKey = 'acceptable';
-    else if (categoryKey === 'deficiente') categoryKey = 'poor';
-
     return `
         <div class="metric-card">
             <div class="metric-card-header">
                 <h3 data-i18n="wellness.sleepScore.title">${t('wellness.sleepScore.title')}</h3>
                 <div class="metric-badge" style="background-color: ${evaluation.color}20; color: ${evaluation.color};">
-                    ${t('wellness.sleepScore.categories.' + categoryKey)}
+                    ${t('wellness.sleepScore.categories.' + evaluation.categoryKey)}
                 </div>
             </div>
             <div class="metric-card-body">
@@ -548,7 +540,7 @@ function renderSleepScoreCard(data) {
                     </div>
                 </div>
                 <div class="metric-status-text">
-                    ${t('wellness.sleepScore.description.' + categoryKey)}
+                    ${t('wellness.sleepScore.description.' + evaluation.categoryKey)}
                 </div>
                 <div class="metric-chart-container">
                     <button class="chart-fullscreen-btn" data-chart="sleepScore" title="${t('wellness.chart.fullscreen')}">⛶</button>
@@ -604,7 +596,7 @@ function renderSummaryCard(data) {
                 <div class="summary-item">
                     <span class="summary-label" data-i18n="wellness.summary.sleepQuality">${t('wellness.summary.sleepQuality')}</span>
                     <span class="summary-value" style="color: ${data.sleepScore.evaluation.color};">
-                        ${t('wellness.sleepScore.categories.' + (data.sleepScore.evaluation.category.toLowerCase() === 'sin datos' ? 'noData' : data.sleepScore.evaluation.category.toLowerCase()))}
+                        ${t('wellness.sleepScore.categories.' + data.sleepScore.evaluation.categoryKey)}
                     </span>
                 </div>
             </div>

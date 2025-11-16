@@ -136,35 +136,30 @@ export function calculateBaseline(data, days = 7) {
 export function evaluateSleepScore(score) {
     if (score === null || score === undefined) {
         return {
-            category: 'Sin datos',
-            color: '#94a3b8',
-            description: 'No hay datos disponibles'
+            categoryKey: 'noData',
+            color: '#94a3b8'
         };
     }
 
     if (score >= 90) {
         return {
-            category: 'Excelente',
-            color: '#10b981',
-            description: 'Recuperación óptima'
+            categoryKey: 'excellent',
+            color: '#10b981'
         };
     } else if (score >= 80) {
         return {
-            category: 'Bueno',
-            color: '#3b82f6',
-            description: 'Buena recuperación'
+            categoryKey: 'good',
+            color: '#3b82f6'
         };
     } else if (score >= 60) {
         return {
-            category: 'Aceptable',
-            color: '#f59e0b',
-            description: 'Recuperación moderada'
+            categoryKey: 'acceptable',
+            color: '#f59e0b'
         };
     } else {
         return {
-            category: 'Deficiente',
-            color: '#ef4444',
-            description: 'Recuperación insuficiente'
+            categoryKey: 'poor',
+            color: '#ef4444'
         };
     }
 }
