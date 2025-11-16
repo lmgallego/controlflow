@@ -270,14 +270,14 @@ function renderSleepDurationCard(data) {
  */
 function renderSleepScoreCard(data) {
     const { sleepScore } = data;
-    const eval = sleepScore.evaluation;
+    const evaluation = sleepScore.evaluation;
 
     return `
         <div class="metric-card">
             <div class="metric-card-header">
                 <h3>Calidad del Sueño</h3>
-                <div class="metric-badge" style="background-color: ${eval.color}20; color: ${eval.color};">
-                    ${eval.category}
+                <div class="metric-badge" style="background-color: ${evaluation.color}20; color: ${evaluation.color};">
+                    ${evaluation.category}
                 </div>
             </div>
             <div class="metric-card-body">
@@ -288,7 +288,7 @@ function renderSleepScoreCard(data) {
                     </div>
                 </div>
                 <div class="metric-status-text">
-                    ${eval.description}
+                    ${evaluation.description}
                 </div>
                 <div class="metric-chart">
                     <canvas id="sleep-score-chart"></canvas>
