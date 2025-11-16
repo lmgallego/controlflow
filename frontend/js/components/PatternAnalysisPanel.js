@@ -33,18 +33,21 @@ export function createPatternAnalysisPanel(data) {
                 t('wellness.patterns.correlations.hrvSleep'),
                 correlations.hrvSleep,
                 'hrv-sleep-chart')}
-            ${renderCorrelationCard('hrv-sleep-duration',
-                t('wellness.patterns.correlations.hrvSleepDuration'),
-                correlations.hrvSleepDuration,
-                'hrv-sleep-duration-chart')}
-            ${correlations.hrvLoad ? renderCorrelationCard('hrv-load',
-                t('wellness.patterns.correlations.hrvLoad'),
-                correlations.hrvLoad,
-                'hrv-load-chart') : ''}
             ${renderCorrelationCard('sleep-quality',
                 t('wellness.patterns.correlations.sleepQuality'),
                 correlations.sleepQuality,
                 'sleep-quality-chart')}
+        </div>
+
+        <div class="patterns-grid patterns-grid-secondary">
+            ${renderCorrelationCard('hrv-sleep-duration',
+                t('wellness.patterns.correlations.hrvSleepDuration'),
+                correlations.hrvSleepDuration,
+                'hrv-sleep-duration-chart')}
+            ${renderCorrelationCard('hrv-load',
+                t('wellness.patterns.correlations.hrvLoad'),
+                correlations.hrvLoad || { r: null, regression: null },
+                'hrv-load-chart')}
         </div>
 
         <div class="patterns-insights">
@@ -61,17 +64,16 @@ export function createPatternAnalysisPanel(data) {
             'HRV (ms)', t('wellness.rhr.abbrev') || 'RHR (bpm)', correlations.hrvRhr);
         renderCorrelationChart('hrv-sleep-chart', data.hrv.raw, data.sleepScore.values,
             'HRV (ms)', t('wellness.sleepScore.title'), correlations.hrvSleep);
+        renderCorrelationChart('sleep-quality-chart', data.sleepDuration.hours, data.sleepScore.values,
+            t('wellness.sleepDuration.title') + ' (h)', t('wellness.sleepScore.title'), correlations.sleepQuality);
+
         renderCorrelationChart('hrv-sleep-duration-chart', data.hrv.raw, data.sleepDuration.hours,
             'HRV (ms)', t('wellness.sleepDuration.title') + ' (h)', correlations.hrvSleepDuration);
 
-        // Renderizar HRV vs Carga si hay datos disponibles
-        if (correlations.hrvLoad && data.trainingLoad) {
-            renderCorrelationChart('hrv-load-chart', data.hrv.raw, data.trainingLoad.values,
-                'HRV (ms)', 'Carga (TSS)', correlations.hrvLoad);
-        }
-
-        renderCorrelationChart('sleep-quality-chart', data.sleepDuration.hours, data.sleepScore.values,
-            t('wellness.sleepDuration.title') + ' (h)', t('wellness.sleepScore.title'), correlations.sleepQuality);
+        // Renderizar HRV vs Carga (usar datos si existen, sino arrays vacíos)
+        const loadValues = (data.trainingLoad && data.trainingLoad.values) ? data.trainingLoad.values : [];
+        renderCorrelationChart('hrv-load-chart', data.hrv.raw, loadValues,
+            'HRV (ms)', 'Carga (TSS)', correlations.hrvLoad || { r: null, regression: null });
 
         // Configurar event listeners para botones de fullscreen después de renderizar
         setupPatternFullscreenButtons();

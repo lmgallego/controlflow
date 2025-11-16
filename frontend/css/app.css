@@ -2103,6 +2103,11 @@ a {
     margin-bottom: 32px;
 }
 
+.patterns-grid-secondary {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 1600px;
+}
+
 .correlation-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -2223,7 +2228,8 @@ a {
 
 /* Responsive patterns */
 @media (max-width: 768px) {
-    .patterns-grid {
+    .patterns-grid,
+    .patterns-grid-secondary {
         grid-template-columns: 1fr;
     }
 
