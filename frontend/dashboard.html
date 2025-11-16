@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/app.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
 </head>
 <body>
     <div class="app-layout">
@@ -15,28 +16,43 @@
                 <h3>ControlFlow</h3>
             </div>
             <ul class="nav-menu">
-                <li class="nav-item active" data-view="wellness"><a>Bienestar</a></li>
-                <li class="nav-item" data-view="activities"><a>Actividades</a></li>
-                <li class="nav-item" data-view="analysis"><a>Análisis</a></li>
+                <li class="nav-item active" data-view="wellness"><a data-i18n="nav.wellness">Bienestar</a></li>
+                <li class="nav-item" data-view="activities"><a data-i18n="nav.activities">Actividades</a></li>
+                <li class="nav-item" data-view="analysis"><a data-i18n="nav.analysis">Análisis</a></li>
             </ul>
             <div class="sidebar-footer">
                 <ul class="nav-menu">
-                     <li class="nav-item" data-view="settings"><a>Configuración</a></li>
+                     <li class="nav-item" data-view="settings"><a data-i18n="nav.settings">Configuración</a></li>
                 </ul>
-                <a href="#" id="logout-btn">Cerrar Sesión</a>
+                <a href="#" id="logout-btn" data-i18n="nav.logout">Cerrar Sesión</a>
             </div>
         </nav>
 
         <main class="main-content">
             <header class="app-header">
                 <div class="controls">
-                    <label for="athlete-select">Atleta:</label>
+                    <label for="athlete-select" data-i18n="header.athlete">Atleta:</label>
                     <select id="athlete-select">
-                        <option>Cargando...</option>
+                        <option data-i18n="header.loading">Cargando...</option>
                     </select>
                 </div>
-                <div class="user-profile">
-                    <span id="user-email">Cargando...</span>
+                <div class="header-actions">
+                    <!-- Language Selector -->
+                    <div class="language-selector">
+                        <button class="language-btn active" data-lang="es">ES</button>
+                        <button class="language-btn" data-lang="en">EN</button>
+                    </div>
+
+                    <!-- Theme Toggle -->
+                    <button class="theme-toggle" id="theme-toggle" title="Cambiar tema">
+                        <span class="theme-icon sun">☀️</span>
+                        <span class="theme-icon moon">🌙</span>
+                    </button>
+
+                    <!-- User Profile -->
+                    <div class="user-profile">
+                        <span id="user-email">Cargando...</span>
+                    </div>
                 </div>
             </header>
 
@@ -46,11 +62,12 @@
     </div>
 
     <script src="js/firebase-init.js" type="module"></script>
-    
+    <script src="js/initUI.js" type="module"></script>
     <script src="js/apiService.js" type="module"></script>
     <script src="js/charts.js" type="module"></script>
     <script src="js/components/WellnessPanel.js" type="module"></script>
     <script src="js/components/ActivityFeed.js" type="module"></script>
-    <script src="js/components/SettingsPanel.js" type="module"></script> <script src="js/app.js" type="module"></script>
+    <script src="js/components/SettingsPanel.js" type="module"></script>
+    <script src="js/app.js" type="module"></script>
 </body>
 </html>

@@ -12,26 +12,42 @@ import {
     secondsToHours,
     evaluateHRVStatus
 } from '../statsUtils.js';
+import { t } from '../i18n.js';
+import { createBPEPanel } from './BPEPanel.js';
+
+// Variables globales para el panel
+let currentAthleteId = null;
+let currentProcessedData = null;
+let chartInstances = {};
 
 /**
  * Renderiza el panel profesional de wellness con análisis avanzado de HRV
  */
 export async function renderWellnessPanel(container, athleteId) {
-    container.innerHTML = '<div class="loading">Cargando análisis de bienestar...</div>';
+    currentAthleteId = athleteId;
+
+    container.innerHTML = `<div class="loading">${t('wellness.loadingData')}</div>`;
 
     // Obtener últimos 30 días para análisis estadístico
     const today = new Date();
     const oldest = new Date();
     oldest.setDate(today.getDate() - 30);
 
-    const oldestISO = oldest.toISOString().split('T')[0];
-    const newestISO = today.toISOString().split('T')[0];
+    await loadWellnessData(container, athleteId, oldest, today);
+}
+
+/**
+ * Carga y renderiza los datos de wellness
+ */
+async function loadWellnessData(container, athleteId, startDate, endDate) {
+    const oldestISO = startDate.toISOString().split('T')[0];
+    const newestISO = endDate.toISOString().split('T')[0];
 
     try {
         const data = await getWellnessData(athleteId, oldestISO, newestISO);
 
         if (!data || data.length === 0) {
-            container.innerHTML = '<div class="loading">No hay datos de wellness disponibles</div>';
+            container.innerHTML = `<div class="loading">${t('wellness.noData')}</div>`;
             return;
         }
 
@@ -39,37 +55,211 @@ export async function renderWellnessPanel(container, athleteId) {
         const sortedData = [...data].sort((a, b) => new Date(a.id) - new Date(b.id));
 
         // Procesar datos para análisis
-        const processedData = processWellnessData(sortedData);
+        currentProcessedData = processWellnessData(sortedData);
 
-        // Renderizar cards profesionales
-        container.innerHTML = `
-            <div class="wellness-header">
-                <h2>Análisis de Recuperación y Rendimiento</h2>
-                <p class="wellness-subtitle">Últimos 30 días • Datos actualizados</p>
-            </div>
-
-            <div class="wellness-metrics-grid">
-                ${renderHRVCard(processedData)}
-                ${renderRestingHRCard(processedData)}
-                ${renderSleepDurationCard(processedData)}
-                ${renderSleepScoreCard(processedData)}
-            </div>
-
-            <div class="wellness-summary-grid">
-                ${renderSummaryCard(processedData)}
-            </div>
-        `;
-
-        // Renderizar todos los gráficos
-        renderHRVChart(processedData);
-        renderRestingHRChart(processedData);
-        renderSleepDurationChart(processedData);
-        renderSleepScoreChart(processedData);
+        // Renderizar panel completo
+        renderWellnessPanelContent(container, currentProcessedData);
 
     } catch (error) {
         console.error('Error loading wellness data:', error);
-        container.innerHTML = '<div class="loading">Error al cargar los datos de bienestar</div>';
+        container.innerHTML = `<div class="loading">${t('wellness.errorLoading')}</div>`;
     }
+}
+
+/**
+ * Renderiza el contenido completo del panel
+ */
+function renderWellnessPanelContent(container, data) {
+    container.innerHTML = `
+        <div class="wellness-header">
+            <div class="wellness-header-main">
+                <h2 data-i18n="wellness.title">${t('wellness.title')}</h2>
+                <p class="wellness-subtitle" data-i18n="wellness.subtitle">${t('wellness.subtitle')}</p>
+            </div>
+            <div class="date-range-selector">
+                <label data-i18n="wellness.dateRange">${t('wellness.dateRange')}:</label>
+                <div class="date-inputs">
+                    <input type="date" id="wellness-date-from" value="${getDateDaysAgo(30)}">
+                    <span>-</span>
+                    <input type="date" id="wellness-date-to" value="${getDateDaysAgo(0)}">
+                    <button id="apply-date-range" class="apply-date-btn" data-i18n="wellness.apply">${t('wellness.apply')}</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="wellness-metrics-grid">
+            ${renderHRVCard(data)}
+            ${renderRestingHRCard(data)}
+            ${renderSleepDurationCard(data)}
+            ${renderSleepScoreCard(data)}
+        </div>
+
+        <div class="wellness-summary-grid">
+            ${renderSummaryCard(data)}
+        </div>
+
+        <div id="bpe-container"></div>
+
+        <!-- Modal para gráficos en pantalla completa -->
+        <div id="chart-modal" class="chart-modal">
+            <div class="chart-modal-content">
+                <button class="chart-modal-close" data-i18n="wellness.chart.close">${t('wellness.chart.close')}</button>
+                <div class="chart-modal-body">
+                    <canvas id="modal-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Destruir gráficos anteriores
+    Object.values(chartInstances).forEach(chart => chart?.destroy());
+    chartInstances = {};
+
+    // Renderizar todos los gráficos
+    chartInstances.hrvChart = renderHRVChart(data);
+    chartInstances.rhrChart = renderRestingHRChart(data);
+    chartInstances.sleepDurationChart = renderSleepDurationChart(data);
+    chartInstances.sleepScoreChart = renderSleepScoreChart(data);
+
+    // Añadir panel BPE
+    const bpeContainer = container.querySelector('#bpe-container');
+    const bpePanel = createBPEPanel(data);
+    bpeContainer.appendChild(bpePanel);
+
+    // Event listeners
+    setupEventListeners(container);
+}
+
+/**
+ * Configura event listeners para el panel
+ */
+function setupEventListeners(container) {
+    // Date range selector
+    const applyDateBtn = container.querySelector('#apply-date-range');
+    applyDateBtn?.addEventListener('click', () => {
+        const fromInput = container.querySelector('#wellness-date-from');
+        const toInput = container.querySelector('#wellness-date-to');
+
+        const startDate = new Date(fromInput.value);
+        const endDate = new Date(toInput.value);
+
+        if (startDate && endDate && currentAthleteId) {
+            loadWellnessData(container, currentAthleteId, startDate, endDate);
+        }
+    });
+
+    // Fullscreen buttons
+    setupFullscreenButtons(container);
+
+    // Modal close
+    const modal = container.querySelector('#chart-modal');
+    const closeBtn = container.querySelector('.chart-modal-close');
+
+    closeBtn?.addEventListener('click', () => {
+        modal.classList.remove('active');
+    });
+
+    modal?.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('active');
+        }
+    });
+}
+
+/**
+ * Configura los botones de pantalla completa para los gráficos
+ */
+function setupFullscreenButtons(container) {
+    const fullscreenBtns = container.querySelectorAll('.chart-fullscreen-btn');
+
+    fullscreenBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const chartType = btn.dataset.chart;
+            showChartFullscreen(chartType);
+        });
+    });
+}
+
+/**
+ * Muestra un gráfico en pantalla completa
+ */
+function showChartFullscreen(chartType) {
+    const modal = document.getElementById('chart-modal');
+    const modalCanvas = document.getElementById('modal-chart');
+
+    if (!modal || !modalCanvas) return;
+
+    // Destruir gráfico anterior en el modal
+    if (chartInstances.modalChart) {
+        chartInstances.modalChart.destroy();
+    }
+
+    // Clonar configuración del gráfico original
+    const originalChart = chartInstances[chartType + 'Chart'];
+    if (!originalChart) return;
+
+    const ctx = modalCanvas.getContext('2d');
+    chartInstances.modalChart = new Chart(ctx, {
+        type: originalChart.config.type,
+        data: JSON.parse(JSON.stringify(originalChart.config.data)),
+        options: {
+            ...originalChart.config.options,
+            maintainAspectRatio: true,
+            aspectRatio: 2
+        }
+    });
+
+    modal.classList.add('active');
+}
+
+/**
+ * Calcula tendencia (última semana vs semana anterior)
+ */
+function calculateTrend(data, last = 7) {
+    if (data.length < last * 2) return { direction: 'stable', percent: 0 };
+
+    const lastWeek = data.slice(-last).filter(v => v !== null && v !== undefined);
+    const prevWeek = data.slice(-last * 2, -last).filter(v => v !== null && v !== undefined);
+
+    if (lastWeek.length === 0 || prevWeek.length === 0) return { direction: 'stable', percent: 0 };
+
+    const lastAvg = mean(lastWeek);
+    const prevAvg = mean(prevWeek);
+
+    const percentChange = ((lastAvg - prevAvg) / prevAvg) * 100;
+
+    let direction = 'stable';
+    if (percentChange > 2) direction = 'increasing';
+    else if (percentChange < -2) direction = 'decreasing';
+
+    return { direction, percent: Math.abs(percentChange) };
+}
+
+/**
+ * Renderiza icono de tendencia
+ */
+function renderTrendIcon(trend, isPositiveGood = true) {
+    const { direction, percent } = trend;
+
+    if (direction === 'stable') {
+        return `<span class="trend-icon trend-stable" title="${t('wellness.trends.stable')}">→</span>`;
+    }
+
+    const isGood = (direction === 'increasing' && isPositiveGood) || (direction === 'decreasing' && !isPositiveGood);
+    const color = isGood ? 'var(--success)' : 'var(--warning)';
+    const arrow = direction === 'increasing' ? '↑' : '↓';
+    const text = direction === 'increasing' ? t('wellness.trends.increasing') : t('wellness.trends.decreasing');
+
+    return `<span class="trend-icon" style="color: ${color};" title="${text} (${percent.toFixed(1)}%)">${arrow}</span>`;
+}
+
+/**
+ * Helper para obtener fecha de hace N días
+ */
+function getDateDaysAgo(days) {
+    const date = new Date();
+    date.setDate(date.getDate() - days);
+    return date.toISOString().split('T')[0];
 }
 
 /**
@@ -80,7 +270,7 @@ function processWellnessData(data) {
     const hrvRaw = data.map(d => d.hrv);
     const restingHR = data.map(d => d.restingHR);
     const sleepSecs = data.map(d => d.sleepSecs);
-    const sleepScore = data.map(d => d.sleepScore);
+    const sleepScoreValues = data.map(d => d.sleepScore);
 
     // Calcular LnRMSSD para HRV
     const hrvLnRMSSD = hrvRaw.map(h => calculateLnRMSSD(h));
@@ -106,12 +296,19 @@ function processWellnessData(data) {
     const latestZScore = hrvZScores[hrvZScores.length - 1];
     const hrvStatus = evaluateHRVStatus(latestZScore);
 
-    const latestSleepScore = sleepScore[sleepScore.length - 1];
+    const latestSleepScore = sleepScoreValues[sleepScoreValues.length - 1];
     const sleepEvaluation = evaluateSleepScore(latestSleepScore);
+
+    // Calcular tendencias
+    const hrvTrend = calculateTrend(hrvRaw, 7);
+    const rhrTrend = calculateTrend(restingHR, 7);
+    const sleepTrend = calculateTrend(sleepHours, 7);
+    const sleepScoreTrend = calculateTrend(sleepScoreValues, 7);
 
     return {
         dates,
         hrv: {
+            data: hrvRaw,
             raw: hrvRaw,
             lnRMSSD: hrvLnRMSSD,
             zScores: hrvZScores,
@@ -121,13 +318,32 @@ function processWellnessData(data) {
             baseline: hrvBaseline,
             latest: latestHRV,
             latestZScore,
-            status: hrvStatus
+            status: hrvStatus,
+            trend: hrvTrend
+        },
+        rhr: {
+            data: restingHR,
+            values: restingHR,
+            ci: rhrCI,
+            baseline: rhrBaseline,
+            latest: restingHR[restingHR.length - 1],
+            trend: rhrTrend
         },
         restingHR: {
             values: restingHR,
             ci: rhrCI,
             baseline: rhrBaseline,
             latest: restingHR[restingHR.length - 1]
+        },
+        sleepDuration: {
+            data: sleepHours,
+            hours: sleepHours,
+            seconds: sleepSecs,
+            ci: sleepCI,
+            baseline: sleepBaseline,
+            latest: sleepHours[sleepHours.length - 1],
+            latestFormatted: formatSleepHours(sleepSecs[sleepSecs.length - 1]),
+            trend: sleepTrend
         },
         sleep: {
             hours: sleepHours,
@@ -138,9 +354,11 @@ function processWellnessData(data) {
             latestFormatted: formatSleepHours(sleepSecs[sleepSecs.length - 1])
         },
         sleepScore: {
-            values: sleepScore,
+            data: sleepScoreValues,
+            values: sleepScoreValues,
             latest: latestSleepScore,
-            evaluation: sleepEvaluation
+            evaluation: sleepEvaluation,
+            trend: sleepScoreTrend
         }
     };
 }
@@ -150,42 +368,50 @@ function processWellnessData(data) {
  */
 function renderHRVCard(data) {
     const { hrv } = data;
+    const trendIcon = renderTrendIcon(hrv.trend, true);
 
     return `
         <div class="metric-card">
             <div class="metric-card-header">
-                <h3>Variabilidad Cardíaca (HRV)</h3>
+                <h3 data-i18n="wellness.hrv.title">${t('wellness.hrv.title')}</h3>
                 <div class="metric-badge" style="background-color: ${hrv.status.color}20; color: ${hrv.status.color};">
-                    ${hrv.status.status}
+                    ${t('wellness.hrv.status.' + hrv.status.status.toLowerCase().replace(' ', ''))}
                 </div>
             </div>
             <div class="metric-card-body">
                 <div class="metric-value-group">
                     <div class="metric-primary">
-                        <span class="metric-label">HRV Actual</span>
-                        <span class="metric-value">${hrv.latest ? hrv.latest.toFixed(0) : 'N/A'} <span class="metric-unit">ms</span></span>
+                        <span class="metric-label" data-i18n="wellness.hrv.current">${t('wellness.hrv.current')}</span>
+                        <span class="metric-value">
+                            ${hrv.latest ? hrv.latest.toFixed(0) : t('common.na')}
+                            <span class="metric-unit">${t('common.units.ms')}</span>
+                            ${trendIcon}
+                        </span>
                     </div>
                     <div class="metric-secondary">
-                        <span class="metric-label">Z-Score</span>
+                        <span class="metric-label" data-i18n="wellness.hrv.zScore">${t('wellness.hrv.zScore')}</span>
                         <span class="metric-value ${hrv.latestZScore > 0 ? 'positive' : 'negative'}">
-                            ${hrv.latestZScore ? hrv.latestZScore.toFixed(2) : 'N/A'}
+                            ${hrv.latestZScore ? hrv.latestZScore.toFixed(2) : t('common.na')}
                         </span>
                     </div>
                 </div>
                 <div class="metric-status-text">
-                    ${hrv.status.description}
+                    ${t('wellness.hrv.description.' + hrv.status.status.toLowerCase().replace(' ', ''))}
                 </div>
-                <div class="metric-chart">
-                    <canvas id="hrv-chart"></canvas>
+                <div class="metric-chart-container">
+                    <button class="chart-fullscreen-btn" data-chart="hrv" title="${t('wellness.chart.fullscreen')}">⛶</button>
+                    <div class="metric-chart">
+                        <canvas id="hrv-chart"></canvas>
+                    </div>
                 </div>
                 <div class="metric-stats">
                     <div class="stat-item">
-                        <span class="stat-label">Baseline (7d)</span>
-                        <span class="stat-value">${hrv.baseline.mean ? hrv.baseline.mean.toFixed(2) : 'N/A'}</span>
+                        <span class="stat-label" data-i18n="wellness.hrv.baseline">${t('wellness.hrv.baseline')}</span>
+                        <span class="stat-value">${hrv.baseline.mean ? hrv.baseline.mean.toFixed(2) : t('common.na')}</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Desv. Estándar</span>
-                        <span class="stat-value">${hrv.baseline.std ? hrv.baseline.std.toFixed(2) : 'N/A'}</span>
+                        <span class="stat-label" data-i18n="wellness.hrv.stdDev">${t('wellness.hrv.stdDev')}</span>
+                        <span class="stat-value">${hrv.baseline.std ? hrv.baseline.std.toFixed(2) : t('common.na')}</span>
                     </div>
                 </div>
             </div>
@@ -197,31 +423,39 @@ function renderHRVCard(data) {
  * Card de Pulso en Reposo
  */
 function renderRestingHRCard(data) {
-    const { restingHR } = data;
+    const { rhr } = data;
+    const trendIcon = renderTrendIcon(rhr.trend, false); // Menor RHR es mejor
 
     return `
         <div class="metric-card">
             <div class="metric-card-header">
-                <h3>Frecuencia Cardíaca en Reposo</h3>
+                <h3 data-i18n="wellness.rhr.title">${t('wellness.rhr.title')}</h3>
             </div>
             <div class="metric-card-body">
                 <div class="metric-value-group">
                     <div class="metric-primary">
-                        <span class="metric-label">RHR Actual</span>
-                        <span class="metric-value">${restingHR.latest || 'N/A'} <span class="metric-unit">bpm</span></span>
+                        <span class="metric-label" data-i18n="wellness.rhr.current">${t('wellness.rhr.current')}</span>
+                        <span class="metric-value">
+                            ${rhr.latest || t('common.na')}
+                            <span class="metric-unit">${t('common.units.bpm')}</span>
+                            ${trendIcon}
+                        </span>
                     </div>
                 </div>
-                <div class="metric-chart">
-                    <canvas id="rhr-chart"></canvas>
+                <div class="metric-chart-container">
+                    <button class="chart-fullscreen-btn" data-chart="rhr" title="${t('wellness.chart.fullscreen')}">⛶</button>
+                    <div class="metric-chart">
+                        <canvas id="rhr-chart"></canvas>
+                    </div>
                 </div>
                 <div class="metric-stats">
                     <div class="stat-item">
-                        <span class="stat-label">Baseline (7d)</span>
-                        <span class="stat-value">${restingHR.baseline.mean ? restingHR.baseline.mean.toFixed(1) : 'N/A'} bpm</span>
+                        <span class="stat-label" data-i18n="wellness.rhr.baseline">${t('wellness.rhr.baseline')}</span>
+                        <span class="stat-value">${rhr.baseline.mean ? rhr.baseline.mean.toFixed(1) : t('common.na')} ${t('common.units.bpm')}</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Rango</span>
-                        <span class="stat-value">${restingHR.baseline.min ? restingHR.baseline.min : 'N/A'} - ${restingHR.baseline.max ? restingHR.baseline.max : 'N/A'}</span>
+                        <span class="stat-label" data-i18n="wellness.rhr.range">${t('wellness.rhr.range')}</span>
+                        <span class="stat-value">${rhr.baseline.min || t('common.na')} - ${rhr.baseline.max || t('common.na')}</span>
                     </div>
                 </div>
             </div>
@@ -230,34 +464,47 @@ function renderRestingHRCard(data) {
 }
 
 /**
- * Card de Duración del Sueño
+ * Card de Duración del Sueño (con calidad incluida)
  */
 function renderSleepDurationCard(data) {
-    const { sleep } = data;
+    const { sleepDuration, sleepScore } = data;
+    const trendIcon = renderTrendIcon(sleepDuration.trend, true);
 
     return `
         <div class="metric-card">
             <div class="metric-card-header">
-                <h3>Duración del Sueño</h3>
+                <h3 data-i18n="wellness.sleepDuration.title">${t('wellness.sleepDuration.title')}</h3>
             </div>
             <div class="metric-card-body">
                 <div class="metric-value-group">
                     <div class="metric-primary">
-                        <span class="metric-label">Última Noche</span>
-                        <span class="metric-value">${sleep.latestFormatted}</span>
+                        <span class="metric-label" data-i18n="wellness.sleepDuration.lastNight">${t('wellness.sleepDuration.lastNight')}</span>
+                        <span class="metric-value">
+                            ${sleepDuration.latestFormatted}
+                            ${trendIcon}
+                        </span>
+                    </div>
+                    <div class="metric-secondary">
+                        <span class="metric-label" data-i18n="wellness.sleepDuration.quality">${t('wellness.sleepDuration.quality')}</span>
+                        <span class="metric-value" style="color: ${sleepScore.evaluation.color};">
+                            ${sleepScore.latest || t('common.na')}
+                        </span>
                     </div>
                 </div>
-                <div class="metric-chart">
-                    <canvas id="sleep-duration-chart"></canvas>
+                <div class="metric-chart-container">
+                    <button class="chart-fullscreen-btn" data-chart="sleepDuration" title="${t('wellness.chart.fullscreen')}">⛶</button>
+                    <div class="metric-chart">
+                        <canvas id="sleep-duration-chart"></canvas>
+                    </div>
                 </div>
                 <div class="metric-stats">
                     <div class="stat-item">
-                        <span class="stat-label">Promedio (7d)</span>
-                        <span class="stat-value">${sleep.baseline.mean ? sleep.baseline.mean.toFixed(1) : 'N/A'} h</span>
+                        <span class="stat-label" data-i18n="wellness.sleepDuration.average">${t('wellness.sleepDuration.average')}</span>
+                        <span class="stat-value">${sleepDuration.baseline.mean ? sleepDuration.baseline.mean.toFixed(1) : t('common.na')} ${t('common.units.hours')}</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Objetivo</span>
-                        <span class="stat-value">7-9 h</span>
+                        <span class="stat-label" data-i18n="wellness.sleepDuration.target">${t('wellness.sleepDuration.target')}</span>
+                        <span class="stat-value">7-9 ${t('common.units.hours')}</span>
                     </div>
                 </div>
             </div>
@@ -271,44 +518,60 @@ function renderSleepDurationCard(data) {
 function renderSleepScoreCard(data) {
     const { sleepScore } = data;
     const evaluation = sleepScore.evaluation;
+    const trendIcon = renderTrendIcon(sleepScore.trend, true);
+
+    // Traducir categoría
+    let categoryKey = evaluation.category.toLowerCase();
+    if (categoryKey === 'sin datos') categoryKey = 'noData';
+    else if (categoryKey === 'excelente') categoryKey = 'excellent';
+    else if (categoryKey === 'bueno') categoryKey = 'good';
+    else if (categoryKey === 'aceptable') categoryKey = 'acceptable';
+    else if (categoryKey === 'deficiente') categoryKey = 'poor';
 
     return `
         <div class="metric-card">
             <div class="metric-card-header">
-                <h3>Calidad del Sueño</h3>
+                <h3 data-i18n="wellness.sleepScore.title">${t('wellness.sleepScore.title')}</h3>
                 <div class="metric-badge" style="background-color: ${evaluation.color}20; color: ${evaluation.color};">
-                    ${evaluation.category}
+                    ${t('wellness.sleepScore.categories.' + categoryKey)}
                 </div>
             </div>
             <div class="metric-card-body">
                 <div class="metric-value-group">
                     <div class="metric-primary">
-                        <span class="metric-label">Puntuación</span>
-                        <span class="metric-value">${sleepScore.latest || 'N/A'}<span class="metric-unit">/100</span></span>
+                        <span class="metric-label" data-i18n="wellness.sleepScore.score">${t('wellness.sleepScore.score')}</span>
+                        <span class="metric-value">
+                            ${sleepScore.latest || t('common.na')}
+                            <span class="metric-unit">/100</span>
+                            ${trendIcon}
+                        </span>
                     </div>
                 </div>
                 <div class="metric-status-text">
-                    ${evaluation.description}
+                    ${t('wellness.sleepScore.description.' + categoryKey)}
                 </div>
-                <div class="metric-chart">
-                    <canvas id="sleep-score-chart"></canvas>
+                <div class="metric-chart-container">
+                    <button class="chart-fullscreen-btn" data-chart="sleepScore" title="${t('wellness.chart.fullscreen')}">⛶</button>
+                    <div class="metric-chart">
+                        <canvas id="sleep-score-chart"></canvas>
+                    </div>
                 </div>
                 <div class="sleep-score-legend">
                     <div class="legend-item">
                         <span class="legend-color" style="background-color: #10b981;"></span>
-                        <span class="legend-text">Excelente (90-100)</span>
+                        <span class="legend-text" data-i18n="wellness.sleepScore.legend.excellent">${t('wellness.sleepScore.legend.excellent')}</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-color" style="background-color: #3b82f6;"></span>
-                        <span class="legend-text">Bueno (80-89)</span>
+                        <span class="legend-text" data-i18n="wellness.sleepScore.legend.good">${t('wellness.sleepScore.legend.good')}</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-color" style="background-color: #f59e0b;"></span>
-                        <span class="legend-text">Aceptable (60-79)</span>
+                        <span class="legend-text" data-i18n="wellness.sleepScore.legend.acceptable">${t('wellness.sleepScore.legend.acceptable')}</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-color" style="background-color: #ef4444;"></span>
-                        <span class="legend-text">Deficiente (<60)</span>
+                        <span class="legend-text" data-i18n="wellness.sleepScore.legend.poor">${t('wellness.sleepScore.legend.poor')}</span>
                     </div>
                 </div>
             </div>
@@ -322,23 +585,27 @@ function renderSleepScoreCard(data) {
 function renderSummaryCard(data) {
     return `
         <div class="summary-card">
-            <h3>Resumen de Recuperación</h3>
+            <h3 data-i18n="wellness.summary.title">${t('wellness.summary.title')}</h3>
             <div class="summary-grid">
                 <div class="summary-item">
-                    <span class="summary-label">Estado HRV</span>
-                    <span class="summary-value" style="color: ${data.hrv.status.color};">${data.hrv.status.status}</span>
+                    <span class="summary-label" data-i18n="wellness.summary.hrvStatus">${t('wellness.summary.hrvStatus')}</span>
+                    <span class="summary-value" style="color: ${data.hrv.status.color};">
+                        ${t('wellness.hrv.status.' + data.hrv.status.status.toLowerCase().replace(' ', ''))}
+                    </span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">RHR Promedio</span>
-                    <span class="summary-value">${data.restingHR.baseline.mean ? data.restingHR.baseline.mean.toFixed(1) : 'N/A'} bpm</span>
+                    <span class="summary-label" data-i18n="wellness.summary.rhrAverage">${t('wellness.summary.rhrAverage')}</span>
+                    <span class="summary-value">${data.rhr.baseline.mean ? data.rhr.baseline.mean.toFixed(1) : t('common.na')} ${t('common.units.bpm')}</span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">Sueño Promedio</span>
-                    <span class="summary-value">${data.sleep.baseline.mean ? data.sleep.baseline.mean.toFixed(1) : 'N/A'} h</span>
+                    <span class="summary-label" data-i18n="wellness.summary.sleepAverage">${t('wellness.summary.sleepAverage')}</span>
+                    <span class="summary-value">${data.sleepDuration.baseline.mean ? data.sleepDuration.baseline.mean.toFixed(1) : t('common.na')} ${t('common.units.hours')}</span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">Calidad Sueño</span>
-                    <span class="summary-value" style="color: ${data.sleepScore.evaluation.color};">${data.sleepScore.evaluation.category}</span>
+                    <span class="summary-label" data-i18n="wellness.summary.sleepQuality">${t('wellness.summary.sleepQuality')}</span>
+                    <span class="summary-value" style="color: ${data.sleepScore.evaluation.color};">
+                        ${t('wellness.sleepScore.categories.' + (data.sleepScore.evaluation.category.toLowerCase() === 'sin datos' ? 'noData' : data.sleepScore.evaluation.category.toLowerCase()))}
+                    </span>
                 </div>
             </div>
         </div>
@@ -352,9 +619,9 @@ function renderSummaryCard(data) {
  */
 function renderHRVChart(data) {
     const ctx = document.getElementById('hrv-chart');
-    if (!ctx) return;
+    if (!ctx) return null;
 
-    new Chart(ctx, {
+    return new Chart(ctx, {
         type: 'line',
         data: {
             labels: data.dates,
@@ -400,16 +667,16 @@ function renderHRVChart(data) {
  */
 function renderRestingHRChart(data) {
     const ctx = document.getElementById('rhr-chart');
-    if (!ctx) return;
+    if (!ctx) return null;
 
-    new Chart(ctx, {
+    return new Chart(ctx, {
         type: 'line',
         data: {
             labels: data.dates,
             datasets: [
                 {
                     label: 'RHR',
-                    data: data.restingHR.values,
+                    data: data.rhr.values,
                     borderColor: '#f59e0b',
                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
                     borderWidth: 2,
@@ -420,7 +687,7 @@ function renderRestingHRChart(data) {
                 },
                 {
                     label: 'IC Superior',
-                    data: data.restingHR.ci.upper,
+                    data: data.rhr.ci.upper,
                     borderColor: 'rgba(245, 158, 11, 0.3)',
                     borderWidth: 1,
                     borderDash: [5, 5],
@@ -429,7 +696,7 @@ function renderRestingHRChart(data) {
                 },
                 {
                     label: 'IC Inferior',
-                    data: data.restingHR.ci.lower,
+                    data: data.rhr.ci.lower,
                     borderColor: 'rgba(245, 158, 11, 0.3)',
                     borderWidth: 1,
                     borderDash: [5, 5],
@@ -448,23 +715,23 @@ function renderRestingHRChart(data) {
  */
 function renderSleepDurationChart(data) {
     const ctx = document.getElementById('sleep-duration-chart');
-    if (!ctx) return;
+    if (!ctx) return null;
 
-    new Chart(ctx, {
+    return new Chart(ctx, {
         type: 'bar',
         data: {
             labels: data.dates,
             datasets: [
                 {
                     label: 'Horas de Sueño',
-                    data: data.sleep.hours,
+                    data: data.sleepDuration.hours,
                     backgroundColor: 'rgba(139, 92, 246, 0.6)',
                     borderColor: '#8b5cf6',
                     borderWidth: 1
                 },
                 {
                     label: 'Promedio Móvil',
-                    data: data.sleep.ci.mean,
+                    data: data.sleepDuration.ci.mean,
                     type: 'line',
                     borderColor: '#a78bfa',
                     borderWidth: 2,
@@ -482,7 +749,7 @@ function renderSleepDurationChart(data) {
  */
 function renderSleepScoreChart(data) {
     const ctx = document.getElementById('sleep-score-chart');
-    if (!ctx) return;
+    if (!ctx) return null;
 
     // Colorear barras según la puntuación
     const backgroundColors = data.sleepScore.values.map(score => {
@@ -493,7 +760,7 @@ function renderSleepScoreChart(data) {
         return '#ef4444';
     });
 
-    new Chart(ctx, {
+    return new Chart(ctx, {
         type: 'bar',
         data: {
             labels: data.dates,
@@ -595,11 +862,10 @@ function getChartOptions(unit = '') {
         scales: {
             x: {
                 grid: {
-                    color: 'rgba(51, 65, 85, 0.3)',
-                    drawBorder: false
+                    color: 'rgba(148, 163, 184, 0.1)'
                 },
                 ticks: {
-                    color: '#94a3b8',
+                    color: 'var(--text-secondary)',
                     maxRotation: 45,
                     minRotation: 45,
                     font: {
@@ -609,11 +875,10 @@ function getChartOptions(unit = '') {
             },
             y: {
                 grid: {
-                    color: 'rgba(51, 65, 85, 0.3)',
-                    drawBorder: false
+                    color: 'rgba(148, 163, 184, 0.1)'
                 },
                 ticks: {
-                    color: '#94a3b8',
+                    color: 'var(--text-secondary)',
                     callback: function(value) {
                         return value.toFixed(1) + ' ' + unit;
                     }

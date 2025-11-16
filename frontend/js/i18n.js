@@ -181,6 +181,7 @@ const translations = {
             close: 'Cerrar',
             apply: 'Aplicar',
             reset: 'Restablecer',
+            types: 'Tipos',
             units: {
                 ms: 'ms',
                 bpm: 'bpm',
@@ -369,6 +370,7 @@ const translations = {
             close: 'Close',
             apply: 'Apply',
             reset: 'Reset',
+            types: 'Types',
             units: {
                 ms: 'ms',
                 bpm: 'bpm',
