@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request, g
+from firebase_admin import firestore
 from core.firebase_admin import db
 from core.security import encrypt_data
 from core.auth import token_required
