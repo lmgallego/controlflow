@@ -13,7 +13,9 @@ async function getAuthToken() {
         throw new Error('Usuario no autenticado');
     }
     // Obtener el token (Firebase lo cachea)
-    return user.getIdToken();
+    const token = await user.getIdToken();
+    console.log('[DEBUG] Token obtenido, longitud:', token.length, 'primeros chars:', token.substring(0, 20));
+    return token;
 }
 
 /**

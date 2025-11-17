@@ -18,14 +18,18 @@ def token_required(f):
 
         try:
             # Verificar el token con Firebase
+            print(f"[DEBUG] Verificando token, longitud: {len(token)}, primeros chars: {token[:20]}")
             decoded_token = firebase_auth.verify_id_token(token)
-            
+
             # Almacena el ID del usuario (uid) en el contexto global 'g' de Flask
             g.user_id = decoded_token['uid']
-            
-        except firebase_auth.InvalidIdTokenError:
+            print(f"[DEBUG] Token verificado correctamente para usuario: {g.user_id}")
+
+        except firebase_auth.InvalidIdTokenError as e:
+            print(f"[DEBUG] Token inválido: {str(e)}")
             return jsonify({"error": "Token inválido"}), 401
         except Exception as e:
+            print(f"[DEBUG] Error de autenticación: {type(e).__name__}: {str(e)}")
             return jsonify({"error": f"Error de autenticación: {str(e)}"}), 401
 
         return f(*args, **kwargs)
