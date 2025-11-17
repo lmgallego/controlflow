@@ -99,14 +99,14 @@ function renderWellnessPanelContent(container, data) {
         <!-- Tab 1: Métricas -->
         <div id="tab-metrics" class="wellness-tab-content active">
             <div class="wellness-metrics-grid">
+                ${renderReadinessCard(data)}
                 ${renderHRVCard(data)}
                 ${renderRestingHRCard(data)}
                 ${renderSleepDurationCard(data)}
-                ${renderSleepScoreCard(data)}
             </div>
 
             <div class="wellness-summary-grid">
-                ${renderReadinessCard(data)}
+                ${renderSleepScoreCard(data)}
                 ${renderSummaryCard(data)}
             </div>
         </div>
