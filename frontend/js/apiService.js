@@ -38,11 +38,6 @@ async function fetchAuth(endpoint, options = {}) {
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
-    if (response.status === 401) {
-        // Token inválido o expirado
-        window.location.href = '../landing/login.html';
-    }
-
     // Devolvemos el JSON de error para que el frontend pueda leerlo
     if (!response.ok) {
         const errorData = await response.json();

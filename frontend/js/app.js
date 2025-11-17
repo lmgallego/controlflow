@@ -107,7 +107,16 @@ async function initializeApp() {
 
     } catch (error) {
         console.error("Error al inicializar:", error);
-        // ¡Magia! Si el error es por credenciales, forzamos la vista de configuración
+
+        // Si el token de Firebase es inválido, hacer logout
+        if (error.message && error.message.includes("Token inválido")) {
+            console.log('Token de Firebase inválido, cerrando sesión...');
+            await signOut(auth);
+            window.location.href = '../landing/login.html';
+            return;
+        }
+
+        // Si el error es por credenciales de Intervals.icu, mostrar vista de configuración
         if (error.message && error.message.includes("Credenciales")) {
             athleteSelect.innerHTML = '<option>Configuración requerida</option>';
             await loadView('settings'); // Carga la vista de configuración
