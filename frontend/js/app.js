@@ -21,33 +21,34 @@ const userEmailDisplay = document.getElementById('user-email');
  * Carga la vista principal (Wellness, Actividades, etc.)
  */
 async function loadView(view, athleteId) {
-    // Actualizar estado activo en la UI
-    navItems.forEach(i => {
-        i.classList.remove('active');
-        if (i.dataset.view === view) {
-            i.classList.add('active');
-        }
-    });
-    
-    currentView = view; // Actualizar el estado global
-    viewContainer.innerHTML = '<h3>Cargando...</h3>';
+    try {
+        // Actualizar estado activo en la UI
+        navItems.forEach(i => {
+            i.classList.remove('active');
+            if (i.dataset.view === view) {
+                i.classList.add('active');
+            }
+        });
 
-    // Router simple
-    switch (view) {
-        case 'wellness':
-            if (!athleteId) {
-                viewContainer.innerHTML = '<h3>Cargando atletas...</h3>';
-                return;
-            }
-            await renderWellnessPanel(viewContainer, athleteId);
-            break;
-        case 'activities':
-            if (!athleteId) {
-                viewContainer.innerHTML = '<h3>Cargando atletas...</h3>';
-                return;
-            }
-            await renderActivityFeed(viewContainer, athleteId);
-            break;
+        currentView = view; // Actualizar el estado global
+        viewContainer.innerHTML = '<h3>Cargando...</h3>';
+
+        // Router simple
+        switch (view) {
+            case 'wellness':
+                if (!athleteId) {
+                    viewContainer.innerHTML = '<h3>Cargando atletas...</h3>';
+                    return;
+                }
+                await renderWellnessPanel(viewContainer, athleteId);
+                break;
+            case 'activities':
+                if (!athleteId) {
+                    viewContainer.innerHTML = '<h3>Cargando atletas...</h3>';
+                    return;
+                }
+                await renderActivityFeed(viewContainer, athleteId);
+                break;
         case 'analysis':
             viewContainer.innerHTML = '<h3>Panel de Análisis (Próximamente)</h3>';
             break;
@@ -57,6 +58,14 @@ async function loadView(view, athleteId) {
             break;
         default:
             viewContainer.innerHTML = '<h3>Vista no encontrada</h3>';
+        }
+    } catch (error) {
+        console.error('Error en loadView:', error);
+        viewContainer.innerHTML = `<div class="error-message">
+            <h3>Error al cargar la vista</h3>
+            <p>${error.message}</p>
+            <button onclick="location.reload()">Recargar página</button>
+        </div>`;
     }
 }
 
@@ -64,23 +73,26 @@ async function loadView(view, athleteId) {
  * Carga inicial de la aplicación.
  */
 async function initializeApp() {
-    if (!user) return; // Salir si el usuario no está autenticado
-    
-    // Mostrar el email del usuario y limpiar el selector
-    userEmailDisplay.textContent = user.email;
-    athleteSelect.innerHTML = '<option>Cargando atletas...</option>';
-    athleteSelect.disabled = true;
-
     try {
+        if (!user) {
+            console.error('initializeApp called without user');
+            return; // Salir si el usuario no está autenticado
+        }
+
+        // Mostrar el email del usuario y limpiar el selector
+        userEmailDisplay.textContent = user.email;
+        athleteSelect.innerHTML = '<option>Cargando atletas...</option>';
+        athleteSelect.disabled = true;
+
         const athletes = await getAthletes();
-        
+
         // Rellenar el selector de atletas
         athleteSelect.innerHTML = ''; // Limpiar "Cargando..."
         athletes.forEach(athlete => {
             const option = new Option(athlete.name, athlete.id);
             athleteSelect.add(option);
         });
-        
+
         // Seleccionar el primer atleta por defecto
         if (athletes.length > 0) {
             currentAthleteId = athletes[0].id;
@@ -92,15 +104,15 @@ async function initializeApp() {
             athleteSelect.innerHTML = '<option>No hay atletas</option>';
             viewContainer.innerHTML = '<h3>No se encontraron atletas.</h3>';
         }
-        
+
     } catch (error) {
-        console.error("Error al inicializar:", error.message);
+        console.error("Error al inicializar:", error);
         // ¡Magia! Si el error es por credenciales, forzamos la vista de configuración
-        if (error.message.includes("Credenciales")) {
+        if (error.message && error.message.includes("Credenciales")) {
             athleteSelect.innerHTML = '<option>Configuración requerida</option>';
-            loadView('settings'); // Carga la vista de configuración
+            await loadView('settings'); // Carga la vista de configuración
         } else {
-            viewContainer.innerHTML = `<h1>Error al cargar la app.</h1><p>${error.message}</p>`;
+            viewContainer.innerHTML = `<h1>Error al cargar la app.</h1><p>${error.message || 'Error desconocido'}</p>`;
         }
     }
 }
