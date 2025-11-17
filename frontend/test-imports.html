@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Imports</title>
+</head>
+<body>
+    <h1>Testing Module Imports</h1>
+    <div id="status">Loading...</div>
+
+    <script type="module">
+        try {
+            console.log('1. Testing i18n.js...');
+            const i18n = await import('./js/i18n.js');
+            console.log('✅ i18n.js loaded:', i18n);
+
+            console.log('2. Testing initUI.js...');
+            const initUI = await import('./js/initUI.js');
+            console.log('✅ initUI.js loaded:', initUI);
+
+            console.log('3. Testing bpeAnalysis.js...');
+            const bpe = await import('./js/bpeAnalysis.js');
+            console.log('✅ bpeAnalysis.js loaded:', bpe);
+
+            console.log('4. Testing BPEPanel.js...');
+            const panel = await import('./js/components/BPEPanel.js');
+            console.log('✅ BPEPanel.js loaded:', panel);
+
+            document.getElementById('status').innerHTML = '<span style="color:green">✅ All imports successful! Check console for details.</span>';
+        } catch (error) {
+            console.error('❌ Import failed:', error);
+            document.getElementById('status').innerHTML = '<span style="color:red">❌ Import failed: ' + error.message + '</span>';
+        }
+    </script>
+</body>
+</html>

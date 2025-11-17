@@ -24,20 +24,59 @@
                         <label for="password">Contraseña</label>
                         <input type="password" id="password" required>
                     </div>
-                    <button type="button" class="btn btn-primary btn-large" onclick="fakeLogin()">Acceder</button>
+                    <button type="submit" class="btn btn-primary btn-large">Acceder</button>
                 </form>
             </div>
         </main>
     </div>
     
-    <script>
-        function fakeLogin() {
-            // En una app real, aquí harías un fetch() a tu backend
-            // y si tiene éxito, rediriges.
-            console.log("Simulando inicio de sesión...");
-            // Redirige al panel de la aplicación
-            window.location.href = "../frontend/dashboard.html";
-        }
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+        // Configuración de Firebase (la misma del dashboard)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDWsnabf45cwAMKdcctBv-0Nmka6cg39qU",
+            authDomain: "controlflow-pro.firebaseapp.com",
+            projectId: "controlflow-pro",
+            storageBucket: "controlflow-pro.firebasestorage.app",
+            messagingSenderId: "9591197476",
+            appId: "1:9591197476:web:787c0644399b8f3a4f6db1",
+            measurementId: "G-S4Z12RB0FN"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const loginForm = document.getElementById('login-form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            try {
+                // Intentar iniciar sesión
+                await signInWithEmailAndPassword(auth, email, password);
+                // Si tiene éxito, redirigir al dashboard
+                window.location.href = "../frontend/dashboard.html";
+            } catch (error) {
+                if (error.code === 'auth/user-not-found') {
+                    // Si el usuario no existe, crear la cuenta automáticamente
+                    try {
+                        await createUserWithEmailAndPassword(auth, email, password);
+                        window.location.href = "../frontend/dashboard.html";
+                    } catch (signupError) {
+                        alert('Error al crear cuenta: ' + signupError.message);
+                    }
+                } else {
+                    alert('Error al iniciar sesión: ' + error.message);
+                }
+            }
+        });
     </script>
 </body>
 </html>

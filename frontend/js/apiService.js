@@ -38,11 +38,6 @@ async function fetchAuth(endpoint, options = {}) {
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
-    if (response.status === 401) {
-        // Token inválido o expirado
-        window.location.href = '../landing/login.html';
-    }
-
     // Devolvemos el JSON de error para que el frontend pueda leerlo
     if (!response.ok) {
         const errorData = await response.json();
@@ -64,12 +59,12 @@ export async function getAthletes() {
 }
 
 export async function getWellnessData(athleteId, oldest, newest) {
-    const params = new URLSearchParams({ athleteId, oldest, newest });
+    const params = new URLSearchParams({ athlete_id: athleteId, oldest, newest });
     return fetchAuth(`/wellness?${params}`);
 }
 
 export async function getActivityData(athleteId, oldest, newest) {
-    const params = new URLSearchParams({ athleteId, oldest, newest });
+    const params = new URLSearchParams({ athlete_id: athleteId, oldest, newest });
     return fetchAuth(`/activities?${params}`);
 }
 

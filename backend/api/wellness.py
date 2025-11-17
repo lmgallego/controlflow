@@ -12,12 +12,13 @@ def get_wellness():
         client = get_user_client()
         athlete_id = request.args.get('athlete_id')
         today = date.today()
-        oldest = request.args.get('oldest', (today - timedelta(days=7)).isoformat())
+        # Cambiar a 30 días para tener suficientes datos para análisis estadísticos
+        oldest = request.args.get('oldest', (today - timedelta(days=30)).isoformat())
         newest = request.args.get('newest', today.isoformat())
         if not athlete_id:
             return jsonify({"error": "Se requiere athlete_id"}), 400
         data = client.get_wellness(athlete_id, oldest, newest)
-        if isinstance(data, tuple): 
+        if isinstance(data, tuple):
             return jsonify(data[0]), data[1]
         return jsonify(data)
     except Exception as e:
