@@ -108,7 +108,18 @@ function renderWellnessPanelContent(container, data) {
         </div>
 
         <!-- Tab 1: Métricas -->
-        <div id="tab-metrics" class="wellness-tab-content ${currentActiveTab === 'metrics' ? 'active' : ''}"
+        <div id="tab-metrics" class="wellness-tab-content ${currentActiveTab === 'metrics' ? 'active' : ''}">
+            <!-- Sección superior: Preparación (1/4) + Gráfico HRV Z-Score (3/4) -->
+            <div class="wellness-top-section">
+                <div class="wellness-readiness-compact">
+                    ${renderReadinessCard(data)}
+                </div>
+                <div class="wellness-hrv-zscore-chart">
+                    ${renderHRVZScoreChart(data)}
+                </div>
+            </div>
+            
+            <!-- Métricas en grid -->
             <div class="wellness-metrics-grid">
                 ${renderHRVCard(data)}
                 ${renderRestingHRCard(data)}
@@ -117,7 +128,6 @@ function renderWellnessPanelContent(container, data) {
             </div>
 
             <div class="wellness-summary-grid">
-                ${renderReadinessCard(data)}
                 ${renderSummaryCard(data)}
             </div>
         </div>
@@ -151,6 +161,7 @@ function renderWellnessPanelContent(container, data) {
     chartInstances = {};
 
     // Renderizar gráficos de la pestaña Métricas
+    chartInstances.hrvZScoreChart = renderHRVZScoreChartInstance(data);
     chartInstances.hrvChart = renderHRVChart(data);
     chartInstances.rhrChart = renderRestingHRChart(data);
     chartInstances.sleepDurationChart = renderSleepDurationChart(data);
@@ -798,6 +809,41 @@ function renderSummaryCard(data) {
     `;
 }
 
+/**
+ * Renderiza el gráfico de HRV Z-Score con zonas de preparación
+ */
+function renderHRVZScoreChart(data) {
+    return `
+        <div class="hrv-zscore-chart-card">
+            <div class="hrv-zscore-header">
+                <h3>HRV Z-Score con Zonas de Preparación</h3>
+                <button class="chart-fullscreen-btn" data-chart="hrv-zscore" title="${t('wellness.chart.fullscreen')}">⛶</button>
+            </div>
+            <div class="hrv-zscore-chart-container">
+                <canvas id="hrv-zscore-chart"></canvas>
+            </div>
+            <div class="hrv-zscore-legend">
+                <div class="legend-item">
+                    <span class="legend-color" style="background-color: rgba(239, 68, 68, 0.2);"></span>
+                    <span class="legend-text">REST (Z < -1.5)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background-color: rgba(251, 191, 36, 0.2);"></span>
+                    <span class="legend-text">LIT (-1.5 ≤ Z < -0.5)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background-color: rgba(59, 130, 246, 0.2);"></span>
+                    <span class="legend-text">NORMAL (-0.5 ≤ Z < 0.5)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background-color: rgba(16, 185, 129, 0.2);"></span>
+                    <span class="legend-text">HIIT (Z ≥ 0.5)</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 // === GRÁFICOS ===
 
 /**
@@ -1002,6 +1048,169 @@ function renderSleepScoreChart(data) {
                             borderDash: [5, 5]
                         }
                     }
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Renderiza el gráfico de HRV Z-Score con zonas de preparación
+ */
+function renderHRVZScoreChartInstance(data) {
+    const ctx = document.getElementById('hrv-zscore-chart');
+    if (!ctx) return null;
+
+    const colors = getThemeColors();
+    const labels = data.dates;
+    const zScores = data.hrv.zScores;
+
+    return new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'HRV Z-Score',
+                    data: zScores,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: zScores.map(z => {
+                        if (z >= 0.5) return '#10b981'; // HIIT - verde
+                        if (z >= -0.5) return '#3b82f6'; // NORMAL - azul
+                        if (z >= -1.5) return '#fbbf24'; // LIT - amarillo
+                        return '#ef4444'; // REST - rojo
+                    }),
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: colors.tooltipBg,
+                    titleColor: colors.text,
+                    bodyColor: colors.textSecondary,
+                    borderColor: colors.tooltipBorder,
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: (context) => {
+                            const zScore = context.parsed.y;
+                            let zone = '';
+                            if (zScore >= 0.5) zone = 'HIIT';
+                            else if (zScore >= -0.5) zone = 'NORMAL';
+                            else if (zScore >= -1.5) zone = 'LIT';
+                            else zone = 'REST';
+                            return `Z-Score: ${zScore.toFixed(2)} (${zone})`;
+                        }
+                    }
+                },
+                annotation: {
+                    annotations: {
+                        // Zona REST (roja) - por debajo de -1.5
+                        restZone: {
+                            type: 'box',
+                            yMin: -3,
+                            yMax: -1.5,
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 0
+                        },
+                        // Zona LIT (amarilla) - entre -1.5 y -0.5
+                        litZone: {
+                            type: 'box',
+                            yMin: -1.5,
+                            yMax: -0.5,
+                            backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                            borderWidth: 0
+                        },
+                        // Zona NORMAL (azul) - entre -0.5 y 0.5
+                        normalZone: {
+                            type: 'box',
+                            yMin: -0.5,
+                            yMax: 0.5,
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 0
+                        },
+                        // Zona HIIT (verde) - por encima de 0.5
+                        hiitZone: {
+                            type: 'box',
+                            yMin: 0.5,
+                            yMax: 3,
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 0
+                        },
+                        // Líneas de separación
+                        line1: {
+                            type: 'line',
+                            yMin: -1.5,
+                            yMax: -1.5,
+                            borderColor: '#fbbf24',
+                            borderWidth: 2,
+                            borderDash: [5, 5]
+                        },
+                        line2: {
+                            type: 'line',
+                            yMin: -0.5,
+                            yMax: -0.5,
+                            borderColor: '#3b82f6',
+                            borderWidth: 2,
+                            borderDash: [5, 5]
+                        },
+                        line3: {
+                            type: 'line',
+                            yMin: 0.5,
+                            yMax: 0.5,
+                            borderColor: '#10b981',
+                            borderWidth: 2,
+                            borderDash: [5, 5]
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: colors.text,
+                        maxRotation: 45,
+                        minRotation: 45
+                    },
+                    grid: {
+                        color: colors.grid
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Z-Score',
+                        color: colors.text,
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        color: colors.text
+                    },
+                    grid: {
+                        color: colors.grid
+                    },
+                    min: -3,
+                    max: 3
                 }
             }
         }

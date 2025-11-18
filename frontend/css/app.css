@@ -638,6 +638,77 @@ a {
     margin: 0;
 }
 
+/* --- Wellness Top Section (Preparación + HRV Z-Score) --- */
+.wellness-top-section {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.wellness-readiness-compact {
+    display: flex;
+    align-items: stretch;
+}
+
+.wellness-hrv-zscore-chart {
+    display: flex;
+    flex-direction: column;
+}
+
+.hrv-zscore-chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.hrv-zscore-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.hrv-zscore-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.hrv-zscore-chart-container {
+    flex: 1;
+    min-height: 250px;
+    position: relative;
+}
+
+.hrv-zscore-legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.hrv-zscore-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+}
+
+.hrv-zscore-legend .legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid var(--border-color);
+}
+
 /* --- Wellness Metrics Grid --- */
 .wellness-metrics-grid {
     display: grid;
@@ -908,9 +979,21 @@ a {
     .wellness-metrics-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+    
+    .wellness-top-section {
+        grid-template-columns: 1fr 2fr;
+    }
 }
 
 @media (max-width: 768px) {
+    .wellness-top-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .hrv-zscore-chart-container {
+        min-height: 200px;
+    }
+    
     .wellness-metrics-grid {
         grid-template-columns: 1fr;
     }
