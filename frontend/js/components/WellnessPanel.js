@@ -751,14 +751,32 @@ function renderSleepScoreCard(data) {
 }
 
 /**
- * Card de PREPARACIÓN basado en HRV Z-score (versión compacta)
+ * Card de PREPARACIÓN basado en HRV Z-score (versión expandida)
  */
 function renderReadinessCard(data) {
     const { readiness } = data;
+    
+    // Detectar cambios inusuales en Z-Score (diferencia > 2 respecto al día anterior)
+    const zScores = data.hrv.zScores;
+    let unusualChange = null;
+    if (zScores.length >= 2) {
+        const lastZScore = zScores[zScores.length - 1];
+        const previousZScore = zScores[zScores.length - 2];
+        const diff = Math.abs(lastZScore - previousZScore);
+        
+        if (diff > 2) {
+            const direction = lastZScore > previousZScore ? 'mejora' : 'caída';
+            unusualChange = {
+                diff: diff.toFixed(2),
+                direction: direction,
+                color: lastZScore > previousZScore ? '#10b981' : '#ef4444'
+            };
+        }
+    }
 
     return `
-        <div class="readiness-card readiness-card-compact" style="border-left-color: ${readiness.color};">
-            <div class="readiness-content-compact">
+        <div class="readiness-card readiness-card-expanded" style="border-left-color: ${readiness.color};">
+            <div class="readiness-content-expanded">
                 <div class="readiness-top">
                     <h4 data-i18n="wellness.readiness.title">${t('wellness.readiness.title')}</h4>
                     <div class="readiness-emoji-small">${readiness.emoji}</div>
@@ -767,10 +785,20 @@ function renderReadinessCard(data) {
                     ${t('wellness.readiness.levels.' + readiness.levelKey)}
                 </div>
                 <div class="readiness-intensity-compact">
+                    <span class="intensity-label-compact" data-i18n="wellness.readiness.recommended">${t('wellness.readiness.recommended')}:</span>
                     <span class="intensity-value-compact" style="color: ${readiness.color};">
-                        ${readiness.intensityKey === 'noData' ? 'N/A' : readiness.intensityKey.toUpperCase()}
+                        ${readiness.intensityKey === 'noData' ? 'N/A' : t('wellness.readiness.intensities.' + readiness.intensityKey)}
                     </span>
                 </div>
+                ${unusualChange ? `
+                    <div class="readiness-unusual-change" style="border-color: ${unusualChange.color};">
+                        <div class="unusual-change-icon" style="color: ${unusualChange.color};">⚠️</div>
+                        <div class="unusual-change-text">
+                            <strong data-i18n="wellness.readiness.unusualChange">Cambio Inusual</strong>
+                            <span>${t('wellness.readiness.unusualChangeDesc.' + unusualChange.direction)} (Δ ${unusualChange.diff})</span>
+                        </div>
+                    </div>
+                ` : ''}
             </div>
         </div>
     `;
@@ -816,7 +844,7 @@ function renderHRVZScoreChart(data) {
     return `
         <div class="hrv-zscore-chart-card">
             <div class="hrv-zscore-header">
-                <h3>HRV Z-Score con Zonas de Preparación</h3>
+                <h3 data-i18n="wellness.hrvZScore.title">${t('wellness.hrvZScore.title')}</h3>
                 <button class="chart-fullscreen-btn" data-chart="hrv-zscore" title="${t('wellness.chart.fullscreen')}">⛶</button>
             </div>
             <div class="hrv-zscore-chart-container">
@@ -825,19 +853,19 @@ function renderHRVZScoreChart(data) {
             <div class="hrv-zscore-legend">
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(239, 68, 68, 0.2);"></span>
-                    <span class="legend-text">REST (Z < -1.5)</span>
+                    <span class="legend-text" data-i18n="wellness.hrvZScore.zones.rest">${t('wellness.hrvZScore.zones.rest')}</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(251, 191, 36, 0.2);"></span>
-                    <span class="legend-text">LIT (-1.5 ≤ Z < -0.5)</span>
+                    <span class="legend-text" data-i18n="wellness.hrvZScore.zones.lit">${t('wellness.hrvZScore.zones.lit')}</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(59, 130, 246, 0.2);"></span>
-                    <span class="legend-text">NORMAL (-0.5 ≤ Z < 0.5)</span>
+                    <span class="legend-text" data-i18n="wellness.hrvZScore.zones.normal">${t('wellness.hrvZScore.zones.normal')}</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(16, 185, 129, 0.2);"></span>
-                    <span class="legend-text">HIIT (Z ≥ 0.5)</span>
+                    <span class="legend-text" data-i18n="wellness.hrvZScore.zones.hiit">${t('wellness.hrvZScore.zones.hiit')}</span>
                 </div>
             </div>
         </div>
@@ -1305,7 +1333,7 @@ function getChartOptions(unit = '') {
                 ticks: {
                     color: colors.textSecondary,
                     callback: function(value) {
-                        return value.toFixed(1) + ' ' + unit;
+                        return value.toFixed(1);
                     }
                 }
             }

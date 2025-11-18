@@ -162,6 +162,17 @@ const translations = {
                 sleepQuality: 'Calidad Sueño'
             },
 
+            // HRV Z-Score Chart
+            hrvZScore: {
+                title: 'HRV Z-Score con Zonas de Preparación',
+                zones: {
+                    rest: 'REST (Z < -1.5)',
+                    lit: 'LIT (-1.5 ≤ Z < -0.5)',
+                    normal: 'NORMAL (-0.5 ≤ Z < 0.5)',
+                    hiit: 'HIIT (Z ≥ 0.5)'
+                }
+            },
+
             // Readiness Card
             readiness: {
                 title: 'PREPARACIÓN',
@@ -186,6 +197,11 @@ const translations = {
                     normal: 'Entrenamiento de fuerza o cardio moderado',
                     hiit: 'HIIT, series de velocidad, entrenamiento de alta intensidad',
                     noData: 'N/A'
+                },
+                unusualChange: 'Cambio Inusual',
+                unusualChangeDesc: {
+                    mejora: 'Mejora significativa detectada',
+                    caída: 'Caída significativa detectada'
                 }
             },
 
@@ -447,6 +463,17 @@ const translations = {
                 sleepQuality: 'Sleep Quality'
             },
 
+            // HRV Z-Score Chart
+            hrvZScore: {
+                title: 'HRV Z-Score with Readiness Zones',
+                zones: {
+                    rest: 'REST (Z < -1.5)',
+                    lit: 'LIT (-1.5 ≤ Z < -0.5)',
+                    normal: 'NORMAL (-0.5 ≤ Z < 0.5)',
+                    hiit: 'HIIT (Z ≥ 0.5)'
+                }
+            },
+
             // Readiness Card
             readiness: {
                 title: 'READINESS',
@@ -471,6 +498,11 @@ const translations = {
                     normal: 'Strength training or moderate cardio',
                     hiit: 'HIIT, speed intervals, high-intensity training',
                     noData: 'N/A'
+                },
+                unusualChange: 'Unusual Change',
+                unusualChangeDesc: {
+                    mejora: 'Significant improvement detected',
+                    caída: 'Significant drop detected'
                 }
             },
 
