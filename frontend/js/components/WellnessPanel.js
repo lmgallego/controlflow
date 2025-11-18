@@ -740,27 +740,23 @@ function renderSleepScoreCard(data) {
 }
 
 /**
- * Card de PREPARACIÓN basado en HRV Z-score
+ * Card de PREPARACIÓN basado en HRV Z-score (versión compacta)
  */
 function renderReadinessCard(data) {
     const { readiness } = data;
 
     return `
-        <div class="readiness-card" style="border-left-color: ${readiness.color};">
-            <div class="readiness-header">
-                <h3 data-i18n="wellness.readiness.title">${t('wellness.readiness.title')}</h3>
-            </div>
-            <div class="readiness-content">
-                <div class="readiness-emoji">${readiness.emoji}</div>
-                <div class="readiness-level" style="color: ${readiness.color};">
+        <div class="readiness-card readiness-card-compact" style="border-left-color: ${readiness.color};">
+            <div class="readiness-content-compact">
+                <div class="readiness-top">
+                    <h4 data-i18n="wellness.readiness.title">${t('wellness.readiness.title')}</h4>
+                    <div class="readiness-emoji-small">${readiness.emoji}</div>
+                </div>
+                <div class="readiness-level-compact" style="color: ${readiness.color};">
                     ${t('wellness.readiness.levels.' + readiness.levelKey)}
                 </div>
-                <div class="readiness-description">
-                    ${t('wellness.readiness.descriptions.' + readiness.levelKey)}
-                </div>
-                <div class="readiness-intensity">
-                    <span class="intensity-label" data-i18n="wellness.readiness.recommended">${t('wellness.readiness.recommended')}:</span>
-                    <span class="intensity-value" style="color: ${readiness.color};">
+                <div class="readiness-intensity-compact">
+                    <span class="intensity-value-compact" style="color: ${readiness.color};">
                         ${readiness.intensityKey === 'noData' ? 'N/A' : readiness.intensityKey.toUpperCase()}
                     </span>
                 </div>

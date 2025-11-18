@@ -70,10 +70,17 @@ export function createPatternAnalysisPanel(data) {
         renderCorrelationChart('hrv-sleep-duration-chart', data.hrv.raw, data.sleepDuration.hours,
             'HRV (ms)', t('wellness.sleepDuration.title') + ' (h)', correlations.hrvSleepDuration);
 
-        // Renderizar HRV vs Carga (usar datos si existen, sino arrays vacíos)
-        const loadValues = (data.trainingLoad && data.trainingLoad.values) ? data.trainingLoad.values : [];
-        renderCorrelationChart('hrv-load-chart', data.hrv.raw, loadValues,
-            'HRV (ms)', 'Carga (TSS)', correlations.hrvLoad || { r: null, regression: null });
+        // Renderizar HRV vs Carga con desfase de 1 día
+        // La carga de hoy (X) afecta el HRV de mañana (Y)
+        if (data.trainingLoad && data.trainingLoad.values) {
+            const hrvShifted = data.hrv.raw.slice(1); // HRV desde día 2
+            const loadShifted = data.trainingLoad.values.slice(0, -1); // Carga hasta penúltimo día
+            renderCorrelationChart('hrv-load-chart', loadShifted, hrvShifted,
+                'Carga Día Anterior (TSS)', 'HRV Día Siguiente (ms)', correlations.hrvLoad || { r: null, regression: null });
+        } else {
+            renderCorrelationChart('hrv-load-chart', [], [],
+                'Carga Día Anterior (TSS)', 'HRV Día Siguiente (ms)', { r: null, regression: null });
+        }
 
         // Configurar event listeners para botones de fullscreen después de renderizar
         setupPatternFullscreenButtons();
@@ -106,10 +113,17 @@ function calculateCorrelations(data) {
     };
 
     // Añadir correlación HRV vs Carga si hay datos de actividades
+    // IMPORTANTE: El HRV responde al día siguiente de la carga de entrenamiento
+    // Por lo tanto, desplazamos el HRV 1 día hacia adelante para la correlación
     if (data.trainingLoad && data.trainingLoad.values) {
+        // Desplazar HRV 1 día adelante (HRV[i+1] vs Carga[i])
+        // Esto significa: la carga de hoy afecta el HRV de mañana
+        const hrvShifted = data.hrv.raw.slice(1); // HRV desde día 2 en adelante
+        const loadShifted = data.trainingLoad.values.slice(0, -1); // Carga hasta el penúltimo día
+        
         correlations.hrvLoad = {
-            r: pearsonCorrelation(data.hrv.raw, data.trainingLoad.values),
-            regression: linearRegression(data.hrv.raw, data.trainingLoad.values)
+            r: pearsonCorrelation(hrvShifted, loadShifted),
+            regression: linearRegression(loadShifted, hrvShifted) // X=Carga, Y=HRV
         };
     }
 

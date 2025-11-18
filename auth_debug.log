@@ -1,0 +1,108 @@
+[2025-11-17 22:54:02] === Nueva petición ===
+[2025-11-17 22:54:02] Authorization header presente: True
+[2025-11-17 22:54:02] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 22:54:02] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 22:54:02] Intentando verificar token con Firebase...
+[2025-11-17 22:54:02] ERROR InvalidArgumentError: Token used too early, 1763416442 < 1763416444. Check that your computer's clock is set correctly.
+[2025-11-17 22:54:02] === Nueva petición ===
+[2025-11-17 22:54:02] Authorization header presente: True
+[2025-11-17 22:54:02] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 22:54:02] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 22:54:02] Intentando verificar token con Firebase...
+[2025-11-17 22:54:02] ERROR InvalidArgumentError: Token used too early, 1763416442 < 1763416444. Check that your computer's clock is set correctly.
+[2025-11-17 22:55:35] === Nueva petición ===
+[2025-11-17 22:55:35] Authorization header presente: True
+[2025-11-17 22:55:35] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 22:55:35] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 22:55:35] Intentando verificar token con Firebase...
+[2025-11-17 22:55:35] ERROR ValueError: Illegal clock_skew_seconds value: 300. Must be between 0 and 60, inclusive.
+[2025-11-17 22:55:35] === Nueva petición ===
+[2025-11-17 22:55:35] Authorization header presente: True
+[2025-11-17 22:55:35] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 22:55:35] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 22:55:35] Intentando verificar token con Firebase...
+[2025-11-17 22:55:35] ERROR ValueError: Illegal clock_skew_seconds value: 300. Must be between 0 and 60, inclusive.
+[2025-11-17 22:56:27] === Nueva petición ===
+[2025-11-17 22:56:27] Authorization header presente: True
+[2025-11-17 22:56:27] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 22:56:27] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 22:56:27] Intentando verificar token con Firebase...
+[2025-11-17 22:56:27] ERROR ValueError: Illegal clock_skew_seconds value: 300. Must be between 0 and 60, inclusive.
+[2025-11-17 22:56:27] === Nueva petición ===
+[2025-11-17 22:56:27] Authorization header presente: True
+[2025-11-17 22:56:27] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 22:56:27] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 22:56:27] Intentando verificar token con Firebase...
+[2025-11-17 22:56:27] ERROR ValueError: Illegal clock_skew_seconds value: 300. Must be between 0 and 60, inclusive.
+[2025-11-17 22:58:58] === Nueva petición ===
+[2025-11-17 22:58:58] Authorization header presente: True
+[2025-11-17 22:58:58] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 22:58:58] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 22:58:58] Intentando verificar token con Firebase...
+[2025-11-17 22:58:58] ✓ Token verificado exitosamente. UID: FotU9wq7Q4gxjveFbCo43dwW1Xx1
+[2025-11-17 22:59:00] === Nueva petición ===
+[2025-11-17 22:59:00] Authorization header presente: True
+[2025-11-17 22:59:00] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 22:59:00] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 22:59:00] Intentando verificar token con Firebase...
+[2025-11-17 22:59:00] ✓ Token verificado exitosamente. UID: FotU9wq7Q4gxjveFbCo43dwW1Xx1
+[2025-11-17 22:59:00] === Nueva petición ===
+[2025-11-17 22:59:00] Authorization header presente: True
+[2025-11-17 22:59:00] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 22:59:00] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 22:59:00] Intentando verificar token con Firebase...
+[2025-11-17 22:59:00] ✓ Token verificado exitosamente. UID: FotU9wq7Q4gxjveFbCo43dwW1Xx1
+[2025-11-17 22:59:01] === Nueva petición ===
+[2025-11-17 22:59:01] Authorization header presente: True
+[2025-11-17 22:59:01] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 22:59:01] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 22:59:01] Intentando verificar token con Firebase...
+[2025-11-17 22:59:01] ✓ Token verificado exitosamente. UID: FotU9wq7Q4gxjveFbCo43dwW1Xx1
+[2025-11-17 22:59:37] === Nueva petición ===
+[2025-11-17 22:59:37] Authorization header presente: True
+[2025-11-17 22:59:37] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 22:59:37] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 22:59:37] Intentando verificar token con Firebase...
+[2025-11-17 22:59:37] ✓ Token verificado exitosamente. UID: FotU9wq7Q4gxjveFbCo43dwW1Xx1
+[2025-11-17 23:00:27] === Nueva petición ===
+[2025-11-17 23:00:27] Authorization header presente: True
+[2025-11-17 23:00:27] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 23:00:27] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 23:00:27] Intentando verificar token con Firebase...
+[2025-11-17 23:00:28] ✓ Token verificado exitosamente. UID: FotU9wq7Q4gxjveFbCo43dwW1Xx1
+[2025-11-17 23:00:29] === Nueva petición ===
+[2025-11-17 23:00:29] Authorization header presente: True
+[2025-11-17 23:00:29] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 23:00:29] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 23:00:29] Intentando verificar token con Firebase...
+[2025-11-17 23:00:29] ✓ Token verificado exitosamente. UID: FotU9wq7Q4gxjveFbCo43dwW1Xx1
+[2025-11-17 23:00:30] === Nueva petición ===
+[2025-11-17 23:00:30] Authorization header presente: True
+[2025-11-17 23:00:30] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 23:00:30] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 23:00:30] Intentando verificar token con Firebase...
+[2025-11-17 23:00:30] ✓ Token verificado exitosamente. UID: FotU9wq7Q4gxjveFbCo43dwW1Xx1
+[2025-11-17 23:01:54] === Nueva petición ===
+[2025-11-17 23:01:54] Authorization header presente: True
+[2025-11-17 23:01:54] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 23:01:54] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 23:01:54] Intentando verificar token con Firebase...
+[2025-11-17 23:01:54] ✓ Token verificado exitosamente. UID: FotU9wq7Q4gxjveFbCo43dwW1Xx1
+[2025-11-17 23:01:55] === Nueva petición ===
+[2025-11-17 23:01:55] Authorization header presente: True
+[2025-11-17 23:01:55] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 23:01:55] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 23:01:55] Intentando verificar token con Firebase...
+[2025-11-17 23:01:55] ✓ Token verificado exitosamente. UID: FotU9wq7Q4gxjveFbCo43dwW1Xx1
+[2025-11-17 23:01:57] === Nueva petición ===
+[2025-11-17 23:01:57] Authorization header presente: True
+[2025-11-17 23:01:57] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 23:01:57] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 23:01:57] Intentando verificar token con Firebase...
+[2025-11-17 23:01:57] ✓ Token verificado exitosamente. UID: FotU9wq7Q4gxjveFbCo43dwW1Xx1
+[2025-11-17 23:01:57] === Nueva petición ===
+[2025-11-17 23:01:57] Authorization header presente: True
+[2025-11-17 23:01:57] Authorization header (primeros 50 chars): Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1YTZjMGMyYjg
+[2025-11-17 23:01:57] Token extraído (primeros 30 chars): eyJhbGciOiJSUzI1NiIsImtpZCI6Ij
+[2025-11-17 23:01:57] Intentando verificar token con Firebase...
+[2025-11-17 23:01:57] ✓ Token verificado exitosamente. UID: FotU9wq7Q4gxjveFbCo43dwW1Xx1

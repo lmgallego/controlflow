@@ -75,8 +75,8 @@ const translations = {
                     hrvRhrPositive: 'Correlación positiva HRV-RHR inusual: Podría indicar estrés o adaptación al entrenamiento.',
                     hrvSleepPositive: 'Buena calidad de sueño mejora tu HRV: Prioriza el descanso para optimizar la recuperación.',
                     hrvSleepDurationPositive: 'Más horas de sueño mejoran tu HRV: Intenta dormir consistentemente 7-9 horas.',
-                    hrvLoadNegative: 'Correlación negativa HRV-Carga: El entrenamiento intenso reduce tu HRV temporalmente. Asegura recuperación adecuada.',
-                    hrvLoadPositive: 'Tu cuerpo se adapta bien al entrenamiento: El HRV se mantiene alto incluso con carga elevada.',
+                    hrvLoadNegative: 'Correlación negativa HRV-Carga (día siguiente): El entrenamiento intenso reduce tu HRV al día siguiente. Asegura recuperación adecuada.',
+                    hrvLoadPositive: 'Tu cuerpo se adapta bien al entrenamiento: El HRV del día siguiente se mantiene alto incluso con carga elevada.',
                     sleepQualityStrong: 'Fuerte relación entre duración y calidad del sueño: Dormir más horas mejora tu recuperación.',
                     sleepQualityWeak: 'Baja correlación duración-calidad: La calidad del sueño importa más que la cantidad.',
                     noSignificant: 'No se detectaron patrones significativos con los datos actuales.'
@@ -360,8 +360,8 @@ const translations = {
                     hrvRhrPositive: 'Unusual positive HRV-RHR correlation: Could indicate stress or training adaptation.',
                     hrvSleepPositive: 'Good sleep quality improves your HRV: Prioritize rest to optimize recovery.',
                     hrvSleepDurationPositive: 'More sleep hours improve your HRV: Try to consistently sleep 7-9 hours.',
-                    hrvLoadNegative: 'Negative HRV-Load correlation: Intense training temporarily reduces HRV. Ensure adequate recovery.',
-                    hrvLoadPositive: 'Your body adapts well to training: HRV remains high even with elevated load.',
+                    hrvLoadNegative: 'Negative HRV-Load correlation (next day): Intense training reduces HRV the following day. Ensure adequate recovery.',
+                    hrvLoadPositive: 'Your body adapts well to training: Next-day HRV remains high even with elevated load.',
                     sleepQualityStrong: 'Strong relationship between sleep duration and quality: More sleep hours improve your recovery.',
                     sleepQualityWeak: 'Low duration-quality correlation: Sleep quality matters more than quantity.',
                     noSignificant: 'No significant patterns detected with current data.'

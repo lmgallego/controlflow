@@ -11,6 +11,7 @@ from flask_cors import CORS
 from config import Config
 from api.athletes import athletes_api
 from api.wellness import wellness_api
+from api.activities import activities_api
 from api.users import users_api
 import core.firebase_admin # Importar esto inicializa la app de Firebase
 
@@ -23,10 +24,16 @@ def create_app():
     app.register_blueprint(users_api, url_prefix='/api/v1/users')
     app.register_blueprint(athletes_api, url_prefix='/api/v1')
     app.register_blueprint(wellness_api, url_prefix='/api/v1')
+    app.register_blueprint(activities_api, url_prefix='/api/v1')
     
     @app.route('/')
     def health_check():
         return "El servidor del backend está activo."
+    
+    @app.route('/test')
+    def test_endpoint():
+        import datetime
+        return f"Servidor reiniciado correctamente - {datetime.datetime.now()}"
 
     return app
 

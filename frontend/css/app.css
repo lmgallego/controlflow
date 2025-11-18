@@ -2046,6 +2046,64 @@ a {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
+/* Versión compacta de la tarjeta de preparación */
+.readiness-card-compact {
+    padding: 16px 20px;
+    min-height: auto;
+}
+
+.readiness-card-compact:hover {
+    transform: translateY(-2px);
+}
+
+.readiness-content-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.readiness-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.readiness-top h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.readiness-emoji-small {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.readiness-level-compact {
+    font-size: 1.3rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.readiness-intensity-compact {
+    text-align: center;
+    padding: 8px 12px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.intensity-value-compact {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
 /* Responsive readiness card */
 @media (max-width: 768px) {
     .readiness-card {
@@ -2062,6 +2120,18 @@ a {
 
     .readiness-description {
         font-size: 0.95rem;
+    }
+    
+    .readiness-card-compact {
+        padding: 14px 18px;
+    }
+    
+    .readiness-level-compact {
+        font-size: 1.1rem;
+    }
+    
+    .intensity-value-compact {
+        font-size: 0.9rem;
     }
 
     .readiness-intensity {
