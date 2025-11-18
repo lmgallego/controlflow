@@ -787,7 +787,7 @@ function renderReadinessCard(data) {
                 <div class="readiness-intensity-compact">
                     <span class="intensity-label-compact" data-i18n="wellness.readiness.recommended">${t('wellness.readiness.recommended')}:</span>
                     <span class="intensity-value-compact" style="color: ${readiness.color};">
-                        ${readiness.intensityKey === 'noData' ? 'N/A' : t('wellness.readiness.intensities.' + readiness.intensityKey)}
+                        ${readiness.intensityKey === 'noData' ? 'N/A' : readiness.intensityKey.toUpperCase()}
                     </span>
                 </div>
                 ${unusualChange ? `
@@ -844,7 +844,7 @@ function renderHRVZScoreChart(data) {
     return `
         <div class="hrv-zscore-chart-card">
             <div class="hrv-zscore-header">
-                <h3 data-i18n="wellness.hrvZScore.title">${t('wellness.hrvZScore.title')}</h3>
+                <h3>${t('wellness.hrvZScore.title')}</h3>
                 <button class="chart-fullscreen-btn" data-chart="hrv-zscore" title="${t('wellness.chart.fullscreen')}">⛶</button>
             </div>
             <div class="hrv-zscore-chart-container">
@@ -853,19 +853,19 @@ function renderHRVZScoreChart(data) {
             <div class="hrv-zscore-legend">
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(239, 68, 68, 0.2);"></span>
-                    <span class="legend-text" data-i18n="wellness.hrvZScore.zones.rest">${t('wellness.hrvZScore.zones.rest')}</span>
+                    <span class="legend-text">${t('wellness.hrvZScore.zones.rest')}</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(251, 191, 36, 0.2);"></span>
-                    <span class="legend-text" data-i18n="wellness.hrvZScore.zones.lit">${t('wellness.hrvZScore.zones.lit')}</span>
+                    <span class="legend-text">${t('wellness.hrvZScore.zones.lit')}</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(59, 130, 246, 0.2);"></span>
-                    <span class="legend-text" data-i18n="wellness.hrvZScore.zones.normal">${t('wellness.hrvZScore.zones.normal')}</span>
+                    <span class="legend-text">${t('wellness.hrvZScore.zones.normal')}</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(16, 185, 129, 0.2);"></span>
-                    <span class="legend-text" data-i18n="wellness.hrvZScore.zones.hiit">${t('wellness.hrvZScore.zones.hiit')}</span>
+                    <span class="legend-text">${t('wellness.hrvZScore.zones.hiit')}</span>
                 </div>
             </div>
         </div>
