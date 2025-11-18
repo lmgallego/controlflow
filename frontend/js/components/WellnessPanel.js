@@ -786,19 +786,23 @@ function renderReadinessCard(data) {
                 </div>
                 <div class="readiness-intensity-compact">
                     <span class="intensity-label-compact" data-i18n="wellness.readiness.recommended">${t('wellness.readiness.recommended')}:</span>
-                    <span class="intensity-value-compact" style="color: ${readiness.color};">
+                    <span class="intensity-value-compact" style="color: ${readiness.color}; text-align: center; display: block;">
                         ${readiness.intensityKey === 'noData' ? 'N/A' : readiness.intensityKey.toUpperCase()}
                     </span>
                 </div>
-                ${unusualChange ? `
-                    <div class="readiness-unusual-change" style="border-color: ${unusualChange.color};">
+                <div class="readiness-unusual-change ${unusualChange ? 'has-change' : 'no-change'}" style="${unusualChange ? `border-color: ${unusualChange.color};` : ''}">
+                    ${unusualChange ? `
                         <div class="unusual-change-icon" style="color: ${unusualChange.color};">⚠️</div>
                         <div class="unusual-change-text">
-                            <strong data-i18n="wellness.readiness.unusualChange">Cambio Inusual</strong>
+                            <strong data-i18n="wellness.readiness.unusualChange">${t('wellness.readiness.unusualChange')}</strong>
                             <span>${t('wellness.readiness.unusualChangeDesc.' + unusualChange.direction)} (Δ ${unusualChange.diff})</span>
                         </div>
-                    </div>
-                ` : ''}
+                    ` : `
+                        <div class="unusual-change-text" style="text-align: center;">
+                            <span style="color: var(--text-secondary); font-size: 0.85rem;">Sin cambios anómalos detectados</span>
+                        </div>
+                    `}
+                </div>
             </div>
         </div>
     `;
@@ -844,8 +848,8 @@ function renderHRVZScoreChart(data) {
     return `
         <div class="hrv-zscore-chart-card">
             <div class="hrv-zscore-header">
-                <h3>${t('wellness.hrvZScore.title')}</h3>
-                <button class="chart-fullscreen-btn" data-chart="hrv-zscore" title="${t('wellness.chart.fullscreen')}">⛶</button>
+                <h3>HRV Z-Score con Zonas de Preparación</h3>
+                <button class="chart-fullscreen-btn" data-chart="hrv-zscore" title="Pantalla completa">⛶</button>
             </div>
             <div class="hrv-zscore-chart-container">
                 <canvas id="hrv-zscore-chart"></canvas>
@@ -853,19 +857,19 @@ function renderHRVZScoreChart(data) {
             <div class="hrv-zscore-legend">
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(239, 68, 68, 0.2);"></span>
-                    <span class="legend-text">${t('wellness.hrvZScore.zones.rest')}</span>
+                    <span class="legend-text">REST (Z < -1.5)</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(251, 191, 36, 0.2);"></span>
-                    <span class="legend-text">${t('wellness.hrvZScore.zones.lit')}</span>
+                    <span class="legend-text">LIT (-1.5 ≤ Z < -0.5)</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(59, 130, 246, 0.2);"></span>
-                    <span class="legend-text">${t('wellness.hrvZScore.zones.normal')}</span>
+                    <span class="legend-text">NORMAL (-0.5 ≤ Z < 0.5)</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(16, 185, 129, 0.2);"></span>
-                    <span class="legend-text">${t('wellness.hrvZScore.zones.hiit')}</span>
+                    <span class="legend-text">HIIT (Z ≥ 0.5)</span>
                 </div>
             </div>
         </div>

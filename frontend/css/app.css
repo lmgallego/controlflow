@@ -2208,6 +2208,10 @@ a {
     border-left: 3px solid;
 }
 
+.readiness-unusual-change.no-change {
+    border-left-color: var(--border-color);
+}
+
 .unusual-change-icon {
     font-size: 1.2rem;
     line-height: 1;
