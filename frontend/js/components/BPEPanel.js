@@ -256,7 +256,7 @@ function createTimelineSection(result) {
 
     const canvas = document.createElement('canvas');
     canvas.id = 'bpe-timeline-chart';
-    canvas.height = 150;
+    canvas.height = 100;
 
     section.appendChild(canvas);
 
