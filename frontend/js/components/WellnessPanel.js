@@ -794,8 +794,8 @@ function renderReadinessCard(data) {
                     ${unusualChange ? `
                         <div class="unusual-change-icon" style="color: ${unusualChange.color};">⚠️</div>
                         <div class="unusual-change-text">
-                            <strong data-i18n="wellness.readiness.unusualChange">${t('wellness.readiness.unusualChange')}</strong>
-                            <span>${t('wellness.readiness.unusualChangeDesc.' + unusualChange.direction)} (Δ ${unusualChange.diff})</span>
+                            <strong>Cambio Inusual</strong>
+                            <span>${unusualChange.direction === 'mejora' ? 'Mejora significativa detectada' : 'Caída significativa detectada'} (Δ ${unusualChange.diff})</span>
                         </div>
                     ` : `
                         <div class="unusual-change-text" style="text-align: center;">
