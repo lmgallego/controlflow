@@ -7,6 +7,7 @@ const translations = {
     es: {
         // Navigation
         nav: {
+            athletes: 'Deportistas',
             wellness: 'Bienestar',
             activities: 'Actividades',
             analysis: 'Análisis',
@@ -295,6 +296,19 @@ const translations = {
             required: 'Por favor, completa ambos campos.'
         },
 
+        // Athletes Panel
+        athletes: {
+            title: 'Deportistas',
+            subtitle: 'Gestión de atletas',
+            loading: 'Cargando deportistas...',
+            error: 'Error al cargar deportistas.',
+            noAthletes: 'No se encontraron deportistas',
+            athleteId: 'ID',
+            athleteName: 'Nombre',
+            actions: 'Acciones',
+            viewDetails: 'Ver detalles'
+        },
+
         // Activities
         activities: {
             title: 'Actividades Recientes',
@@ -334,6 +348,7 @@ const translations = {
     en: {
         // Navigation
         nav: {
+            athletes: 'Athletes',
             wellness: 'Wellness',
             activities: 'Activities',
             analysis: 'Analysis',
@@ -620,6 +635,19 @@ const translations = {
             success: 'Credentials saved! Reloading application...',
             error: 'Error saving',
             required: 'Please fill in both fields.'
+        },
+
+        // Athletes Panel
+        athletes: {
+            title: 'Athletes',
+            subtitle: 'Athlete management',
+            loading: 'Loading athletes...',
+            error: 'Error loading athletes.',
+            noAthletes: 'No athletes found',
+            athleteId: 'ID',
+            athleteName: 'Name',
+            actions: 'Actions',
+            viewDetails: 'View details'
         },
 
         // Activities

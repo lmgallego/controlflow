@@ -1,9 +1,10 @@
 import { auth } from './firebase-init.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { getAthletes } from './apiService.js';
+import { renderAthletesPanel } from './components/AthletesPanel.js';
 import { renderWellnessPanel } from './components/WellnessPanel.js';
 import { renderActivityFeed } from './components/ActivityFeed.js';
-import { renderSettingsPanel } from './components/SettingsPanel.js'; // NUEVO
+import { renderSettingsPanel } from './components/SettingsPanel.js';
 
 // --- Estado de la Aplicación ---
 let currentAthleteId = null;
@@ -35,6 +36,15 @@ async function loadView(view, athleteId) {
 
         // Router simple
         switch (view) {
+            case 'athletes':
+                await renderAthletesPanel(viewContainer);
+                // Después de renderizar, inicializar iconos de Lucide
+                setTimeout(() => {
+                    if (window.lucide) {
+                        window.lucide.createIcons();
+                    }
+                }, 100);
+                break;
             case 'wellness':
                 if (!athleteId) {
                     viewContainer.innerHTML = '<h3>Cargando atletas...</h3>';
@@ -52,7 +62,7 @@ async function loadView(view, athleteId) {
         case 'analysis':
             viewContainer.innerHTML = '<h3>Panel de Análisis (Próximamente)</h3>';
             break;
-        case 'settings': // NUEVA VISTA
+        case 'settings':
             // Pasamos 'initializeApp' como la función callback 'onSave'
             renderSettingsPanel(viewContainer, initializeApp);
             break;
