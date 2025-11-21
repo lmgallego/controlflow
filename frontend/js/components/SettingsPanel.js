@@ -1,4 +1,5 @@
 import { saveIntervalsCredentials } from '../apiService.js';
+import { t } from '../i18n.js';
 
 /**
  * Renderiza la vista de configuración para que el usuario ingrese sus claves.
@@ -6,21 +7,21 @@ import { saveIntervalsCredentials } from '../apiService.js';
 export function renderSettingsPanel(container, onSave) {
     container.innerHTML = `
         <div class="settings-form">
-            <h2>Configuración de Intervals.icu</h2>
-            <p>Para usar la aplicación, necesitamos tu ID de Atleta (Coach) y tu API Key de Intervals.icu.</p>
-            <p>Puedes encontrarlos en tu página de <strong>Configuración > Developer</strong> en Intervals.icu.</p>
+            <h2 data-i18n="settings.title">${t('settings.title')}</h2>
+            <p data-i18n="settings.description">${t('settings.description')}</p>
+            <p data-i18n="settings.instructions">${t('settings.instructions')}</p>
             
             <div class="form-group">
-                <label for="coach-id">ID de Atleta (Coach)</label>
-                <input type="text" id="coach-id" placeholder="ej: i12345">
+                <label for="coach-id" data-i18n="settings.coachId">${t('settings.coachId')}</label>
+                <input type="text" id="coach-id" placeholder="${t('settings.coachIdPlaceholder')}">
             </div>
             
             <div class="form-group">
-                <label for="api-key">API Key</label>
-                <input type="password" id="api-key" placeholder="ej: tu_clave_secreta_aqui">
+                <label for="api-key" data-i18n="settings.apiKey">${t('settings.apiKey')}</label>
+                <input type="password" id="api-key" placeholder="${t('settings.apiKeyPlaceholder')}">
             </div>
             
-            <button class="btn btn-primary" id="save-keys-btn">Guardar Credenciales</button>
+            <button class="btn btn-primary" id="save-keys-btn" data-i18n="settings.save">${t('settings.save')}</button>
             <div id="status-message" class="status-message"></div>
         </div>
     `;
@@ -36,25 +37,25 @@ export function renderSettingsPanel(container, onSave) {
         const apiKey = apiKeyInput.value;
 
         if (!coachId || !apiKey) {
-            statusMessage.textContent = 'Por favor, completa ambos campos.';
+            statusMessage.textContent = t('settings.required');
             statusMessage.className = 'status-message error';
             return;
         }
 
-        statusMessage.textContent = 'Guardando...';
+        statusMessage.textContent = t('settings.saving');
         statusMessage.className = 'status-message';
         saveButton.disabled = true;
 
         try {
             await saveIntervalsCredentials(coachId, apiKey);
-            statusMessage.textContent = '¡Credenciales guardadas! Recargando la aplicación...';
+            statusMessage.textContent = t('settings.success');
             statusMessage.className = 'status-message success';
             
             // Llama a la función 'onSave' (que será initializeApp)
             setTimeout(onSave, 1500);
             
         } catch (error) {
-            statusMessage.textContent = `Error al guardar: ${error.message}`;
+            statusMessage.textContent = `${t('settings.error')}: ${error.message}`;
             statusMessage.className = 'status-message error';
             saveButton.disabled = false;
         }

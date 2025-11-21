@@ -76,10 +76,10 @@ export function createPatternAnalysisPanel(data) {
             const hrvShifted = data.hrv.raw.slice(1); // HRV desde día 2
             const loadShifted = data.trainingLoad.values.slice(0, -1); // Carga hasta penúltimo día
             renderCorrelationChart('hrv-load-chart', loadShifted, hrvShifted,
-                'Carga Día Anterior (TSS)', 'HRV Día Siguiente (ms)', correlations.hrvLoad || { r: null, regression: null });
+                t('wellness.patterns.axes.previousLoad'), t('wellness.patterns.axes.nextDayHRV'), correlations.hrvLoad || { r: null, regression: null });
         } else {
             renderCorrelationChart('hrv-load-chart', [], [],
-                'Carga Día Anterior (TSS)', 'HRV Día Siguiente (ms)', { r: null, regression: null });
+                t('wellness.patterns.axes.previousLoad'), t('wellness.patterns.axes.nextDayHRV'), { r: null, regression: null });
         }
 
         // Configurar event listeners para botones de fullscreen después de renderizar

@@ -42,6 +42,14 @@ const translations = {
                 download: 'Descargar gráfico'
             },
 
+            // Chart Labels
+            charts: {
+                sleepHours: 'Horas de Sueño',
+                rollingAverage: 'Promedio Móvil',
+                upperCI: 'IC Superior',
+                lowerCI: 'IC Inferior'
+            },
+
             // Tabs
             tabs: {
                 metrics: 'Métricas',
@@ -61,6 +69,10 @@ const translations = {
                     hrvSleepDuration: 'HRV vs Duración de Sueño',
                     hrvLoad: 'HRV vs Carga de Entrenamiento',
                     sleepQuality: 'Duración vs Calidad de Sueño'
+                },
+                axes: {
+                    previousLoad: 'Carga Día Anterior (TSS)',
+                    nextDayHRV: 'HRV Día Siguiente (ms)'
                 },
                 strength: {
                     strong: 'Correlación Fuerte',
@@ -202,7 +214,8 @@ const translations = {
                 unusualChangeDesc: {
                     mejora: 'Mejora significativa detectada',
                     caída: 'Caída significativa detectada'
-                }
+                },
+                noAnomalies: 'Sin cambios anómalos detectados'
             },
 
             // Trends
@@ -282,6 +295,19 @@ const translations = {
             required: 'Por favor, completa ambos campos.'
         },
 
+        // Activities
+        activities: {
+            title: 'Actividades Recientes',
+            loading: 'Cargando actividades...',
+            error: 'Error al cargar actividades.',
+            date: 'Fecha',
+            name: 'Nombre',
+            type: 'Tipo',
+            time: 'Tiempo',
+            distance: 'Distancia (km)',
+            load: 'Carga (TSS)'
+        },
+
         // Common
         common: {
             na: 'N/A',
@@ -343,6 +369,14 @@ const translations = {
                 download: 'Download chart'
             },
 
+            // Chart Labels
+            charts: {
+                sleepHours: 'Sleep Hours',
+                rollingAverage: 'Rolling Average',
+                upperCI: 'Upper CI',
+                lowerCI: 'Lower CI'
+            },
+
             // Tabs
             tabs: {
                 metrics: 'Metrics',
@@ -362,6 +396,10 @@ const translations = {
                     hrvSleepDuration: 'HRV vs Sleep Duration',
                     hrvLoad: 'HRV vs Training Load',
                     sleepQuality: 'Sleep Duration vs Sleep Quality'
+                },
+                axes: {
+                    previousLoad: 'Previous Day Load (TSS)',
+                    nextDayHRV: 'Next Day HRV (ms)'
                 },
                 strength: {
                     strong: 'Strong Correlation',
@@ -503,7 +541,8 @@ const translations = {
                 unusualChangeDesc: {
                     mejora: 'Significant improvement detected',
                     caída: 'Significant drop detected'
-                }
+                },
+                noAnomalies: 'No anomalous changes detected'
             },
 
             // Trends
@@ -581,6 +620,19 @@ const translations = {
             success: 'Credentials saved! Reloading application...',
             error: 'Error saving',
             required: 'Please fill in both fields.'
+        },
+
+        // Activities
+        activities: {
+            title: 'Recent Activities',
+            loading: 'Loading activities...',
+            error: 'Error loading activities.',
+            date: 'Date',
+            name: 'Name',
+            type: 'Type',
+            time: 'Time',
+            distance: 'Distance (km)',
+            load: 'Load (TSS)'
         },
 
         // Common

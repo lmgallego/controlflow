@@ -161,11 +161,11 @@ function renderWellnessPanelContent(container, data) {
     chartInstances = {};
 
     // Renderizar gráficos de la pestaña Métricas
-    chartInstances.hrvZScoreChart = renderHRVZScoreChartInstance(data);
-    chartInstances.hrvChart = renderHRVChart(data);
-    chartInstances.rhrChart = renderRestingHRChart(data);
-    chartInstances.sleepDurationChart = renderSleepDurationChart(data);
-    chartInstances.sleepScoreChart = renderSleepScoreChart(data);
+    chartInstances.hrvZScore = renderHRVZScoreChartInstance(data);
+    chartInstances.hrv = renderHRVChart(data);
+    chartInstances.rhr = renderRestingHRChart(data);
+    chartInstances.sleepDuration = renderSleepDurationChart(data);
+    chartInstances.sleepScore = renderSleepScoreChart(data);
 
     // Añadir panel de Patrones
     const patternsContainer = container.querySelector('#patterns-container');
@@ -317,7 +317,8 @@ function showChartFullscreen(chartType) {
     }
 
     // Buscar gráfico original en chartInstances (métricas) o patternChartInstances (patrones)
-    let originalChart = chartInstances[chartType + 'Chart'] || patternChartInstances[chartType];
+    // Primero buscar directamente por chartType, luego con sufijo 'Chart' para compatibilidad
+    let originalChart = chartInstances[chartType] || chartInstances[chartType + 'Chart'] || patternChartInstances[chartType];
     if (!originalChart) return;
 
     const ctx = modalCanvas.getContext('2d');
@@ -794,12 +795,12 @@ function renderReadinessCard(data) {
                     ${unusualChange ? `
                         <div class="unusual-change-icon" style="color: ${unusualChange.color};">⚠️</div>
                         <div class="unusual-change-text">
-                            <strong>Cambio Inusual</strong>
-                            <span>${unusualChange.direction === 'mejora' ? 'Mejora significativa detectada' : 'Caída significativa detectada'} (Δ ${unusualChange.diff})</span>
+                            <strong data-i18n="wellness.readiness.unusualChange">${t('wellness.readiness.unusualChange')}</strong>
+                            <span>${t('wellness.readiness.unusualChangeDesc.' + unusualChange.direction)} (Δ ${unusualChange.diff})</span>
                         </div>
                     ` : `
                         <div class="unusual-change-text" style="text-align: center;">
-                            <span style="color: var(--text-secondary); font-size: 0.85rem;">Sin cambios anómalos detectados</span>
+                            <span style="color: var(--text-secondary); font-size: 0.85rem;" data-i18n="wellness.readiness.noAnomalies">${t('wellness.readiness.noAnomalies')}</span>
                         </div>
                     `}
                 </div>
@@ -848,28 +849,28 @@ function renderHRVZScoreChart(data) {
     return `
         <div class="hrv-zscore-chart-card">
             <div class="hrv-zscore-header">
-                <h3>HRV Z-Score con Zonas de Preparación</h3>
-                <button class="chart-fullscreen-btn" data-chart="hrv-zscore" title="Pantalla completa">⛶</button>
+                <h3 data-i18n="wellness.hrvZScore.title">${t('wellness.hrvZScore.title')}</h3>
             </div>
             <div class="hrv-zscore-chart-container">
+                <button class="chart-fullscreen-btn" data-chart="hrvZScore" title="${t('wellness.chart.fullscreen')}">⛶</button>
                 <canvas id="hrv-zscore-chart"></canvas>
             </div>
             <div class="hrv-zscore-legend">
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(239, 68, 68, 0.2);"></span>
-                    <span class="legend-text">REST (Z < -1.5)</span>
+                    <span class="legend-text" data-i18n="wellness.hrvZScore.zones.rest">${t('wellness.hrvZScore.zones.rest')}</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(251, 191, 36, 0.2);"></span>
-                    <span class="legend-text">LIT (-1.5 ≤ Z < -0.5)</span>
+                    <span class="legend-text" data-i18n="wellness.hrvZScore.zones.lit">${t('wellness.hrvZScore.zones.lit')}</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(59, 130, 246, 0.2);"></span>
-                    <span class="legend-text">NORMAL (-0.5 ≤ Z < 0.5)</span>
+                    <span class="legend-text" data-i18n="wellness.hrvZScore.zones.normal">${t('wellness.hrvZScore.zones.normal')}</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-color" style="background-color: rgba(16, 185, 129, 0.2);"></span>
-                    <span class="legend-text">HIIT (Z ≥ 0.5)</span>
+                    <span class="legend-text" data-i18n="wellness.hrvZScore.zones.hiit">${t('wellness.hrvZScore.zones.hiit')}</span>
                 </div>
             </div>
         </div>
@@ -902,7 +903,7 @@ function renderHRVChart(data) {
                     pointHoverRadius: 6
                 },
                 {
-                    label: 'IC Superior',
+                    label: t('wellness.charts.upperCI'),
                     data: data.hrv.ci.upper,
                     borderColor: 'rgba(59, 130, 246, 0.3)',
                     borderWidth: 1,
@@ -911,7 +912,7 @@ function renderHRVChart(data) {
                     pointRadius: 0
                 },
                 {
-                    label: 'IC Inferior',
+                    label: t('wellness.charts.lowerCI'),
                     data: data.hrv.ci.lower,
                     borderColor: 'rgba(59, 130, 246, 0.3)',
                     borderWidth: 1,
@@ -950,7 +951,7 @@ function renderRestingHRChart(data) {
                     pointHoverRadius: 6
                 },
                 {
-                    label: 'IC Superior',
+                    label: t('wellness.charts.upperCI'),
                     data: data.rhr.ci.upper,
                     borderColor: 'rgba(245, 158, 11, 0.3)',
                     borderWidth: 1,
@@ -959,7 +960,7 @@ function renderRestingHRChart(data) {
                     pointRadius: 0
                 },
                 {
-                    label: 'IC Inferior',
+                    label: t('wellness.charts.lowerCI'),
                     data: data.rhr.ci.lower,
                     borderColor: 'rgba(245, 158, 11, 0.3)',
                     borderWidth: 1,
@@ -987,14 +988,14 @@ function renderSleepDurationChart(data) {
             labels: data.dates,
             datasets: [
                 {
-                    label: 'Horas de Sueño',
+                    label: t('wellness.charts.sleepHours'),
                     data: data.sleepDuration.hours,
                     backgroundColor: 'rgba(139, 92, 246, 0.6)',
                     borderColor: '#8b5cf6',
                     borderWidth: 1
                 },
                 {
-                    label: 'Promedio Móvil',
+                    label: t('wellness.charts.rollingAverage'),
                     data: data.sleepDuration.ci.mean,
                     type: 'line',
                     borderColor: '#a78bfa',
@@ -1030,7 +1031,7 @@ function renderSleepScoreChart(data) {
             labels: data.dates,
             datasets: [
                 {
-                    label: 'Puntuación de Sueño',
+                    label: t('wellness.sleepScore.title'),
                     data: data.sleepScore.values,
                     backgroundColor: backgroundColors,
                     borderWidth: 0
@@ -1059,7 +1060,7 @@ function renderSleepScoreChart(data) {
                             borderWidth: 1,
                             borderDash: [5, 5],
                             label: {
-                                content: 'Excelente',
+                                content: t('wellness.sleepScore.categories.excellent'),
                                 enabled: false
                             }
                         },
@@ -1096,6 +1097,15 @@ function renderHRVZScoreChartInstance(data) {
     const colors = getThemeColors();
     const labels = data.dates;
     const zScores = data.hrv.zScores;
+
+    // Calcular límites dinámicos del eje Y
+    const dataMin = Math.min(...zScores);
+    const dataMax = Math.max(...zScores);
+    
+    // Asegurar que el gráfico cubre al menos de -3 a 3, pero se expande si hay datos fuera
+    // Se añade un margen de 0.5 para que los puntos extremos no toquen el borde
+    const yMinLimit = Math.min(-3, Math.floor(dataMin - 0.5));
+    const yMaxLimit = Math.max(3, Math.ceil(dataMax + 0.5));
 
     return new Chart(ctx, {
         type: 'line',
@@ -1158,7 +1168,7 @@ function renderHRVZScoreChartInstance(data) {
                         // Zona REST (roja) - por debajo de -1.5
                         restZone: {
                             type: 'box',
-                            yMin: -3,
+                            yMin: yMinLimit, // Límite dinámico
                             yMax: -1.5,
                             backgroundColor: 'rgba(239, 68, 68, 0.1)',
                             borderWidth: 0
@@ -1183,7 +1193,7 @@ function renderHRVZScoreChartInstance(data) {
                         hiitZone: {
                             type: 'box',
                             yMin: 0.5,
-                            yMax: 3,
+                            yMax: yMaxLimit, // Límite dinámico
                             backgroundColor: 'rgba(16, 185, 129, 0.1)',
                             borderWidth: 0
                         },
@@ -1241,8 +1251,8 @@ function renderHRVZScoreChartInstance(data) {
                     grid: {
                         color: colors.grid
                     },
-                    min: -3,
-                    max: 3
+                    min: yMinLimit,
+                    max: yMaxLimit
                 }
             }
         }

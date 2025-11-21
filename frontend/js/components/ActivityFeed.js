@@ -1,4 +1,5 @@
 import { getActivityData } from '../apiService.js';
+import { t } from '../i18n.js';
 
 const NA_CELL = '<span class="na">N/A</span>';
 
@@ -6,7 +7,7 @@ const NA_CELL = '<span class="na">N/A</span>';
  * Renderiza el panel de actividades.
  */
 export async function renderActivityFeed(container, athleteId) {
-    container.innerHTML = '<h3>Cargando actividades...</h3>';
+    container.innerHTML = `<h3 data-i18n="activities.loading">${t('activities.loading')}</h3>`;
     
     // Rango de fechas por defecto
     const today = new Date();
@@ -24,16 +25,16 @@ export async function renderActivityFeed(container, athleteId) {
 
         container.innerHTML = `
             <div class="data-table">
-                <h3>Actividades Recientes</h3>
+                <h3 data-i18n="activities.title">${t('activities.title')}</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th>Fecha</th>
-                            <th>Nombre</th>
-                            <th>Tipo</th>
-                            <th>Tiempo</th>
-                            <th>Distancia (km)</th>
-                            <th>Carga (TSS)</th>
+                            <th data-i18n="activities.date">${t('activities.date')}</th>
+                            <th data-i18n="activities.name">${t('activities.name')}</th>
+                            <th data-i18n="activities.type">${t('activities.type')}</th>
+                            <th data-i18n="activities.time">${t('activities.time')}</th>
+                            <th data-i18n="activities.distance">${t('activities.distance')}</th>
+                            <th data-i18n="activities.load">${t('activities.load')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -45,7 +46,7 @@ export async function renderActivityFeed(container, athleteId) {
 
     } catch (error) {
         console.error(error);
-        container.innerHTML = '<h3>Error al cargar actividades.</h3>';
+        container.innerHTML = `<h3 data-i18n="activities.error">${t('activities.error')}</h3>`;
     }
 }
 
