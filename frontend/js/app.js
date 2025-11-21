@@ -34,15 +34,30 @@ async function loadView(view, athleteId) {
         currentView = view; // Actualizar el estado global
         viewContainer.innerHTML = '<h3>Cargando...</h3>';
 
+        // Mostrar/ocultar selector de atletas según la vista
+        const athleteSelectContainer = document.querySelector('.controls');
+        if (view === 'athletes' || view === 'settings') {
+            athleteSelectContainer.style.display = 'none';
+        } else {
+            athleteSelectContainer.style.display = 'flex';
+        }
+
+        // Si se proporciona un athleteId, actualizar el selector y el estado global
+        if (athleteId) {
+            currentAthleteId = athleteId;
+            athleteSelect.value = athleteId;
+        }
+
         // Router simple
         switch (view) {
             case 'athletes':
                 await renderAthletesPanel(viewContainer);
-                // Después de renderizar, inicializar iconos de Lucide
+                // Después de renderizar, inicializar iconos de Lucide y configurar event listeners
                 setTimeout(() => {
                     if (window.lucide) {
                         window.lucide.createIcons();
                     }
+                    setupAthleteCardListeners();
                 }, 100);
                 break;
             case 'wellness':
@@ -160,6 +175,36 @@ logoutBtn.addEventListener('click', (e) => {
         console.error('Error al cerrar sesión:', error);
     });
 });
+
+/**
+ * Configura los event listeners para las tarjetas de atletas
+ */
+function setupAthleteCardListeners() {
+    // Botones "Ver detalles"
+    const viewBtns = document.querySelectorAll('.view-athlete-btn');
+    viewBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const athleteId = btn.dataset.athleteId;
+            loadView('wellness', athleteId);
+        });
+    });
+
+    // Enlaces rápidos en las tarjetas (Bienestar, Actividades, Análisis)
+    const statItems = document.querySelectorAll('.athlete-card .stat-item');
+    statItems.forEach(item => {
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', () => {
+            const athleteCard = item.closest('.athlete-card');
+            const athleteId = athleteCard.querySelector('.view-athlete-btn').dataset.athleteId;
+            const targetView = item.dataset.view; // Obtener la vista desde el atributo data-view
+            
+            loadView(targetView, athleteId);
+        });
+    });
+}
+
+// Exponer función loadView globalmente para uso desde otros componentes
+window.navigateToView = loadView;
 
 // --- Iniciar la App ---
 // Espera a que el estado de autenticación de Firebase cambie

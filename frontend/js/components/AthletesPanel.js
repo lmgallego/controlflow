@@ -73,15 +73,15 @@ function renderAthleteCard(athlete) {
             </div>
             <div class="athlete-card-body">
                 <div class="athlete-stats">
-                    <div class="stat-item">
+                    <div class="stat-item" data-view="wellness" title="${t('nav.wellness')}">
                         <i data-lucide="heart-pulse"></i>
                         <span data-i18n="nav.wellness">${t('nav.wellness')}</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item" data-view="activities" title="${t('nav.activities')}">
                         <i data-lucide="activity"></i>
                         <span data-i18n="nav.activities">${t('nav.activities')}</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item" data-view="analysis" title="${t('nav.analysis')}">
                         <i data-lucide="bar-chart-3"></i>
                         <span data-i18n="nav.analysis">${t('nav.analysis')}</span>
                     </div>
