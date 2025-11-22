@@ -238,6 +238,48 @@ a {
     background: var(--bg-hover);
 }
 
+/* Athlete Metrics in Header */
+.athlete-metrics-header {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    padding: 0 16px;
+    border-left: 2px solid var(--border-color);
+    border-right: 2px solid var(--border-color);
+}
+
+.metric-header-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 12px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    min-width: 90px;
+}
+
+.metric-header-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-header-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-light);
+    line-height: 1;
+}
+
+.metric-header-unit {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
 .controls select:focus {
     outline: none;
     border-color: var(--primary-color);
@@ -2763,6 +2805,331 @@ a {
 /* ==========================================
    PMC Panel Styles - New Layout
    ========================================== */
+
+.pmc-panel-new {
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pmc-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+}
+
+.pmc-date-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pmc-date-controls label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.pmc-date-input {
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.pmc-refresh-btn {
+    padding: 8px 12px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.pmc-refresh-btn:hover {
+    background: var(--primary-dark);
+    transform: scale(1.05);
+}
+
+.pmc-refresh-btn i {
+    width: 16px;
+    height: 16px;
+}
+
+.pmc-content-grid {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 16px;
+    flex: 1;
+    overflow: hidden;
+}
+
+.pmc-sidebar-new {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pmc-kpis {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pmc-kpi-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--primary-color);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.pmc-kpi-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pmc-kpi-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.pmc-kpi-zone {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    display: inline-block;
+    margin-top: 4px;
+    align-self: flex-start;
+}
+
+.pmc-kpi-tsb.zone-risk {
+    border-left-color: #ef4444;
+}
+
+.pmc-kpi-tsb.zone-risk .pmc-kpi-value {
+    color: #ef4444;
+}
+
+.pmc-kpi-tsb.zone-risk .pmc-kpi-zone {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.pmc-kpi-tsb.zone-optimal {
+    border-left-color: #10b981;
+}
+
+.pmc-kpi-tsb.zone-optimal .pmc-kpi-value {
+    color: #10b981;
+}
+
+.pmc-kpi-tsb.zone-optimal .pmc-kpi-zone {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.pmc-kpi-tsb.zone-gray {
+    border-left-color: #94a3b8;
+}
+
+.pmc-kpi-tsb.zone-gray .pmc-kpi-value {
+    color: #94a3b8;
+}
+
+.pmc-kpi-tsb.zone-gray .pmc-kpi-zone {
+    background: rgba(148, 163, 184, 0.2);
+    color: #94a3b8;
+}
+
+.pmc-kpi-tsb.zone-fresh {
+    border-left-color: #3b82f6;
+}
+
+.pmc-kpi-tsb.zone-fresh .pmc-kpi-value {
+    color: #3b82f6;
+}
+
+.pmc-kpi-tsb.zone-fresh .pmc-kpi-zone {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+.pmc-kpi-tsb.zone-transition {
+    border-left-color: #f59e0b;
+}
+
+.pmc-kpi-tsb.zone-transition .pmc-kpi-value {
+    color: #f59e0b;
+}
+
+.pmc-kpi-tsb.zone-transition .pmc-kpi-zone {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.pmc-charts-area {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    position: relative;
+}
+
+.pmc-loader {
+    position: absolute;
+    inset: 0;
+    background: rgba(var(--bg-primary-rgb), 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    border-radius: var(--radius-lg);
+}
+
+.pmc-loader .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.pmc-loader p {
+    margin-top: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.pmc-chart-card-new {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 12px;
+}
+
+.pmc-chart-header-new {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.pmc-chart-header-new h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.pmc-fullscreen-btn {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 1.125rem;
+    transition: all var(--transition-fast);
+}
+
+.pmc-fullscreen-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.pmc-chart-wrapper-new {
+    position: relative;
+}
+
+.pmc-chart-main {
+    height: 400px;
+}
+
+.pmc-chart-strip {
+    height: 180px;
+}
+
+.pmc-fullscreen-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.2s ease;
+}
+
+.pmc-fullscreen-content {
+    width: 95%;
+    height: 90%;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    position: relative;
+}
+
+.pmc-fullscreen-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--danger-color);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    z-index: 10001;
+}
+
+.pmc-fullscreen-close:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+.pmc-fullscreen-content canvas {
+    width: 100% !important;
+    height: calc(100% - 20px) !important;
+}
 
 .pmc-panel-layout {
     display: flex;
