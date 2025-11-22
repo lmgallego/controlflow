@@ -47,50 +47,18 @@ export async function renderPMCPanel(container, athleteId) {
                         </div>
                     </div>
                     
-                    <!-- TSB Zones Legend -->
-                    <div class="pmc-tsb-legend">
-                        <div class="pmc-legend-title">${t('pmc.tsbZones')}</div>
-                        <div class="pmc-legend-item">
-                            <span class="pmc-legend-color" style="background: #ef4444;"></span>
-                            <span class="pmc-legend-text">${t('pmc.zones.risk')}</span>
-                        </div>
-                        <div class="pmc-legend-item">
-                            <span class="pmc-legend-color" style="background: #22c55e;"></span>
-                            <span class="pmc-legend-text">${t('pmc.zones.optimal')}</span>
-                        </div>
-                        <div class="pmc-legend-item">
-                            <span class="pmc-legend-color" style="background: #94a3b8;"></span>
-                            <span class="pmc-legend-text">${t('pmc.zones.gray')}</span>
-                        </div>
-                        <div class="pmc-legend-item">
-                            <span class="pmc-legend-color" style="background: #0ea5e9;"></span>
-                            <span class="pmc-legend-text">${t('pmc.zones.fresh')}</span>
-                        </div>
-                        <div class="pmc-legend-item">
-                            <span class="pmc-legend-color" style="background: #eab308;"></span>
-                            <span class="pmc-legend-text">${t('pmc.zones.transition')}</span>
-                        </div>
+                    <!-- Current TSB Zone Card -->
+                    <div class="pmc-zone-card" id="pmc-current-tsb-zone">
+                        <div class="pmc-zone-card-label">${t('pmc.currentTsbZone')}</div>
+                        <div class="pmc-zone-card-value" id="pmc-tsb-zone-value">-</div>
+                        <div class="pmc-zone-card-name" id="pmc-tsb-zone-name">-</div>
                     </div>
                     
-                    <!-- ACWR Zones Legend -->
-                    <div class="pmc-tsb-legend">
-                        <div class="pmc-legend-title">${t('pmc.acwrZones')}</div>
-                        <div class="pmc-legend-item">
-                            <span class="pmc-legend-color" style="background: #3b82f6;"></span>
-                            <span class="pmc-legend-text">${t('pmc.acwr.detraining')}</span>
-                        </div>
-                        <div class="pmc-legend-item">
-                            <span class="pmc-legend-color" style="background: #22c55e;"></span>
-                            <span class="pmc-legend-text">${t('pmc.acwr.safe')}</span>
-                        </div>
-                        <div class="pmc-legend-item">
-                            <span class="pmc-legend-color" style="background: #f59e0b;"></span>
-                            <span class="pmc-legend-text">${t('pmc.acwr.alert')}</span>
-                        </div>
-                        <div class="pmc-legend-item">
-                            <span class="pmc-legend-color" style="background: #ef4444;"></span>
-                            <span class="pmc-legend-text">${t('pmc.acwr.danger')}</span>
-                        </div>
+                    <!-- Current ACWR Zone Card -->
+                    <div class="pmc-zone-card" id="pmc-current-acwr-zone">
+                        <div class="pmc-zone-card-label">${t('pmc.currentAcwrZone')}</div>
+                        <div class="pmc-zone-card-value" id="pmc-acwr-zone-value">-</div>
+                        <div class="pmc-zone-card-name" id="pmc-acwr-zone-name">-</div>
                     </div>
                 </div>
                 
@@ -329,26 +297,67 @@ function updateKPIs(lastData) {
 
     const card = document.getElementById('pmc-kpi-tsb-card');
     const zoneText = document.getElementById('pmc-kpi-zone');
-    const tsb = lastData.tsb;
-
-    card.className = 'pmc-kpi-card pmc-kpi-tsb';
-
-    if (tsb > 25) {
+    
+    card.classList.remove('zone-risk', 'zone-optimal', 'zone-gray', 'zone-fresh', 'zone-transition');
+    
+    // Update TSB zone
+    let tsbZoneName = '';
+    let tsbZoneColor = '';
+    if (lastData.tsb > 25) {
         card.classList.add('zone-transition');
         zoneText.textContent = t('pmc.zones.transition');
-    } else if (tsb > 5) {
+        tsbZoneName = t('pmc.zones.transition');
+        tsbZoneColor = '#eab308';
+    } else if (lastData.tsb > 5) {
         card.classList.add('zone-fresh');
         zoneText.textContent = t('pmc.zones.fresh');
-    } else if (tsb >= -10) {
+        tsbZoneName = t('pmc.zones.fresh');
+        tsbZoneColor = '#0ea5e9';
+    } else if (lastData.tsb >= -10) {
         card.classList.add('zone-gray');
         zoneText.textContent = t('pmc.zones.gray');
-    } else if (tsb >= -30) {
+        tsbZoneName = t('pmc.zones.gray');
+        tsbZoneColor = '#94a3b8';
+    } else if (lastData.tsb >= -30) {
         card.classList.add('zone-optimal');
         zoneText.textContent = t('pmc.zones.optimal');
+        tsbZoneName = t('pmc.zones.optimal');
+        tsbZoneColor = '#22c55e';
     } else {
         card.classList.add('zone-risk');
         zoneText.textContent = t('pmc.zones.risk');
+        tsbZoneName = t('pmc.zones.risk');
+        tsbZoneColor = '#ef4444';
     }
+    
+    // Update TSB zone card
+    document.getElementById('pmc-tsb-zone-value').textContent = lastData.tsb.toFixed(1);
+    document.getElementById('pmc-tsb-zone-name').textContent = tsbZoneName;
+    const tsbZoneCard = document.getElementById('pmc-current-tsb-zone');
+    tsbZoneCard.style.borderLeftColor = tsbZoneColor;
+    
+    // Update ACWR zone card
+    const acwr = lastData.acwr;
+    let acwrZoneName = '';
+    let acwrZoneColor = '';
+    if (acwr < 0.8) {
+        acwrZoneName = t('pmc.acwr.detraining');
+        acwrZoneColor = '#3b82f6';
+    } else if (acwr >= 0.8 && acwr <= 1.3) {
+        acwrZoneName = t('pmc.acwr.safe');
+        acwrZoneColor = '#22c55e';
+    } else if (acwr > 1.3 && acwr <= 1.5) {
+        acwrZoneName = t('pmc.acwr.alert');
+        acwrZoneColor = '#f59e0b';
+    } else {
+        acwrZoneName = t('pmc.acwr.danger');
+        acwrZoneColor = '#ef4444';
+    }
+    
+    document.getElementById('pmc-acwr-zone-value').textContent = acwr.toFixed(2);
+    document.getElementById('pmc-acwr-zone-name').textContent = acwrZoneName;
+    const acwrZoneCard = document.getElementById('pmc-current-acwr-zone');
+    acwrZoneCard.style.borderLeftColor = acwrZoneColor;
 }
 
 function renderCharts(data) {
@@ -359,6 +368,7 @@ function renderCharts(data) {
     const textColor = isDark ? '#f1f5f9' : '#0f172a';
     const gridColor = isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(71, 85, 105, 0.2)';
     const legendColor = isDark ? '#f1f5f9' : '#0f172a';
+    const axisColor = isDark ? '#f1f5f9' : '#475569'; // Color más visible para ejes en modo claro
 
     const commonOptions = {
         responsive: true,
@@ -437,6 +447,21 @@ function renderCharts(data) {
                         color: legendColor,
                         font: { size: 11, weight: '600' }
                     }
+                },
+                zoom: {
+                    pan: {
+                        enabled: true,
+                        mode: 'x'
+                    },
+                    zoom: {
+                        wheel: {
+                            enabled: true
+                        },
+                        pinch: {
+                            enabled: true
+                        },
+                        mode: 'x'
+                    }
                 }
             },
             scales: {
@@ -448,16 +473,21 @@ function renderCharts(data) {
                 y1: {
                     position: 'right',
                     grid: { borderDash: [4, 4], color: gridColor },
-                    title: { display: true, text: 'CTL / ATL', color: textColor, font: { size: 11, weight: 'bold' } },
-                    ticks: { color: textColor, font: { size: 10 } }
+                    title: { display: true, text: 'CTL / ATL', color: axisColor, font: { size: 11, weight: 'bold' } },
+                    ticks: { color: axisColor, font: { size: 10 } }
                 },
                 y2: {
                     position: 'left',
                     display: true,
                     grid: { display: false },
-                    title: { display: true, text: t('pmc.load'), color: textColor, font: { size: 11, weight: 'bold' } },
+                    title: { display: true, text: t('pmc.load'), color: axisColor, font: { size: 11, weight: 'bold' } },
                     suggestedMax: 200,
-                    ticks: { color: textColor, font: { size: 10 } }
+                    ticks: { color: axisColor, font: { size: 10 } }
+                }
+            },
+            onClick: (event, elements, chart) => {
+                if (event.native.detail === 2) { // Double click
+                    chart.resetZoom();
                 }
             }
         }
@@ -486,6 +516,25 @@ function renderCharts(data) {
             ...commonOptions,
             plugins: {
                 ...commonOptions.plugins,
+                legend: {
+                    display: true,
+                    position: 'top',
+                    align: 'start',
+                    labels: {
+                        generateLabels: () => [
+                            { text: `${t('pmc.zones.risk')} (< -30)`, fillStyle: '#ef4444', strokeStyle: '#ef4444' },
+                            { text: `${t('pmc.zones.optimal')} (-30 a -10)`, fillStyle: '#22c55e', strokeStyle: '#22c55e' },
+                            { text: `${t('pmc.zones.gray')} (-10 a 5)`, fillStyle: '#94a3b8', strokeStyle: '#94a3b8' },
+                            { text: `${t('pmc.zones.fresh')} (5 a 25)`, fillStyle: '#0ea5e9', strokeStyle: '#0ea5e9' },
+                            { text: `${t('pmc.zones.transition')} (> 25)`, fillStyle: '#eab308', strokeStyle: '#eab308' }
+                        ],
+                        boxWidth: 12,
+                        boxHeight: 8,
+                        color: legendColor,
+                        font: { size: 9 },
+                        padding: 8
+                    }
+                },
                 tooltip: {
                     ...commonOptions.plugins.tooltip,
                     callbacks: {
@@ -495,6 +544,21 @@ function renderCharts(data) {
                             return `${t('pmc.form')}: ${value.toFixed(1)} (${zoneName})`;
                         }
                     }
+                },
+                zoom: {
+                    pan: {
+                        enabled: true,
+                        mode: 'x'
+                    },
+                    zoom: {
+                        wheel: {
+                            enabled: true
+                        },
+                        pinch: {
+                            enabled: true
+                        },
+                        mode: 'x'
+                    }
                 }
             },
             scales: {
@@ -502,7 +566,13 @@ function renderCharts(data) {
                 y: {
                     position: 'right',
                     grid: { color: gridColor },
-                    ticks: { stepSize: 10, color: textColor, font: { size: 10 } }
+                    title: { display: true, text: 'TSB', color: axisColor, font: { size: 11, weight: 'bold' } },
+                    ticks: { stepSize: 10, color: axisColor, font: { size: 10 } }
+                }
+            },
+            onClick: (event, elements, chart) => {
+                if (event.native.detail === 2) {
+                    chart.resetZoom();
                 }
             }
         }
@@ -523,6 +593,24 @@ function renderCharts(data) {
         },
         options: {
             ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                zoom: {
+                    pan: {
+                        enabled: true,
+                        mode: 'x'
+                    },
+                    zoom: {
+                        wheel: {
+                            enabled: true
+                        },
+                        pinch: {
+                            enabled: true
+                        },
+                        mode: 'x'
+                    }
+                }
+            },
             scales: {
                 x: {
                     display: true,
@@ -532,7 +620,13 @@ function renderCharts(data) {
                 y: {
                     position: 'right',
                     grid: { display: false },
-                    ticks: { color: textColor, font: { size: 10 } }
+                    title: { display: true, text: t('pmc.ramp'), color: axisColor, font: { size: 11, weight: 'bold' } },
+                    ticks: { color: axisColor, font: { size: 10 } }
+                }
+            },
+            onClick: (event, elements, chart) => {
+                if (event.native.detail === 2) {
+                    chart.resetZoom();
                 }
             }
         }
@@ -561,6 +655,24 @@ function renderCharts(data) {
             ...commonOptions,
             plugins: {
                 ...commonOptions.plugins,
+                legend: {
+                    display: true,
+                    position: 'top',
+                    align: 'start',
+                    labels: {
+                        generateLabels: () => [
+                            { text: `${t('pmc.acwr.detraining')} (< 0.8)`, fillStyle: '#3b82f6', strokeStyle: '#3b82f6' },
+                            { text: `${t('pmc.acwr.safe')} (0.8-1.3)`, fillStyle: '#22c55e', strokeStyle: '#22c55e' },
+                            { text: `${t('pmc.acwr.alert')} (1.3-1.5)`, fillStyle: '#f59e0b', strokeStyle: '#f59e0b' },
+                            { text: `${t('pmc.acwr.danger')} (> 1.5)`, fillStyle: '#ef4444', strokeStyle: '#ef4444' }
+                        ],
+                        boxWidth: 12,
+                        boxHeight: 8,
+                        color: legendColor,
+                        font: { size: 9 },
+                        padding: 8
+                    }
+                },
                 tooltip: {
                     ...commonOptions.plugins.tooltip,
                     callbacks: {
@@ -569,6 +681,21 @@ function renderCharts(data) {
                             const zoneName = getZoneNameForACWR(value);
                             return `ACWR: ${value.toFixed(2)} (${zoneName})`;
                         }
+                    }
+                },
+                zoom: {
+                    pan: {
+                        enabled: true,
+                        mode: 'x'
+                    },
+                    zoom: {
+                        wheel: {
+                            enabled: true
+                        },
+                        pinch: {
+                            enabled: true
+                        },
+                        mode: 'x'
                     }
                 }
             },
@@ -581,9 +708,15 @@ function renderCharts(data) {
                 y: {
                     position: 'right',
                     grid: { color: gridColor },
-                    ticks: { color: textColor, font: { size: 10 } },
+                    title: { display: true, text: 'ACWR', color: axisColor, font: { size: 11, weight: 'bold' } },
+                    ticks: { color: axisColor, font: { size: 10 } },
                     suggestedMin: 0,
                     suggestedMax: 2
+                }
+            },
+            onClick: (event, elements, chart) => {
+                if (event.native.detail === 2) {
+                    chart.resetZoom();
                 }
             }
         }

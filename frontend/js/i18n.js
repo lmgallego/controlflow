@@ -356,6 +356,8 @@ const translations = {
             },
             acwrChart: 'ACWR (Ratio Agudo:Crónico)',
             acwrZones: 'Zonas ACWR',
+            currentTsbZone: 'Zona TSB Actual',
+            currentAcwrZone: 'Zona ACWR Actual',
             acwr: {
                 title: 'ACWR',
                 detraining: 'Desentrenamiento (< 0.8)',
@@ -740,6 +742,8 @@ const translations = {
             },
             acwrChart: 'ACWR (Acute:Chronic Workload Ratio)',
             acwrZones: 'ACWR Zones',
+            currentTsbZone: 'Current TSB Zone',
+            currentAcwrZone: 'Current ACWR Zone',
             acwr: {
                 title: 'ACWR',
                 detraining: 'Detraining (< 0.8)',
