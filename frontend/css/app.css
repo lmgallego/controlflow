@@ -2696,6 +2696,71 @@ a {
 }
 
 /* ==========================================
+   Analysis Panel Styles (with tabs)
+   ========================================== */
+
+.analysis-panel {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.analysis-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 16px 24px 0;
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.analysis-tab {
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    position: relative;
+    bottom: -2px;
+}
+
+.analysis-tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.analysis-tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    background: var(--bg-primary);
+}
+
+.analysis-content {
+    flex: 1;
+    overflow: hidden;
+    background: var(--bg-primary);
+}
+
+.coming-soon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-secondary);
+}
+
+.coming-soon h3 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+/* ==========================================
    PMC Panel Styles - New Layout
    ========================================== */
 
@@ -2709,12 +2774,12 @@ a {
 
 /* Sidebar izquierdo */
 .pmc-sidebar {
-    width: 280px;
+    width: 260px;
     flex-shrink: 0;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
 }
 
 /* Tarjeta de atleta */
@@ -2722,37 +2787,37 @@ a {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    padding: 24px;
+    padding: 16px;
     text-align: center;
     box-shadow: var(--shadow-md);
 }
 
 .athlete-avatar-circle {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 16px;
+    margin: 0 auto 12px;
 }
 
 .athlete-avatar-circle i {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     color: white;
 }
 
 .athlete-name-sidebar {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 700;
     color: var(--text-primary);
-    margin: 0 0 8px 0;
+    margin: 0 0 6px 0;
 }
 
 .athlete-info-sidebar {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
     margin: 0;
 }
@@ -2762,38 +2827,38 @@ a {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    padding: 16px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     box-shadow: var(--shadow-md);
 }
 
 .metric-item {
     background: var(--bg-tertiary);
     border-radius: var(--radius-md);
-    padding: 12px;
+    padding: 10px;
     text-align: center;
 }
 
 .metric-item-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-}
-
-.metric-item-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-light);
-    line-height: 1;
+    letter-spacing: 0.3px;
     margin-bottom: 4px;
 }
 
+.metric-item-value {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--primary-light);
+    line-height: 1;
+    margin-bottom: 3px;
+}
+
 .metric-item-unit {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-secondary);
 }
 
@@ -2802,43 +2867,43 @@ a {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    padding: 16px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     box-shadow: var(--shadow-md);
 }
 
 .current-value-item {
     background: var(--bg-tertiary);
     border-radius: var(--radius-md);
-    padding: 12px;
+    padding: 10px;
     text-align: center;
     border-left: 3px solid transparent;
 }
 
 .current-value-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-}
-
-.current-value-number {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1;
+    letter-spacing: 0.3px;
     margin-bottom: 4px;
 }
 
+.current-value-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 3px;
+}
+
 .current-value-zone {
-    font-size: 0.75rem;
-    padding: 3px 8px;
+    font-size: 0.7rem;
+    padding: 2px 6px;
     border-radius: var(--radius-sm);
     display: inline-block;
-    margin-top: 6px;
+    margin-top: 4px;
 }
 
 /* Clases de zonas TSB */
@@ -2912,26 +2977,26 @@ a {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    padding: 16px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     box-shadow: var(--shadow-md);
 }
 
 .zone-legend-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px;
+    gap: 8px;
+    padding: 6px;
     background: var(--bg-tertiary);
     border-radius: var(--radius-sm);
 }
 
 .zone-legend-color {
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
     flex-shrink: 0;
 }
 
@@ -2956,7 +3021,7 @@ a {
 }
 
 .zone-legend-text {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-secondary);
 }
 
@@ -3000,6 +3065,17 @@ a {
 .pmc-chart-wrapper canvas {
     width: 100% !important;
     height: 100% !important;
+}
+
+/* Altura específica para gráfico principal (Fitness y Fatiga) */
+.pmc-chart-card:first-child .pmc-chart-wrapper {
+    height: 400px;
+}
+
+/* Altura reducida para gráficos de Forma y Rampa */
+.pmc-chart-card:nth-child(2) .pmc-chart-wrapper,
+.pmc-chart-card:nth-child(3) .pmc-chart-wrapper {
+    height: 220px;
 }
 
 /* Botón de pantalla completa */

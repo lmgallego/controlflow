@@ -159,10 +159,11 @@ class PMCChartRenderer {
     getThemeColors() {
         const isDark = this.theme === 'dark';
         return {
-            text: isDark ? '#f1f5f9' : '#0f172a',
-            grid: isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(148, 163, 184, 0.3)',
-            tooltipBg: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-            tooltipBorder: isDark ? 'rgba(148, 163, 184, 0.3)' : 'rgba(148, 163, 184, 0.5)'
+            text: isDark ? '#f1f5f9' : '#1e293b',
+            grid: isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(71, 85, 105, 0.2)',
+            tooltipBg: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.98)',
+            tooltipBorder: isDark ? 'rgba(148, 163, 184, 0.3)' : 'rgba(71, 85, 105, 0.3)',
+            tooltipText: isDark ? '#f1f5f9' : '#0f172a'
         };
     }
 
@@ -241,8 +242,8 @@ class PMCChartRenderer {
                     },
                     tooltip: {
                         backgroundColor: colors.tooltipBg,
-                        titleColor: colors.text,
-                        bodyColor: colors.text,
+                        titleColor: colors.tooltipText,
+                        bodyColor: colors.tooltipText,
                         borderColor: colors.tooltipBorder,
                         borderWidth: 1,
                         titleFont: { size: 13, weight: 'bold' },
@@ -349,8 +350,8 @@ class PMCChartRenderer {
                     },
                     tooltip: {
                         backgroundColor: colors.tooltipBg,
-                        titleColor: colors.text,
-                        bodyColor: colors.text,
+                        titleColor: colors.tooltipText,
+                        bodyColor: colors.tooltipText,
                         borderColor: colors.tooltipBorder,
                         borderWidth: 1,
                         titleFont: { size: 13, weight: 'bold' },
@@ -437,8 +438,8 @@ class PMCChartRenderer {
                     },
                     tooltip: {
                         backgroundColor: colors.tooltipBg,
-                        titleColor: colors.text,
-                        bodyColor: colors.text,
+                        titleColor: colors.tooltipText,
+                        bodyColor: colors.tooltipText,
                         borderColor: colors.tooltipBorder,
                         borderWidth: 1,
                         titleFont: { size: 13, weight: 'bold' },

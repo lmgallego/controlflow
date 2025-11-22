@@ -322,6 +322,13 @@ const translations = {
             load: 'Carga (TSS)'
         },
 
+        // Analysis tabs
+        analysis: {
+            loadAnalysis: 'Análisis de Carga',
+            powerAnalysis: 'Análisis de Potencia',
+            performanceAnalysis: 'Análisis de Rendimiento'
+        },
+
         // PMC (Performance Management Chart)
         pmc: {
             title: 'Análisis de Carga',
@@ -686,6 +693,13 @@ const translations = {
             time: 'Time',
             distance: 'Distance (km)',
             load: 'Load (TSS)'
+        },
+
+        // Analysis tabs
+        analysis: {
+            loadAnalysis: 'Load Analysis',
+            powerAnalysis: 'Power Analysis',
+            performanceAnalysis: 'Performance Analysis'
         },
 
         // PMC (Performance Management Chart)
