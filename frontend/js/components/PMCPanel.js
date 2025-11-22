@@ -5,7 +5,7 @@ import { t } from '../i18n.js';
  * PMC Panel - Corregido según ejemplo de Intervals.icu
  */
 
-let pmcCharts = { main: null, form: null, ramp: null };
+let pmcCharts = { main: null, form: null, ramp: null, acwr: null };
 
 export async function renderPMCPanel(container, athleteId) {
     container.innerHTML = `
@@ -71,6 +71,27 @@ export async function renderPMCPanel(container, athleteId) {
                             <span class="pmc-legend-text">${t('pmc.zones.transition')}</span>
                         </div>
                     </div>
+                    
+                    <!-- ACWR Zones Legend -->
+                    <div class="pmc-tsb-legend">
+                        <div class="pmc-legend-title">${t('pmc.acwrZones')}</div>
+                        <div class="pmc-legend-item">
+                            <span class="pmc-legend-color" style="background: #3b82f6;"></span>
+                            <span class="pmc-legend-text">${t('pmc.acwr.detraining')}</span>
+                        </div>
+                        <div class="pmc-legend-item">
+                            <span class="pmc-legend-color" style="background: #22c55e;"></span>
+                            <span class="pmc-legend-text">${t('pmc.acwr.safe')}</span>
+                        </div>
+                        <div class="pmc-legend-item">
+                            <span class="pmc-legend-color" style="background: #f59e0b;"></span>
+                            <span class="pmc-legend-text">${t('pmc.acwr.alert')}</span>
+                        </div>
+                        <div class="pmc-legend-item">
+                            <span class="pmc-legend-color" style="background: #ef4444;"></span>
+                            <span class="pmc-legend-text">${t('pmc.acwr.danger')}</span>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Charts -->
@@ -107,6 +128,16 @@ export async function renderPMCPanel(container, athleteId) {
                         </div>
                         <div class="pmc-chart-wrapper-new pmc-chart-strip">
                             <canvas id="pmc-chart-ramp"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="pmc-chart-card-new">
+                        <div class="pmc-chart-header-new">
+                            <h4>${t('pmc.acwrChart')}</h4>
+                            <button class="pmc-fullscreen-btn" data-chart="acwr">⛶</button>
+                        </div>
+                        <div class="pmc-chart-wrapper-new pmc-chart-strip">
+                            <canvas id="pmc-chart-acwr"></canvas>
                         </div>
                     </div>
                 </div>
@@ -282,6 +313,8 @@ function processPMCData(wellness, activities, startStr, endStr) {
         if (d.atl === null) d.atl = prevAtl; else prevAtl = d.atl;
         if (d.ramp === null) d.ramp = prevRamp; else prevRamp = d.ramp;
         d.tsb = d.ctl - d.atl;
+        // Calcular ACWR (Acute:Chronic Workload Ratio)
+        d.acwr = d.ctl > 0 ? d.atl / d.ctl : 0;
     });
 
     return data;
@@ -323,8 +356,9 @@ function renderCharts(data) {
     const theme = document.documentElement.getAttribute('data-theme') || 'dark';
     const isDark = theme === 'dark';
     
-    const textColor = isDark ? '#f1f5f9' : '#1e293b';
-    const gridColor = isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(71, 85, 105, 0.15)';
+    const textColor = isDark ? '#f1f5f9' : '#0f172a';
+    const gridColor = isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(71, 85, 105, 0.2)';
+    const legendColor = isDark ? '#f1f5f9' : '#0f172a';
 
     const commonOptions = {
         responsive: true,
@@ -400,7 +434,7 @@ function renderCharts(data) {
                     labels: {
                         boxWidth: 8,
                         usePointStyle: true,
-                        color: textColor,
+                        color: legendColor,
                         font: { size: 11, weight: '600' }
                     }
                 }
@@ -503,6 +537,57 @@ function renderCharts(data) {
             }
         }
     });
+
+    // Chart 4: ACWR (Acute:Chronic Workload Ratio)
+    if (pmcCharts.acwr) pmcCharts.acwr.destroy();
+    pmcCharts.acwr = new Chart(document.getElementById('pmc-chart-acwr'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: t('pmc.acwr.title'),
+                data: data.map(d => d.acwr),
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: true,
+                tension: 0.3,
+                segment: {
+                    borderColor: ctx => getColorForACWR(ctx.p1.parsed.y),
+                    backgroundColor: ctx => getFillForACWR(ctx.p1.parsed.y)
+                }
+            }]
+        },
+        options: {
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                tooltip: {
+                    ...commonOptions.plugins.tooltip,
+                    callbacks: {
+                        label: (context) => {
+                            const value = context.parsed.y;
+                            const zoneName = getZoneNameForACWR(value);
+                            return `ACWR: ${value.toFixed(2)} (${zoneName})`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    ticks: { maxTicksLimit: 10, color: textColor, font: { size: 10 } },
+                    grid: { display: false }
+                },
+                y: {
+                    position: 'right',
+                    grid: { color: gridColor },
+                    ticks: { color: textColor, font: { size: 10 } },
+                    suggestedMin: 0,
+                    suggestedMax: 2
+                }
+            }
+        }
+    });
 }
 
 function getColorForTSB(v) {
@@ -529,11 +614,34 @@ function getZoneNameForTSB(v) {
     return t('pmc.zones.risk');
 }
 
+function getColorForACWR(v) {
+    if (v < 0.8) return '#3b82f6'; // Desentrenamiento - Azul
+    if (v >= 0.8 && v <= 1.3) return '#22c55e'; // Zona Segura - Verde
+    if (v > 1.3 && v <= 1.5) return '#f59e0b'; // Alerta - Naranja
+    return '#ef4444'; // Peligro - Rojo
+}
+
+function getFillForACWR(v) {
+    const hex = getColorForACWR(v).replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.15)`;
+}
+
+function getZoneNameForACWR(v) {
+    if (v < 0.8) return t('pmc.acwr.detraining');
+    if (v >= 0.8 && v <= 1.3) return t('pmc.acwr.safe');
+    if (v > 1.3 && v <= 1.5) return t('pmc.acwr.alert');
+    return t('pmc.acwr.danger');
+}
+
 function showFullscreenChart(chartType) {
     const chartMap = {
         'main': pmcCharts.main,
         'form': pmcCharts.form,
-        'ramp': pmcCharts.ramp
+        'ramp': pmcCharts.ramp,
+        'acwr': pmcCharts.acwr
     };
 
     const chart = chartMap[chartType];

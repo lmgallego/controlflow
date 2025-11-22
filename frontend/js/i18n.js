@@ -353,6 +353,15 @@ const translations = {
                 gray: 'Zona Gris',
                 fresh: 'Fresco',
                 transition: 'Transición'
+            },
+            acwrChart: 'ACWR (Ratio Agudo:Crónico)',
+            acwrZones: 'Zonas ACWR',
+            acwr: {
+                title: 'ACWR',
+                detraining: 'Desentrenamiento (< 0.8)',
+                safe: 'Zona Segura (0.8 - 1.3)',
+                alert: 'Alerta (1.3 - 1.5)',
+                danger: 'Peligro Sobreentrenamiento (> 1.5)'
             }
         },
 
@@ -728,6 +737,15 @@ const translations = {
                 gray: 'Gray Zone',
                 fresh: 'Freshness',
                 transition: 'Transition'
+            },
+            acwrChart: 'ACWR (Acute:Chronic Workload Ratio)',
+            acwrZones: 'ACWR Zones',
+            acwr: {
+                title: 'ACWR',
+                detraining: 'Detraining (< 0.8)',
+                safe: 'Safe Zone (0.8 - 1.3)',
+                alert: 'Alert (1.3 - 1.5)',
+                danger: 'Overtraining Risk (> 1.5)'
             }
         },
 
