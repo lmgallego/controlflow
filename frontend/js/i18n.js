@@ -346,12 +346,12 @@ const translations = {
             fitnessAndFatigue: 'Fitness y Fatiga',
             formChart: 'Forma (TSB)',
             rampChart: 'Rampa',
-            formZones: 'Zonas de Forma (TSB)',
+            tsbZones: 'Zonas TSB',
             zones: {
                 risk: 'Alto Riesgo',
                 optimal: 'Óptimo',
                 gray: 'Zona Gris',
-                fresh: 'Frescura',
+                fresh: 'Fresco',
                 transition: 'Transición'
             }
         },
@@ -721,7 +721,7 @@ const translations = {
             fitnessAndFatigue: 'Fitness and Fatigue',
             formChart: 'Form (TSB)',
             rampChart: 'Ramp',
-            formZones: 'Form Zones (TSB)',
+            tsbZones: 'TSB Zones',
             zones: {
                 risk: 'High Risk',
                 optimal: 'Optimal',

@@ -20,6 +20,12 @@ export async function renderPMCPanel(container, athleteId) {
                         <i data-lucide="refresh-cw"></i>
                     </button>
                 </div>
+                <div class="pmc-quick-dates">
+                    <button class="pmc-quick-date-btn" data-days="7">7d</button>
+                    <button class="pmc-quick-date-btn" data-days="15">15d</button>
+                    <button class="pmc-quick-date-btn" data-days="30">30d</button>
+                    <button class="pmc-quick-date-btn" data-days="90">90d</button>
+                </div>
             </div>
             
             <div class="pmc-content-grid">
@@ -38,6 +44,31 @@ export async function renderPMCPanel(container, athleteId) {
                             <span class="pmc-kpi-label">${t('pmc.form')}</span>
                             <span class="pmc-kpi-value" id="pmc-kpi-tsb">-</span>
                             <span class="pmc-kpi-zone" id="pmc-kpi-zone">-</span>
+                        </div>
+                    </div>
+                    
+                    <!-- TSB Zones Legend -->
+                    <div class="pmc-tsb-legend">
+                        <div class="pmc-legend-title">${t('pmc.tsbZones')}</div>
+                        <div class="pmc-legend-item">
+                            <span class="pmc-legend-color" style="background: #ef4444;"></span>
+                            <span class="pmc-legend-text">${t('pmc.zones.risk')}</span>
+                        </div>
+                        <div class="pmc-legend-item">
+                            <span class="pmc-legend-color" style="background: #22c55e;"></span>
+                            <span class="pmc-legend-text">${t('pmc.zones.optimal')}</span>
+                        </div>
+                        <div class="pmc-legend-item">
+                            <span class="pmc-legend-color" style="background: #94a3b8;"></span>
+                            <span class="pmc-legend-text">${t('pmc.zones.gray')}</span>
+                        </div>
+                        <div class="pmc-legend-item">
+                            <span class="pmc-legend-color" style="background: #0ea5e9;"></span>
+                            <span class="pmc-legend-text">${t('pmc.zones.fresh')}</span>
+                        </div>
+                        <div class="pmc-legend-item">
+                            <span class="pmc-legend-color" style="background: #eab308;"></span>
+                            <span class="pmc-legend-text">${t('pmc.zones.transition')}</span>
                         </div>
                     </div>
                 </div>
@@ -97,6 +128,21 @@ export async function renderPMCPanel(container, athleteId) {
     // Event listener para refresh
     document.getElementById('pmc-refresh-btn').addEventListener('click', () => {
         loadPMCData(athleteId);
+    });
+
+    // Event listeners para botones de fecha rápida
+    document.querySelectorAll('.pmc-quick-date-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const days = parseInt(btn.dataset.days);
+            const end = new Date();
+            const start = new Date();
+            start.setDate(end.getDate() - days);
+            
+            document.getElementById('pmc-end-date').valueAsDate = end;
+            document.getElementById('pmc-start-date').valueAsDate = start;
+            
+            loadPMCData(athleteId);
+        });
     });
 
     // Event listeners para fullscreen
@@ -188,9 +234,11 @@ function updateHeaderMetrics(profile, wellnessHistory) {
     if (vo2max) {
         const weight = profile.weight || profile.icu_weight || 70;
         const vo2maxAbsolute = (vo2max * weight / 1000).toFixed(2);
-        document.getElementById('header-vo2max').textContent = `${vo2max.toFixed(1)} (${vo2maxAbsolute} L/min)`;
+        document.getElementById('header-vo2max').textContent = vo2max.toFixed(1);
+        document.getElementById('header-vo2max-abs').textContent = vo2maxAbsolute;
     } else {
         document.getElementById('header-vo2max').textContent = 'N/A';
+        document.getElementById('header-vo2max-abs').textContent = 'N/A';
     }
 }
 
@@ -402,6 +450,19 @@ function renderCharts(data) {
         },
         options: {
             ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                tooltip: {
+                    ...commonOptions.plugins.tooltip,
+                    callbacks: {
+                        label: (context) => {
+                            const value = context.parsed.y;
+                            const zoneName = getZoneNameForTSB(value);
+                            return `${t('pmc.form')}: ${value.toFixed(1)} (${zoneName})`;
+                        }
+                    }
+                }
+            },
             scales: {
                 x: { display: false },
                 y: {
@@ -458,6 +519,14 @@ function getFillForTSB(v) {
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
     return `rgba(${r}, ${g}, ${b}, 0.15)`;
+}
+
+function getZoneNameForTSB(v) {
+    if (v > 25) return t('pmc.zones.transition');
+    if (v > 5) return t('pmc.zones.fresh');
+    if (v >= -10) return t('pmc.zones.gray');
+    if (v >= -30) return t('pmc.zones.optimal');
+    return t('pmc.zones.risk');
 }
 
 function showFullscreenChart(chartType) {
