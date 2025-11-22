@@ -322,6 +322,31 @@ const translations = {
             load: 'Carga (TSS)'
         },
 
+        // PMC (Performance Management Chart)
+        pmc: {
+            title: 'Análisis de Carga',
+            loading: 'Cargando análisis...',
+            error: 'Error al cargar análisis',
+            years: 'años',
+            anaerobic: '(Anaeróbico)',
+            fitness: 'Fitness (CTL)',
+            fatigue: 'Fatiga (ATL)',
+            form: 'Forma (TSB)',
+            ramp: 'Rampa',
+            load: 'Carga',
+            fitnessAndFatigue: 'Fitness y Fatiga',
+            formChart: 'Forma (TSB)',
+            rampChart: 'Rampa',
+            formZones: 'Zonas de Forma (TSB)',
+            zones: {
+                risk: 'Alto Riesgo',
+                optimal: 'Óptimo',
+                gray: 'Zona Gris',
+                fresh: 'Frescura',
+                transition: 'Transición'
+            }
+        },
+
         // Common
         common: {
             na: 'N/A',
@@ -661,6 +686,31 @@ const translations = {
             time: 'Time',
             distance: 'Distance (km)',
             load: 'Load (TSS)'
+        },
+
+        // PMC (Performance Management Chart)
+        pmc: {
+            title: 'Load Analysis',
+            loading: 'Loading analysis...',
+            error: 'Error loading analysis',
+            years: 'years',
+            anaerobic: '(Anaerobic)',
+            fitness: 'Fitness (CTL)',
+            fatigue: 'Fatigue (ATL)',
+            form: 'Form (TSB)',
+            ramp: 'Ramp',
+            load: 'Load',
+            fitnessAndFatigue: 'Fitness and Fatigue',
+            formChart: 'Form (TSB)',
+            rampChart: 'Ramp',
+            formZones: 'Form Zones (TSB)',
+            zones: {
+                risk: 'High Risk',
+                optimal: 'Optimal',
+                gray: 'Gray Zone',
+                fresh: 'Freshness',
+                transition: 'Transition'
+            }
         },
 
         // Common

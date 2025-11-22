@@ -58,6 +58,10 @@ export async function getAthletes() {
     return fetchAuth('/athletes');
 }
 
+export async function getAthleteProfile(athleteId) {
+    return fetchAuth(`/athlete/${athleteId}`);
+}
+
 export async function getWellnessData(athleteId, oldest, newest) {
     const params = new URLSearchParams({ athlete_id: athleteId, oldest, newest });
     return fetchAuth(`/wellness?${params}`);

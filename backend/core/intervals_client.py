@@ -40,6 +40,12 @@ class IntervalsClient:
         params = {"start": start, "end": end}
         
         return self._get(endpoint, params)
+    
+    def get_athlete_profile(self, athlete_id):
+        """ Obtiene el perfil completo de un atleta. """
+        #
+        endpoint = f"/athlete/{athlete_id}"
+        return self._get(endpoint)
 
     def get_wellness(self, athlete_id, oldest, newest):
         """ Obtiene datos de bienestar para un atleta. """
@@ -48,7 +54,7 @@ class IntervalsClient:
         params = {
             "oldest": oldest,
             "newest": newest,
-            "fields": "id,hrv,restingHR,sleepSecs,sleepScore,soreness,fatigue"
+            "fields": "id,hrv,restingHR,sleepSecs,sleepScore,soreness,fatigue,ctl,atl,tsb,rampRate,vo2max"
         }
         return self._get(endpoint, params)
 

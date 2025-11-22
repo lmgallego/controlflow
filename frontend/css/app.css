@@ -2694,3 +2694,363 @@ a {
         font-size: 1.1rem;
     }
 }
+
+/* ==========================================
+   PMC Panel Styles (Performance Management Chart)
+   ========================================== */
+
+.pmc-panel {
+    padding: 32px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Header con información del atleta */
+.pmc-header {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-md);
+}
+
+.athlete-profile-card {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.athlete-avatar-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.athlete-avatar-large i {
+    width: 40px;
+    height: 40px;
+    color: white;
+}
+
+.athlete-details {
+    flex: 1;
+}
+
+.athlete-name-large {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+}
+
+.athlete-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.athlete-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.stat-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    text-align: center;
+    transition: all var(--transition-normal);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-light);
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.stat-unit {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.stat-secondary {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* Métricas actuales */
+.pmc-current-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.metric-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+}
+
+.metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.metric-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.metric-zone {
+    font-size: 0.875rem;
+    padding: 4px 12px;
+    border-radius: var(--radius-sm);
+    display: inline-block;
+    margin-top: 8px;
+}
+
+/* Clases de zonas TSB */
+.metric-risk {
+    border-left: 4px solid #ef4444;
+}
+
+.metric-risk .metric-value {
+    color: #ef4444;
+}
+
+.metric-risk .metric-zone {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.metric-optimal {
+    border-left: 4px solid #10b981;
+}
+
+.metric-optimal .metric-value {
+    color: #10b981;
+}
+
+.metric-optimal .metric-zone {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.metric-gray {
+    border-left: 4px solid #94a3b8;
+}
+
+.metric-gray .metric-value {
+    color: #94a3b8;
+}
+
+.metric-gray .metric-zone {
+    background: rgba(148, 163, 184, 0.2);
+    color: #94a3b8;
+}
+
+.metric-fresh {
+    border-left: 4px solid #3b82f6;
+}
+
+.metric-fresh .metric-value {
+    color: #3b82f6;
+}
+
+.metric-fresh .metric-zone {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+.metric-transition {
+    border-left: 4px solid #f59e0b;
+}
+
+.metric-transition .metric-value {
+    color: #f59e0b;
+}
+
+.metric-transition .metric-zone {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+/* Leyenda de zonas */
+.tsb-zones-legend {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 32px;
+}
+
+.tsb-zones-legend h4 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+.zones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.zone-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+}
+
+.zone-color {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.zone-risk .zone-color {
+    background: #ef4444;
+}
+
+.zone-optimal .zone-color {
+    background: #10b981;
+}
+
+.zone-gray .zone-color {
+    background: #94a3b8;
+}
+
+.zone-fresh .zone-color {
+    background: #3b82f6;
+}
+
+.zone-transition .zone-color {
+    background: #f59e0b;
+}
+
+.zone-text {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* Contenedores de gráficos */
+.pmc-chart-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-md);
+}
+
+.pmc-chart-container h3 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+}
+
+.pmc-chart-container canvas {
+    height: 300px !important;
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .pmc-header,
+[data-theme="light"] .metric-card,
+[data-theme="light"] .pmc-chart-container,
+[data-theme="light"] .tsb-zones-legend {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .stat-card {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .zone-item {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+/* Responsive PMC */
+@media (max-width: 768px) {
+    .pmc-panel {
+        padding: 20px;
+    }
+
+    .pmc-header {
+        padding: 20px;
+    }
+
+    .athlete-profile-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .athlete-name-large {
+        font-size: 1.5rem;
+    }
+
+    .athlete-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pmc-current-metrics {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .zones-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pmc-chart-container canvas {
+        height: 250px !important;
+    }
+}

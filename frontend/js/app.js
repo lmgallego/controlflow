@@ -4,6 +4,7 @@ import { getAthletes } from './apiService.js';
 import { renderAthletesPanel } from './components/AthletesPanel.js';
 import { renderWellnessPanel } from './components/WellnessPanel.js';
 import { renderActivityFeed } from './components/ActivityFeed.js';
+import { renderPMCPanel } from './components/PMCPanel.js';
 import { renderSettingsPanel } from './components/SettingsPanel.js';
 
 // --- Estado de la Aplicación ---
@@ -75,7 +76,11 @@ async function loadView(view, athleteId) {
                 await renderActivityFeed(viewContainer, athleteId);
                 break;
         case 'analysis':
-            viewContainer.innerHTML = '<h3>Panel de Análisis (Próximamente)</h3>';
+            if (!athleteId) {
+                viewContainer.innerHTML = '<h3>Cargando atletas...</h3>';
+                return;
+            }
+            await renderPMCPanel(viewContainer, athleteId);
             break;
         case 'settings':
             // Pasamos 'initializeApp' como la función callback 'onSave'

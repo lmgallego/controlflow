@@ -43,3 +43,16 @@ def get_athletes():
         return jsonify(athletes_list)
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+@athletes_api.route('/athlete/<athlete_id>', methods=['GET'])
+@token_required
+def get_athlete_profile(athlete_id):
+    try:
+        client = get_user_client()
+        profile_data = client.get_athlete_profile(athlete_id)
+        if isinstance(profile_data, tuple):
+            return jsonify(profile_data[0]), profile_data[1]
+        
+        return jsonify(profile_data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
