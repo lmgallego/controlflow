@@ -265,6 +265,8 @@ const translations = {
                     days: 'días',
                     period: 'Período'
                 },
+                showAll: 'Ver Todos',
+                showLess: 'Ver Menos',
                 info: {
                     tooltip: 'Más información sobre BPE',
                     title: '¿Qué son los Bloques de Patrón Específico?',
@@ -651,6 +653,8 @@ const translations = {
                     days: 'days',
                     period: 'Period'
                 },
+                showAll: 'Show All',
+                showLess: 'Show Less',
                 info: {
                     tooltip: 'More information about SPB',
                     title: 'What are Specific Pattern Blocks?',

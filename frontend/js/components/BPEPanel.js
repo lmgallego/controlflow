@@ -393,7 +393,7 @@ function renderTimelineChart(canvas, result) {
 }
 
 /**
- * Crea la sección de lista de bloques detectados
+ * Crea la sección de lista de bloques detectados con scroll y paginación
  * @param {Array} blocks - Array de bloques
  * @param {Array} dates - Array de fechas
  * @returns {HTMLElement}
@@ -401,6 +401,9 @@ function renderTimelineChart(canvas, result) {
 function createBlocksSection(blocks, dates) {
     const section = document.createElement('div');
     section.className = 'bpe-blocks-section';
+    
+    const INITIAL_VISIBLE = 4; // Bloques visibles inicialmente
+    const isCollapsible = blocks.length > INITIAL_VISIBLE;
 
     const typeIcons = {
         fatigue: '⚠️',
@@ -427,56 +430,99 @@ function createBlocksSection(blocks, dates) {
         sleepScore: t('wellness.sleepScore.title')
     };
 
-    section.innerHTML = `
-        <h3 class="bpe-blocks-title">${t('wellness.bpe.table.title')} (${blocks.length})</h3>
-        <div class="bpe-blocks-table">
-            ${blocks.map((block, index) => {
-                const startDate = new Date(dates[block.startIndex]).toLocaleDateString();
-                const endDate = new Date(dates[block.endIndex]).toLocaleDateString();
-
-                return `
-                    <div class="bpe-block-card bpe-block-${block.type}">
-                        <div class="bpe-block-header">
-                            <div class="bpe-block-type-badge">
-                                <span class="bpe-block-icon">${typeIcons[block.type]}</span>
-                                <span class="bpe-block-type-text">${typeTranslations[block.type]}</span>
-                            </div>
-                            <div class="bpe-block-index">#${index + 1}</div>
+    const renderBlockCard = (block, index) => {
+        const startDate = new Date(dates[block.startIndex]).toLocaleDateString();
+        const endDate = new Date(dates[block.endIndex]).toLocaleDateString();
+        return `
+            <div class="bpe-block-card bpe-block-${block.type}">
+                <div class="bpe-block-header">
+                    <div class="bpe-block-type-badge">
+                        <span class="bpe-block-icon">${typeIcons[block.type]}</span>
+                        <span class="bpe-block-type-text">${typeTranslations[block.type]}</span>
+                    </div>
+                    <div class="bpe-block-index">#${index + 1}</div>
+                </div>
+                <div class="bpe-block-body">
+                    <div class="bpe-block-info-row">
+                        <div class="bpe-block-info-item">
+                            <span class="bpe-info-label">${t('wellness.bpe.table.period')}</span>
+                            <span class="bpe-info-value">${startDate} - ${endDate}</span>
                         </div>
-                        <div class="bpe-block-body">
-                            <div class="bpe-block-info-row">
-                                <div class="bpe-block-info-item">
-                                    <span class="bpe-info-label">${t('wellness.bpe.table.period')}</span>
-                                    <span class="bpe-info-value">${startDate} - ${endDate}</span>
-                                </div>
-                            </div>
-                            <div class="bpe-block-info-row">
-                                <div class="bpe-block-info-item">
-                                    <span class="bpe-info-label">${t('wellness.bpe.table.duration')}</span>
-                                    <span class="bpe-info-value">${block.duration} ${t('wellness.bpe.table.days')}</span>
-                                </div>
-                                <div class="bpe-block-info-item">
-                                    <span class="bpe-info-label">${t('wellness.bpe.table.intensity')}</span>
-                                    <span class="bpe-info-value">${block.intensity.toFixed(2)}</span>
-                                </div>
-                            </div>
-                            <div class="bpe-block-info-row">
-                                <div class="bpe-block-info-item bpe-variables-item">
-                                    <span class="bpe-info-label">${t('wellness.bpe.table.variables')}</span>
-                                    <div class="bpe-variables-badges">
-                                        ${block.activeVariables.map(v => `<span class="bpe-variable-badge">${variableNames[v]}</span>`).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bpe-block-description">
-                                ${typeDescriptions[block.type]}
+                    </div>
+                    <div class="bpe-block-info-row">
+                        <div class="bpe-block-info-item">
+                            <span class="bpe-info-label">${t('wellness.bpe.table.duration')}</span>
+                            <span class="bpe-info-value">${block.duration} ${t('wellness.bpe.table.days')}</span>
+                        </div>
+                        <div class="bpe-block-info-item">
+                            <span class="bpe-info-label">${t('wellness.bpe.table.intensity')}</span>
+                            <span class="bpe-info-value">${block.intensity.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div class="bpe-block-info-row">
+                        <div class="bpe-block-info-item bpe-variables-item">
+                            <span class="bpe-info-label">${t('wellness.bpe.table.variables')}</span>
+                            <div class="bpe-variables-badges">
+                                ${block.activeVariables.map(v => `<span class="bpe-variable-badge">${variableNames[v]}</span>`).join('')}
                             </div>
                         </div>
                     </div>
-                `;
-            }).join('')}
+                    <div class="bpe-block-description">
+                        ${typeDescriptions[block.type]}
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+
+    section.innerHTML = `
+        <div class="bpe-blocks-header">
+            <h3 class="bpe-blocks-title">${t('wellness.bpe.table.title')} (${blocks.length})</h3>
+            ${isCollapsible ? `
+                <button class="bpe-toggle-btn" id="bpe-toggle-blocks">
+                    <span class="bpe-toggle-text">${t('wellness.bpe.showAll') || 'Show All'}</span>
+                    <span class="bpe-toggle-icon">▼</span>
+                </button>
+            ` : ''}
         </div>
+        <div class="bpe-blocks-container ${isCollapsible ? 'bpe-collapsed' : ''}" id="bpe-blocks-container">
+            <div class="bpe-blocks-table">
+                ${blocks.map((block, index) => renderBlockCard(block, index)).join('')}
+            </div>
+        </div>
+        ${isCollapsible ? `
+            <div class="bpe-blocks-fade" id="bpe-blocks-fade"></div>
+        ` : ''}
     `;
+
+    // Event listener para expandir/colapsar
+    if (isCollapsible) {
+        setTimeout(() => {
+            const toggleBtn = section.querySelector('#bpe-toggle-blocks');
+            const container = section.querySelector('#bpe-blocks-container');
+            const fade = section.querySelector('#bpe-blocks-fade');
+            
+            if (toggleBtn && container) {
+                toggleBtn.addEventListener('click', () => {
+                    const isExpanded = container.classList.toggle('bpe-expanded');
+                    container.classList.toggle('bpe-collapsed', !isExpanded);
+                    
+                    const toggleText = toggleBtn.querySelector('.bpe-toggle-text');
+                    const toggleIcon = toggleBtn.querySelector('.bpe-toggle-icon');
+                    
+                    if (isExpanded) {
+                        toggleText.textContent = t('wellness.bpe.showLess') || 'Show Less';
+                        toggleIcon.textContent = '▲';
+                        if (fade) fade.style.display = 'none';
+                    } else {
+                        toggleText.textContent = t('wellness.bpe.showAll') || 'Show All';
+                        toggleIcon.textContent = '▼';
+                        if (fade) fade.style.display = 'block';
+                    }
+                });
+            }
+        }, 0);
+    }
 
     return section;
 }
