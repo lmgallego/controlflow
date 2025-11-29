@@ -267,6 +267,9 @@ const translations = {
                 },
                 showAll: 'Ver Todos',
                 showLess: 'Ver Menos',
+                timeline: 'Línea de Tiempo de Patrones',
+                patternIntensity: 'Intensidad del Patrón',
+                intensity: 'Intensidad (Z-Score)',
                 info: {
                     tooltip: 'Más información sobre BPE',
                     title: '¿Qué son los Bloques de Patrón Específico?',
@@ -655,6 +658,9 @@ const translations = {
                 },
                 showAll: 'Show All',
                 showLess: 'Show Less',
+                timeline: 'Pattern Timeline',
+                patternIntensity: 'Pattern Intensity',
+                intensity: 'Intensity (Z-Score)',
                 info: {
                     tooltip: 'More information about SPB',
                     title: 'What are Specific Pattern Blocks?',

@@ -253,17 +253,82 @@ function createStatsSection(stats) {
 function createTimelineSection(result) {
     const section = document.createElement('div');
     section.className = 'bpe-timeline-section';
+    
+    // Header con título y controles
+    const header = document.createElement('div');
+    header.className = 'bpe-timeline-header';
+    header.innerHTML = `
+        <h4 class="bpe-timeline-title">${t('wellness.bpe.timeline') || 'Pattern Timeline'}</h4>
+        <button class="bpe-timeline-fullscreen-btn" id="bpe-timeline-fullscreen" title="Fullscreen">⛶</button>
+    `;
+    
+    // Contenedor del gráfico con altura fija
+    const chartContainer = document.createElement('div');
+    chartContainer.className = 'bpe-timeline-container';
+    chartContainer.id = 'bpe-timeline-container';
 
     const canvas = document.createElement('canvas');
     canvas.id = 'bpe-timeline-chart';
-    canvas.height = 80;
 
-    section.appendChild(canvas);
+    chartContainer.appendChild(canvas);
+    section.appendChild(header);
+    section.appendChild(chartContainer);
 
     // Renderizar el gráfico
     renderTimelineChart(canvas, result);
+    
+    // Event listener para fullscreen
+    setTimeout(() => {
+        const fullscreenBtn = section.querySelector('#bpe-timeline-fullscreen');
+        if (fullscreenBtn) {
+            fullscreenBtn.addEventListener('click', () => {
+                showFullscreenBPEChart(result);
+            });
+        }
+    }, 0);
 
     return section;
+}
+
+/**
+ * Muestra el gráfico BPE en pantalla completa
+ */
+function showFullscreenBPEChart(result) {
+    const modal = document.createElement('div');
+    modal.className = 'bpe-fullscreen-modal';
+    modal.innerHTML = `
+        <div class="bpe-fullscreen-content">
+            <div class="bpe-fullscreen-header">
+                <h3>${t('wellness.bpe.timeline') || 'Pattern Timeline'}</h3>
+                <button class="bpe-fullscreen-close">&times;</button>
+            </div>
+            <div class="bpe-fullscreen-chart-container">
+                <canvas id="bpe-fullscreen-chart"></canvas>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Renderizar gráfico en fullscreen
+    const canvas = modal.querySelector('#bpe-fullscreen-chart');
+    renderTimelineChart(canvas, result, true);
+    
+    // Cerrar modal
+    const closeBtn = modal.querySelector('.bpe-fullscreen-close');
+    closeBtn.addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+    
+    // ESC para cerrar
+    const handleEsc = (e) => {
+        if (e.key === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', handleEsc);
+        }
+    };
+    document.addEventListener('keydown', handleEsc);
 }
 
 /**
@@ -297,8 +362,9 @@ function getBPEThemeColors() {
  * Renderiza el gráfico de timeline con bloques
  * @param {HTMLCanvasElement} canvas - Canvas para el gráfico
  * @param {Object} result - Resultado del análisis
+ * @param {boolean} isFullscreen - Si está en modo fullscreen
  */
-function renderTimelineChart(canvas, result) {
+function renderTimelineChart(canvas, result, isFullscreen = false) {
     const ctx = canvas.getContext('2d');
     const annotations = blocksToChartAnnotations(result.blocks, result.dates);
     const colors = getBPEThemeColors();
@@ -311,19 +377,23 @@ function renderTimelineChart(canvas, result) {
         }
     });
 
+    // Configuración adaptativa según el número de días
+    const numDays = result.dates.length;
+    const maxTicksToShow = isFullscreen ? 20 : Math.min(12, numDays);
+
     new Chart(ctx, {
         type: 'line',
         data: {
             labels: result.dates,
             datasets: [{
-                label: 'Intensidad de Patrón',
+                label: t('wellness.bpe.patternIntensity') || 'Pattern Intensity',
                 data: blockIntensities,
                 borderColor: 'rgba(99, 102, 241, 0.8)',
                 backgroundColor: 'rgba(99, 102, 241, 0.1)',
                 borderWidth: 2,
                 tension: 0.4,
                 fill: true,
-                pointRadius: 4,
+                pointRadius: isFullscreen ? 4 : 2,
                 pointHoverRadius: 6
             }]
         },
@@ -337,9 +407,13 @@ function renderTimelineChart(canvas, result) {
             plugins: {
                 legend: {
                     display: true,
+                    position: 'top',
+                    align: 'end',
                     labels: {
                         color: colors.text,
-                        font: { size: 12 }
+                        font: { size: 11 },
+                        boxWidth: 12,
+                        padding: 8
                     }
                 },
                 tooltip: {
@@ -348,8 +422,17 @@ function renderTimelineChart(canvas, result) {
                     bodyColor: colors.tooltipText,
                     borderColor: colors.tooltipBorder,
                     borderWidth: 1,
-                    padding: 12,
-                    displayColors: true
+                    padding: 10,
+                    displayColors: true,
+                    callbacks: {
+                        title: (items) => {
+                            if (items.length > 0) {
+                                const date = new Date(items[0].label);
+                                return date.toLocaleDateString();
+                            }
+                            return '';
+                        }
+                    }
                 },
                 annotation: {
                     annotations: annotations
@@ -359,18 +442,21 @@ function renderTimelineChart(canvas, result) {
                 x: {
                     type: 'time',
                     time: {
-                        unit: 'day',
+                        unit: numDays > 60 ? 'week' : 'day',
                         displayFormats: {
-                            day: 'MMM dd'
+                            day: 'dd MMM',
+                            week: 'dd MMM'
                         }
                     },
                     grid: {
-                        color: colors.grid
+                        display: false
                     },
                     ticks: {
                         color: colors.textSecondary,
-                        maxRotation: 45,
-                        minRotation: 0
+                        maxRotation: 0,
+                        autoSkip: true,
+                        maxTicksLimit: maxTicksToShow,
+                        font: { size: 10 }
                     }
                 },
                 y: {
@@ -379,12 +465,14 @@ function renderTimelineChart(canvas, result) {
                         color: colors.grid
                     },
                     ticks: {
-                        color: colors.textSecondary
+                        color: colors.textSecondary,
+                        font: { size: 10 }
                     },
                     title: {
-                        display: true,
-                        text: 'Intensidad (Z-Score)',
-                        color: colors.textSecondary
+                        display: isFullscreen,
+                        text: t('wellness.bpe.intensity') || 'Intensity (Z-Score)',
+                        color: colors.textSecondary,
+                        font: { size: 11 }
                     }
                 }
             }
