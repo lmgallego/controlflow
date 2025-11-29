@@ -9,7 +9,7 @@ import { renderSettingsPanel } from './components/SettingsPanel.js';
 
 // --- Estado de la Aplicación ---
 let currentAthleteId = null;
-let currentView = 'wellness'; // Vista por defecto
+let currentView = 'athletes'; // Vista por defecto
 let user = null; // Almacena el objeto de usuario de Firebase
 
 // --- Elementos del DOM ---
