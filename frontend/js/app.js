@@ -128,11 +128,18 @@ async function initializeApp() {
             currentAthleteId = athletes[0].id;
             athleteSelect.value = currentAthleteId;
             athleteSelect.disabled = false;
-            // Cargar la vista por defecto (wellness)
-            await loadView(currentView, currentAthleteId);
+            
+            // Cargar la vista por defecto
+            // Si es 'athletes', no necesita athleteId
+            if (currentView === 'athletes') {
+                await loadView('athletes');
+            } else {
+                await loadView(currentView, currentAthleteId);
+            }
         } else {
             athleteSelect.innerHTML = '<option>No hay atletas</option>';
-            viewContainer.innerHTML = '<h3>No se encontraron atletas.</h3>';
+            // Aún así cargar la vista de athletes para mostrar "no hay atletas"
+            await loadView('athletes');
         }
 
     } catch (error) {

@@ -1,6 +1,6 @@
 import { getAthletes, getWellnessData } from '../apiService.js';
 import { t } from '../i18n.js';
-import { calculateZScores, mean, stdDev, calculateReadiness } from '../statsUtils.js';
+import { mean, standardDeviation, calculateReadiness } from '../statsUtils.js';
 
 // Prioridad de ordenamiento para readiness
 const READINESS_PRIORITY = {
@@ -40,7 +40,7 @@ async function getAthleteReadiness(athleteId) {
         
         // Calcular Z-Scores
         const hrvMean = mean(hrvValues);
-        const hrvStd = stdDev(hrvValues);
+        const hrvStd = standardDeviation(hrvValues);
         
         if (hrvStd === 0) {
             return { readiness: calculateReadiness(0), hasData: true };
