@@ -55,7 +55,7 @@ const translations = {
             tabs: {
                 metrics: 'Métricas',
                 patterns: 'Patrones',
-                bpe: 'BPE'
+                dtf: 'DTF'
             },
 
             // Patterns Tab
@@ -226,9 +226,9 @@ const translations = {
                 stable: 'Estable'
             },
 
-            // BPE System
-            bpe: {
-                title: 'Detección de Bloques de Patrón Específico (BPE)',
+            // DTF System (Detección Temprana de Fatiga)
+            dtf: {
+                title: 'Detección Temprana de Fatiga (DTF)',
                 subtitle: 'Análisis avanzado de patrones fisiológicos',
                 zThreshold: 'Umbral Z-Score',
                 window: 'Ventana de Detección',
@@ -239,7 +239,7 @@ const translations = {
                 detect: 'Detectar Patrones',
                 detecting: 'Detectando patrones...',
                 viewBlocks: 'Ver Bloques',
-                noPatterns: 'No se detectaron patrones BPE en el período seleccionado',
+                noPatterns: 'No se detectaron patrones de fatiga en el período seleccionado',
                 selectAtLeastOne: 'Selecciona al menos una variable para analizar',
                 types: {
                     fatigue: 'Fatiga Aguda',
@@ -261,7 +261,7 @@ const translations = {
                     title: 'Bloques Detectados',
                     duration: 'Duración',
                     intensity: 'Intensidad',
-                    variables: 'Variables',
+                    variables: 'Variables Afectadas',
                     days: 'días',
                     period: 'Período'
                 },
@@ -271,16 +271,18 @@ const translations = {
                 patternIntensity: 'Intensidad del Patrón',
                 intensity: 'Intensidad (Z-Score)',
                 info: {
-                    tooltip: 'Más información sobre BPE',
-                    title: '¿Qué son los Bloques de Patrón Específico?',
-                    what: 'Los BPE son períodos donde múltiples biomarcadores muestran desviaciones significativas simultáneas, indicando cambios en el estado fisiológico del atleta.',
+                    tooltip: 'Más información sobre DTF',
+                    title: '¿Qué es la Detección Temprana de Fatiga?',
+                    what: 'El sistema DTF identifica períodos donde múltiples biomarcadores muestran desviaciones significativas simultáneas, indicando cambios en el estado fisiológico del atleta antes de que se manifiesten síntomas evidentes.',
                     how: 'El sistema analiza las variables usando Z-Scores adaptativos en ventanas móviles, detectando patrones que persisten durante varios días consecutivos.',
                     typesTitle: 'Tipos de Patrones',
                     fatigueDesc: 'HRV baja, frecuencia cardíaca elevada y sueño reducido. Indica acumulación de fatiga.',
                     recoveryDesc: 'HRV alta, frecuencia cardíaca baja y sueño de calidad. Indica recuperación óptima.',
                     disruptionDesc: 'Patrones mixtos o atípicos que no se clasifican claramente como fatiga o recuperación.',
+                    intensityTitle: '¿Qué es la Intensidad?',
+                    intensityDesc: 'La intensidad mide la magnitud de la desviación de tus biomarcadores respecto a tu baseline normal. Un valor de 1.0 significa una desviación estándar, 2.0 significa dos desviaciones. Valores más altos indican cambios más pronunciados que requieren mayor atención.',
                     interpretTitle: 'Cómo Interpretarlo',
-                    interpret: 'Los bloques coloreados en el gráfico indican períodos donde se detectaron patrones. La intensidad representa qué tan fuerte es la desviación respecto a tu baseline normal.'
+                    interpret: 'Los bloques coloreados en el gráfico indican períodos donde se detectaron patrones. Cuanto mayor sea la intensidad, más importante es tomar medidas de recuperación.'
                 }
             }
         },
@@ -446,7 +448,7 @@ const translations = {
             tabs: {
                 metrics: 'Metrics',
                 patterns: 'Patterns',
-                bpe: 'SPB'
+                dtf: 'EFD'
             },
 
             // Patterns Tab
@@ -617,9 +619,9 @@ const translations = {
                 stable: 'Stable'
             },
 
-            // BPE System
-            bpe: {
-                title: 'Specific Pattern Block (SPB) Detection',
+            // DTF System (Early Fatigue Detection)
+            dtf: {
+                title: 'Early Fatigue Detection (EFD)',
                 subtitle: 'Advanced physiological pattern analysis',
                 zThreshold: 'Z-Score Threshold',
                 window: 'Detection Window',
@@ -630,7 +632,7 @@ const translations = {
                 detect: 'Detect Patterns',
                 detecting: 'Detecting patterns...',
                 viewBlocks: 'View Blocks',
-                noPatterns: 'No SPB patterns detected in selected period',
+                noPatterns: 'No fatigue patterns detected in selected period',
                 selectAtLeastOne: 'Select at least one variable to analyze',
                 types: {
                     fatigue: 'Acute Fatigue',
@@ -652,7 +654,7 @@ const translations = {
                     title: 'Detected Blocks',
                     duration: 'Duration',
                     intensity: 'Intensity',
-                    variables: 'Variables',
+                    variables: 'Affected Variables',
                     days: 'days',
                     period: 'Period'
                 },
@@ -662,16 +664,18 @@ const translations = {
                 patternIntensity: 'Pattern Intensity',
                 intensity: 'Intensity (Z-Score)',
                 info: {
-                    tooltip: 'More information about SPB',
-                    title: 'What are Specific Pattern Blocks?',
-                    what: 'SPBs are periods where multiple biomarkers show simultaneous significant deviations, indicating changes in the athlete\'s physiological state.',
+                    tooltip: 'More information about EFD',
+                    title: 'What is Early Fatigue Detection?',
+                    what: 'The EFD system identifies periods where multiple biomarkers show simultaneous significant deviations, indicating changes in the athlete\'s physiological state before obvious symptoms appear.',
                     how: 'The system analyzes variables using adaptive Z-Scores in rolling windows, detecting patterns that persist for several consecutive days.',
                     typesTitle: 'Pattern Types',
                     fatigueDesc: 'Low HRV, elevated heart rate and reduced sleep. Indicates fatigue accumulation.',
                     recoveryDesc: 'High HRV, low heart rate and quality sleep. Indicates optimal recovery.',
                     disruptionDesc: 'Mixed or atypical patterns that are not clearly classified as fatigue or recovery.',
+                    intensityTitle: 'What is Intensity?',
+                    intensityDesc: 'Intensity measures the magnitude of deviation of your biomarkers from your normal baseline. A value of 1.0 means one standard deviation, 2.0 means two deviations. Higher values indicate more pronounced changes that require greater attention.',
                     interpretTitle: 'How to Interpret',
-                    interpret: 'Colored blocks on the chart indicate periods where patterns were detected. Intensity represents how strong the deviation is from your normal baseline.'
+                    interpret: 'Colored blocks on the chart indicate periods where patterns were detected. The higher the intensity, the more important it is to take recovery measures.'
                 }
             }
         },

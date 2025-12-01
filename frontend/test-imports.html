@@ -17,13 +17,13 @@
             const initUI = await import('./js/initUI.js');
             console.log('✅ initUI.js loaded:', initUI);
 
-            console.log('3. Testing bpeAnalysis.js...');
-            const bpe = await import('./js/bpeAnalysis.js');
-            console.log('✅ bpeAnalysis.js loaded:', bpe);
+            console.log('3. Testing dtfAnalysis.js...');
+            const dtf = await import('./js/dtfAnalysis.js');
+            console.log('✅ dtfAnalysis.js loaded:', dtf);
 
-            console.log('4. Testing BPEPanel.js...');
-            const panel = await import('./js/components/BPEPanel.js');
-            console.log('✅ BPEPanel.js loaded:', panel);
+            console.log('4. Testing DTFPanel.js...');
+            const panel = await import('./js/components/DTFPanel.js');
+            console.log('✅ DTFPanel.js loaded:', panel);
 
             document.getElementById('status').innerHTML = '<span style="color:green">✅ All imports successful! Check console for details.</span>';
         } catch (error) {

@@ -1,5 +1,5 @@
 /**
- * Sistema de Análisis BPE (Bloques de Patrón Específico)
+ * Sistema de Análisis DTF (Detección Temprana de Fatiga)
  * Detecta patrones fisiológicos específicos usando Z-Scores adaptativos
  * y clasificación automática de estados (fatiga, recuperación, disrupción)
  */
@@ -43,7 +43,7 @@ function adaptiveZScores(data, window = 14) {
  * @param {number} minVariables - Mínimo de variables que deben activarse (default: 2)
  * @returns {Array} - Array de bloques detectados
  */
-function detectBPEBlocks(zScoreData, threshold = 1.5, detectionWindow = 5, minVariables = 2) {
+function detectDTFBlocks(zScoreData, threshold = 1.5, detectionWindow = 5, minVariables = 2) {
     const { hrv, rhr, sleep, sleepScore } = zScoreData;
     const length = hrv.length;
     const blocks = [];
@@ -177,7 +177,7 @@ function optimizeThreshold(zScoreData, thresholds = [1.0, 1.25, 1.5, 1.75, 2.0])
     let bestScore = -1;
 
     for (const threshold of thresholds) {
-        const blocks = detectBPEBlocks(zScoreData, threshold, 5, 2);
+        const blocks = detectDTFBlocks(zScoreData, threshold, 5, 2);
 
         if (blocks.length === 0) continue;
 
@@ -233,7 +233,7 @@ function calculateSilhouetteScore(blocks) {
  * @param {Object} options - {threshold, detectionWindow, minVariables, optimizeThreshold}
  * @returns {Object} - {blocks, zScores, stats, threshold}
  */
-export function analyzeBPE(wellnessData, options = {}) {
+export function analyzeDTF(wellnessData, options = {}) {
     const {
         threshold: userThreshold = null,
         detectionWindow = 5,
@@ -270,10 +270,10 @@ export function analyzeBPE(wellnessData, options = {}) {
     }
 
     // Detectar bloques
-    const blocks = detectBPEBlocks(zScoreData, finalThreshold, detectionWindow, minVariables);
+    const blocks = detectDTFBlocks(zScoreData, finalThreshold, detectionWindow, minVariables);
 
     // Calcular estadísticas
-    const stats = calculateBPEStats(blocks, wellnessData.dates);
+    const stats = calculateDTFStats(blocks, wellnessData.dates);
 
     return {
         blocks,
@@ -290,7 +290,7 @@ export function analyzeBPE(wellnessData, options = {}) {
  * @param {Array} dates - Array de fechas
  * @returns {Object} - Estadísticas
  */
-function calculateBPEStats(blocks, dates) {
+function calculateDTFStats(blocks, dates) {
     if (blocks.length === 0) {
         return {
             totalBlocks: 0,

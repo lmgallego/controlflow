@@ -14,7 +14,7 @@ import {
     calculateReadiness
 } from '../statsUtils.js';
 import { t } from '../i18n.js';
-import { createBPEPanel } from './BPEPanel.js';
+import { createDTFPanel } from './DTFPanel.js';
 import { createPatternAnalysisPanel, patternChartInstances } from './PatternAnalysisPanel.js';
 
 // Variables globales para el panel
@@ -104,7 +104,7 @@ function renderWellnessPanelContent(container, data) {
         <div class="wellness-tabs">
             <button class="wellness-tab ${currentActiveTab === 'metrics' ? 'active' : ''}" data-tab="metrics" data-i18n="wellness.tabs.metrics">Métricas</button>
             <button class="wellness-tab ${currentActiveTab === 'patterns' ? 'active' : ''}" data-tab="patterns" data-i18n="wellness.tabs.patterns">Patrones</button>
-            <button class="wellness-tab ${currentActiveTab === 'bpe' ? 'active' : ''}" data-tab="bpe" data-i18n="wellness.tabs.bpe">BPE</button>
+            <button class="wellness-tab ${currentActiveTab === 'dtf' ? 'active' : ''}" data-tab="dtf" data-i18n="wellness.tabs.dtf">DTF</button>
         </div>
 
         <!-- Tab 1: Métricas -->
@@ -137,9 +137,9 @@ function renderWellnessPanelContent(container, data) {
             <div id="patterns-container"></div>
         </div>
 
-        <!-- Tab 3: BPE -->
-        <div id="tab-bpe" class="wellness-tab-content ${currentActiveTab === 'bpe' ? 'active' : ''}">
-            <div id="bpe-container"></div>
+        <!-- Tab 3: DTF -->
+        <div id="tab-dtf" class="wellness-tab-content ${currentActiveTab === 'dtf' ? 'active' : ''}">
+            <div id="dtf-container"></div>
         </div>
 
         <!-- Modal para gráficos en pantalla completa -->
@@ -172,10 +172,10 @@ function renderWellnessPanelContent(container, data) {
     const patternsPanel = createPatternAnalysisPanel(data);
     patternsContainer.appendChild(patternsPanel);
 
-    // Añadir panel BPE
-    const bpeContainer = container.querySelector('#bpe-container');
-    const bpePanel = createBPEPanel(data);
-    bpeContainer.appendChild(bpePanel);
+    // Añadir panel DTF
+    const dtfContainer = container.querySelector('#dtf-container');
+    const dtfPanel = createDTFPanel(data);
+    dtfContainer.appendChild(dtfPanel);
 
     // Event listeners
     setupEventListeners(container);
