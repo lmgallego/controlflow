@@ -522,11 +522,11 @@ function renderCharts(data) {
                     align: 'start',
                     labels: {
                         generateLabels: () => [
-                            { text: `${t('pmc.zones.risk')} (< -30)`, fillStyle: '#ef4444', strokeStyle: '#ef4444' },
-                            { text: `${t('pmc.zones.optimal')} (-30 a -10)`, fillStyle: '#22c55e', strokeStyle: '#22c55e' },
-                            { text: `${t('pmc.zones.gray')} (-10 a 5)`, fillStyle: '#94a3b8', strokeStyle: '#94a3b8' },
-                            { text: `${t('pmc.zones.fresh')} (5 a 25)`, fillStyle: '#0ea5e9', strokeStyle: '#0ea5e9' },
-                            { text: `${t('pmc.zones.transition')} (> 25)`, fillStyle: '#eab308', strokeStyle: '#eab308' }
+                            { text: `${t('pmc.zones.risk')} (< -30)`, fillStyle: '#ef4444', strokeStyle: '#ef4444', fontColor: legendColor },
+                            { text: `${t('pmc.zones.optimal')} (-30 a -10)`, fillStyle: '#22c55e', strokeStyle: '#22c55e', fontColor: legendColor },
+                            { text: `${t('pmc.zones.gray')} (-10 a 5)`, fillStyle: '#94a3b8', strokeStyle: '#94a3b8', fontColor: legendColor },
+                            { text: `${t('pmc.zones.fresh')} (5 a 25)`, fillStyle: '#0ea5e9', strokeStyle: '#0ea5e9', fontColor: legendColor },
+                            { text: `${t('pmc.zones.transition')} (> 25)`, fillStyle: '#eab308', strokeStyle: '#eab308', fontColor: legendColor }
                         ],
                         boxWidth: 12,
                         boxHeight: 8,
@@ -661,10 +661,10 @@ function renderCharts(data) {
                     align: 'start',
                     labels: {
                         generateLabels: () => [
-                            { text: `${t('pmc.acwr.detraining')} (< 0.8)`, fillStyle: '#3b82f6', strokeStyle: '#3b82f6' },
-                            { text: `${t('pmc.acwr.safe')} (0.8-1.3)`, fillStyle: '#22c55e', strokeStyle: '#22c55e' },
-                            { text: `${t('pmc.acwr.alert')} (1.3-1.5)`, fillStyle: '#f59e0b', strokeStyle: '#f59e0b' },
-                            { text: `${t('pmc.acwr.danger')} (> 1.5)`, fillStyle: '#ef4444', strokeStyle: '#ef4444' }
+                            { text: `${t('pmc.acwr.detraining')} (< 0.8)`, fillStyle: '#3b82f6', strokeStyle: '#3b82f6', fontColor: legendColor },
+                            { text: `${t('pmc.acwr.safe')} (0.8-1.3)`, fillStyle: '#22c55e', strokeStyle: '#22c55e', fontColor: legendColor },
+                            { text: `${t('pmc.acwr.alert')} (1.3-1.5)`, fillStyle: '#f59e0b', strokeStyle: '#f59e0b', fontColor: legendColor },
+                            { text: `${t('pmc.acwr.danger')} (> 1.5)`, fillStyle: '#ef4444', strokeStyle: '#ef4444', fontColor: legendColor }
                         ],
                         boxWidth: 12,
                         boxHeight: 8,
