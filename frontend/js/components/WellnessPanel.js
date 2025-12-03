@@ -769,7 +769,7 @@ function renderHRVCVCard(data) {
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">${t('wellness.hrvCV.interpretation.general')}</span>
-                        <span class="stat-value" style="color: #f59e0b;">2-20%</span>
+                        <span class="stat-value" style="color: #f59e0b;">12-20%</span>
                     </div>
                 </div>
             </div>
@@ -1110,7 +1110,7 @@ function renderHRVChart(data) {
  * Zonas según literatura científica:
  * - Élite: 2-7%
  * - Atlético: 7-12%
- * - General: 2-20%
+ * - General: 12-20%
  */
 function renderHRVCVChart(data) {
     const ctx = document.getElementById('hrv-cv-chart');
@@ -1662,7 +1662,7 @@ function showHRVCVInfo() {
                     <ul class="hrv-cv-ranges-list">
                         <li class="elite"><span class="range-badge elite">2-7%</span> ${t('wellness.hrvCV.info.rangeElite')}</li>
                         <li class="athletic"><span class="range-badge athletic">7-12%</span> ${t('wellness.hrvCV.info.rangeMid')}</li>
-                        <li class="general"><span class="range-badge general">2-20%</span> ${t('wellness.hrvCV.info.rangeGeneral')}</li>
+                        <li class="general"><span class="range-badge general">12-20%</span> ${t('wellness.hrvCV.info.rangeGeneral')}</li>
                     </ul>
                 </div>
 

@@ -199,7 +199,7 @@ const translations = {
                     eliteDesc: 'Mayor estabilidad del sistema nervioso autónomo y mejor adaptación al entrenamiento.',
                     athletic: 'Atlético (7-12%)',
                     athleticDesc: 'Rango típico para atletas de nivel medio. Buena variabilidad.',
-                    general: 'General (2-20%)',
+                    general: 'General (12-20%)',
                     generalDesc: 'Rango amplio de la población general.'
                 },
                 adaptation: {
@@ -239,7 +239,7 @@ const translations = {
                     ranges: 'Rangos típicos según nivel de condición física',
                     rangeElite: 'Atletas de élite o alto nivel: CV entre 2-7%',
                     rangeMid: 'Atletas de nivel medio o menor condición: CV entre 7-12%',
-                    rangeGeneral: 'Población general: CV entre 2-20%',
+                    rangeGeneral: 'Población general: CV entre 12-20%',
                     performanceTitle: 'Interpretación según el rendimiento',
                     performanceDesc: 'Los valores más bajos de CV-HRV indican mayor estabilidad del sistema nervioso autónomo y mejor adaptación al entrenamiento. Las personas más jóvenes, sin enfermedades, con mejor composición corporal y mayor capacidad aeróbica tienden a situarse en el extremo inferior del rango (2-7%), mientras que individuos menos saludables presentan valores más altos.',
                     practicalTitle: 'Pasos Prácticos para la Implementación',
@@ -674,7 +674,7 @@ const translations = {
                     eliteDesc: 'Greater autonomic nervous system stability and better training adaptation.',
                     athletic: 'Athletic (7-12%)',
                     athleticDesc: 'Typical range for mid-level athletes. Good variability.',
-                    general: 'General (2-20%)',
+                    general: 'General (12-20%)',
                     generalDesc: 'Wide range for general population.'
                 },
                 adaptation: {
@@ -714,7 +714,7 @@ const translations = {
                     ranges: 'Typical ranges by fitness level',
                     rangeElite: 'Elite or high-level athletes: CV between 2-7%',
                     rangeMid: 'Mid-level athletes or lower fitness: CV between 7-12%',
-                    rangeGeneral: 'General population: CV between 2-20%',
+                    rangeGeneral: 'General population: CV between 12-20%',
                     performanceTitle: 'Performance interpretation',
                     performanceDesc: 'Lower CV-HRV values indicate greater autonomic nervous system stability and better training adaptation. Younger individuals without diseases, with better body composition and higher aerobic capacity tend to be at the lower end of the range (2-7%), while less healthy individuals show higher values.',
                     practicalTitle: 'Practical Implementation Steps',
