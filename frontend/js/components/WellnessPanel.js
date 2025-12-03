@@ -264,6 +264,17 @@ function setupEventListeners(container) {
 
     // Exponer función showChartFullscreen para PatternAnalysisPanel
     window.showPatternChartFullscreen = showChartFullscreen;
+
+    // Botón de información del CV del HRV
+    const hrvCVInfoBtn = container.querySelector('#hrv-cv-info-btn');
+    hrvCVInfoBtn?.addEventListener('click', () => {
+        showHRVCVInfo();
+    });
+
+    // Inicializar iconos Lucide
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }
 
 /**
@@ -619,17 +630,18 @@ function renderHRVCVCard(data) {
     const cv = hrv.cv;
     const cvRolling = hrv.cvRolling;
     const latestCV = cvRolling[cvRolling.length - 1];
-    const trendIcon = renderTrendIcon(hrv.cvTrend, true); // Mayor CV puede ser positivo (más variabilidad)
+    const trendIcon = renderTrendIcon(hrv.cvTrend, false); // Menor CV es mejor (más estabilidad)
     
-    // Determinar el estado del CV
-    let cvStatus = { color: '#3b82f6', key: 'normal' };
+    // Determinar el estado del CV según rangos científicos
+    // Élite: 2-7%, Atlético: 7-12%, General: 2-20%
+    let cvStatus = { color: '#3b82f6', key: 'athletic' };
     if (latestCV !== null) {
-        if (latestCV < 5) {
-            cvStatus = { color: '#ef4444', key: 'low' }; // Rojo - muy baja variabilidad
-        } else if (latestCV > 10) {
-            cvStatus = { color: '#f59e0b', key: 'high' }; // Amarillo - alta variabilidad
+        if (latestCV <= 7) {
+            cvStatus = { color: '#10b981', key: 'elite' }; // Verde - nivel élite
+        } else if (latestCV <= 12) {
+            cvStatus = { color: '#3b82f6', key: 'athletic' }; // Azul - nivel atlético
         } else {
-            cvStatus = { color: '#10b981', key: 'normal' }; // Verde - variabilidad normal
+            cvStatus = { color: '#f59e0b', key: 'general' }; // Amarillo - población general
         }
     }
 
@@ -637,6 +649,9 @@ function renderHRVCVCard(data) {
         <div class="metric-card">
             <div class="metric-card-header">
                 <h3 data-i18n="wellness.hrvCV.title">${t('wellness.hrvCV.title')}</h3>
+                <button class="hrv-cv-info-btn" id="hrv-cv-info-btn" title="${t('wellness.hrvCV.info.title')}">
+                    <i data-lucide="help-circle"></i>
+                </button>
                 <div class="metric-badge" style="background-color: ${cvStatus.color}20; color: ${cvStatus.color};">
                     ${t('wellness.hrvCV.interpretation.' + cvStatus.key)}
                 </div>
@@ -669,16 +684,16 @@ function renderHRVCVCard(data) {
                 </div>
                 <div class="metric-stats">
                     <div class="stat-item">
-                        <span class="stat-label">${t('wellness.hrvCV.interpretation.low')}</span>
-                        <span class="stat-value" style="color: #ef4444;">< 5%</span>
+                        <span class="stat-label">${t('wellness.hrvCV.interpretation.elite')}</span>
+                        <span class="stat-value" style="color: #10b981;">2-7%</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">${t('wellness.hrvCV.interpretation.normal')}</span>
-                        <span class="stat-value" style="color: #10b981;">5-10%</span>
+                        <span class="stat-label">${t('wellness.hrvCV.interpretation.athletic')}</span>
+                        <span class="stat-value" style="color: #3b82f6;">7-12%</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">${t('wellness.hrvCV.interpretation.high')}</span>
-                        <span class="stat-value" style="color: #f59e0b;">> 10%</span>
+                        <span class="stat-label">${t('wellness.hrvCV.interpretation.general')}</span>
+                        <span class="stat-value" style="color: #f59e0b;">2-20%</span>
                     </div>
                 </div>
             </div>
@@ -1016,6 +1031,10 @@ function renderHRVChart(data) {
 
 /**
  * Renderiza gráfico del Coeficiente de Variación del HRV
+ * Zonas según literatura científica:
+ * - Élite: 2-7%
+ * - Atlético: 7-12%
+ * - General: 2-20%
  */
 function renderHRVCVChart(data) {
     const ctx = document.getElementById('hrv-cv-chart');
@@ -1042,18 +1061,18 @@ function renderHRVCVChart(data) {
                     pointHoverRadius: 6
                 },
                 {
-                    label: t('wellness.hrvCV.interpretation.low') + ' (5%)',
-                    data: new Array(data.dates.length).fill(5),
-                    borderColor: 'rgba(239, 68, 68, 0.5)',
+                    label: t('wellness.hrvCV.interpretation.elite') + ' (7%)',
+                    data: new Array(data.dates.length).fill(7),
+                    borderColor: 'rgba(16, 185, 129, 0.6)',
                     borderWidth: 1,
                     borderDash: [5, 5],
                     fill: false,
                     pointRadius: 0
                 },
                 {
-                    label: t('wellness.hrvCV.interpretation.high') + ' (10%)',
-                    data: new Array(data.dates.length).fill(10),
-                    borderColor: 'rgba(245, 158, 11, 0.5)',
+                    label: t('wellness.hrvCV.interpretation.athletic') + ' (12%)',
+                    data: new Array(data.dates.length).fill(12),
+                    borderColor: 'rgba(59, 130, 246, 0.6)',
                     borderWidth: 1,
                     borderDash: [5, 5],
                     fill: false,
@@ -1067,25 +1086,28 @@ function renderHRVCVChart(data) {
                 ...getChartOptions('%').plugins,
                 annotation: {
                     annotations: {
-                        lowZone: {
+                        eliteZone: {
                             type: 'box',
                             yMin: 0,
-                            yMax: 5,
-                            backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                            yMax: 7,
+                            backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                            borderWidth: 0,
+                            label: {
+                                display: false
+                            }
+                        },
+                        athleticZone: {
+                            type: 'box',
+                            yMin: 7,
+                            yMax: 12,
+                            backgroundColor: 'rgba(59, 130, 246, 0.08)',
                             borderWidth: 0
                         },
-                        normalZone: {
+                        generalZone: {
                             type: 'box',
-                            yMin: 5,
-                            yMax: 10,
-                            backgroundColor: 'rgba(16, 185, 129, 0.05)',
-                            borderWidth: 0
-                        },
-                        highZone: {
-                            type: 'box',
-                            yMin: 10,
+                            yMin: 12,
                             yMax: 20,
-                            backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                            backgroundColor: 'rgba(245, 158, 11, 0.08)',
                             borderWidth: 0
                         }
                     }
@@ -1533,4 +1555,85 @@ function getChartOptions(unit = '') {
             }
         }
     };
+}
+
+/**
+ * Muestra el modal de información del CV del HRV
+ */
+function showHRVCVInfo() {
+    const modal = document.createElement('div');
+    modal.className = 'hrv-cv-info-modal';
+    modal.innerHTML = `
+        <div class="hrv-cv-info-content">
+            <button class="hrv-cv-info-close">&times;</button>
+            <h3>${t('wellness.hrvCV.info.title')}</h3>
+            <div class="hrv-cv-info-body">
+                <div class="hrv-cv-info-section">
+                    <h4>Fórmula</h4>
+                    <div class="hrv-cv-formula">
+                        <code>${t('wellness.hrvCV.info.formula')}</code>
+                    </div>
+                    <p>${t('wellness.hrvCV.info.formulaDesc')}</p>
+                </div>
+
+                <div class="hrv-cv-info-section">
+                    <h4>${t('wellness.hrvCV.info.reference')}</h4>
+                    <p>${t('wellness.hrvCV.info.referenceStudy')}</p>
+                </div>
+
+                <div class="hrv-cv-info-section">
+                    <h4>${t('wellness.hrvCV.info.ranges')}</h4>
+                    <ul class="hrv-cv-ranges-list">
+                        <li class="elite"><span class="range-badge elite">2-7%</span> ${t('wellness.hrvCV.info.rangeElite')}</li>
+                        <li class="athletic"><span class="range-badge athletic">7-12%</span> ${t('wellness.hrvCV.info.rangeMid')}</li>
+                        <li class="general"><span class="range-badge general">2-20%</span> ${t('wellness.hrvCV.info.rangeGeneral')}</li>
+                    </ul>
+                </div>
+
+                <div class="hrv-cv-info-section">
+                    <h4>${t('wellness.hrvCV.info.performanceTitle')}</h4>
+                    <p>${t('wellness.hrvCV.info.performanceDesc')}</p>
+                </div>
+
+                <div class="hrv-cv-info-section sources">
+                    <h4>${t('wellness.hrvCV.info.sources')}</h4>
+                    <ul class="hrv-cv-sources-list">
+                        <li>
+                            <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8768029/" target="_blank" rel="noopener noreferrer">
+                                📄 ${t('wellness.hrvCV.info.source1')}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://headsuphealth.com/features/tracking-the-oura-hrv-coefficient-of-variation-hrv-cv/" target="_blank" rel="noopener noreferrer">
+                                📄 ${t('wellness.hrvCV.info.source2')}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Cerrar modal
+    const closeBtn = modal.querySelector('.hrv-cv-info-close');
+    closeBtn.addEventListener('click', () => {
+        modal.remove();
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+
+    // Cerrar con ESC
+    const handleEsc = (e) => {
+        if (e.key === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', handleEsc);
+        }
+    };
+    document.addEventListener('keydown', handleEsc);
 }

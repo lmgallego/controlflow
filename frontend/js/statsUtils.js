@@ -56,14 +56,15 @@ export function zScore(value, avg, std) {
 }
 
 /**
- * Calcula el Coeficiente de Variación (CV)
- * CV = (Desviación Estándar / Media) × 100
- * Mide la variabilidad relativa, útil para comparar variabilidad entre diferentes escalas
- * @param {number[]} values - Array de valores
+ * Calcula el Coeficiente de Variación (CV) del HRV
+ * CV (%) = (Desviación Estándar / Media) × 100
+ * Se calcula usando RMSSD sin normalizar (valores crudos en ms)
+ * Mide la estabilidad del sistema nervioso autónomo
+ * @param {number[]} values - Array de valores RMSSD en ms (sin normalizar)
  * @returns {number} - Coeficiente de variación en porcentaje
  */
 export function coefficientOfVariation(values) {
-    const filtered = values.filter(v => v !== null && v !== undefined && !isNaN(v));
+    const filtered = values.filter(v => v !== null && v !== undefined && !isNaN(v) && v > 0);
     if (filtered.length < 2) return null;
     
     const avg = mean(filtered);

@@ -188,25 +188,35 @@ const translations = {
 
             // HRV Coefficient of Variation
             hrvCV: {
-                title: 'Coeficiente de Variación del HRV',
-                subtitle: 'Variabilidad relativa del HRV (CV%)',
+                title: 'CV del HRV',
+                subtitle: 'Coeficiente de Variación del RMSSD',
                 current: 'CV Actual',
-                average: 'CV Promedio',
+                average: 'CV Promedio (7d)',
                 trend: 'Tendencia',
                 interpretation: {
                     title: 'Interpretación del CV',
-                    low: 'CV Bajo (< 5%)',
-                    lowDesc: 'Variabilidad muy baja. Puede indicar fatiga acumulada o sobreentrenamiento.',
-                    normal: 'CV Normal (5-10%)',
-                    normalDesc: 'Variabilidad saludable. Indica buena adaptación al entrenamiento.',
-                    high: 'CV Alto (> 10%)',
-                    highDesc: 'Alta variabilidad. Puede indicar estrés, recuperación activa o adaptación.'
+                    elite: 'Élite (2-7%)',
+                    eliteDesc: 'Mayor estabilidad del sistema nervioso autónomo y mejor adaptación al entrenamiento.',
+                    athletic: 'Atlético (7-12%)',
+                    athleticDesc: 'Rango típico para atletas de nivel medio. Buena variabilidad.',
+                    general: 'General (2-20%)',
+                    generalDesc: 'Rango amplio de la población general.'
                 },
                 info: {
-                    tooltip: 'Información sobre el CV del HRV',
-                    what: 'El Coeficiente de Variación (CV) mide la variabilidad relativa del HRV como porcentaje. Se calcula como (Desviación Estándar / Media) × 100.',
-                    why: 'A diferencia del valor absoluto del HRV, el CV permite comparar la variabilidad entre diferentes personas o períodos, independientemente de los valores base.',
-                    how: 'Un CV estable entre 5-10% generalmente indica buena salud cardiovascular y adaptación al entrenamiento.'
+                    title: 'Coeficiente de Variación del HRV (CV-HRV)',
+                    formula: 'CV (%) = (Desviación Estándar / Media) × 100',
+                    formulaDesc: 'Se calcula usando el RMSSD sin normalizar (valores crudos en ms).',
+                    reference: 'Valores de referencia en población atlética',
+                    referenceStudy: 'Un estudio realizado en remeras universitarias de División I de la NCAA encontró valores medios de CV de rMSSD de 8.7% (±3.7%) durante mediciones en casa al despertar, y 8.4% (±4.4%) en mediciones antes del entrenamiento. Estos valores mostraron una correlación intraclase muy alta (ICC = 0.82), indicando alta reproducibilidad.',
+                    ranges: 'Rangos típicos según nivel de condición física',
+                    rangeElite: 'Atletas de élite o alto nivel: CV entre 2-7%',
+                    rangeMid: 'Atletas de nivel medio o menor condición: CV entre 7-12%',
+                    rangeGeneral: 'Población general: CV entre 2-20%',
+                    performanceTitle: 'Interpretación según el rendimiento',
+                    performanceDesc: 'Los valores más bajos de CV-HRV indican mayor estabilidad del sistema nervioso autónomo y mejor adaptación al entrenamiento. Las personas más jóvenes, sin enfermedades, con mejor composición corporal y mayor capacidad aeróbica tienden a situarse en el extremo inferior del rango (2-7%), mientras que individuos menos saludables presentan valores más altos.',
+                    sources: 'Fuentes científicas',
+                    source1: 'PMC - National Library of Medicine',
+                    source2: 'Heads Up Health - HRV CV Tracking'
                 }
             },
 
@@ -605,25 +615,35 @@ const translations = {
 
             // HRV Coefficient of Variation
             hrvCV: {
-                title: 'HRV Coefficient of Variation',
-                subtitle: 'Relative HRV variability (CV%)',
+                title: 'HRV CV',
+                subtitle: 'RMSSD Coefficient of Variation',
                 current: 'Current CV',
-                average: 'Average CV',
+                average: 'Average CV (7d)',
                 trend: 'Trend',
                 interpretation: {
                     title: 'CV Interpretation',
-                    low: 'Low CV (< 5%)',
-                    lowDesc: 'Very low variability. May indicate accumulated fatigue or overtraining.',
-                    normal: 'Normal CV (5-10%)',
-                    normalDesc: 'Healthy variability. Indicates good training adaptation.',
-                    high: 'High CV (> 10%)',
-                    highDesc: 'High variability. May indicate stress, active recovery, or adaptation.'
+                    elite: 'Elite (2-7%)',
+                    eliteDesc: 'Greater autonomic nervous system stability and better training adaptation.',
+                    athletic: 'Athletic (7-12%)',
+                    athleticDesc: 'Typical range for mid-level athletes. Good variability.',
+                    general: 'General (2-20%)',
+                    generalDesc: 'Wide range for general population.'
                 },
                 info: {
-                    tooltip: 'Information about HRV CV',
-                    what: 'The Coefficient of Variation (CV) measures the relative variability of HRV as a percentage. It is calculated as (Standard Deviation / Mean) × 100.',
-                    why: 'Unlike the absolute HRV value, CV allows comparing variability between different people or periods, regardless of baseline values.',
-                    how: 'A stable CV between 5-10% generally indicates good cardiovascular health and training adaptation.'
+                    title: 'HRV Coefficient of Variation (CV-HRV)',
+                    formula: 'CV (%) = (Standard Deviation / Mean) × 100',
+                    formulaDesc: 'Calculated using raw RMSSD values (in ms, not normalized).',
+                    reference: 'Reference values in athletic population',
+                    referenceStudy: 'A study conducted on NCAA Division I female rowers found mean CV of rMSSD values of 8.7% (±3.7%) during home measurements upon waking, and 8.4% (±4.4%) in pre-training measurements. These values showed very high intraclass correlation (ICC = 0.82), indicating high reproducibility.',
+                    ranges: 'Typical ranges by fitness level',
+                    rangeElite: 'Elite or high-level athletes: CV between 2-7%',
+                    rangeMid: 'Mid-level athletes or lower fitness: CV between 7-12%',
+                    rangeGeneral: 'General population: CV between 2-20%',
+                    performanceTitle: 'Performance interpretation',
+                    performanceDesc: 'Lower CV-HRV values indicate greater autonomic nervous system stability and better training adaptation. Younger individuals without diseases, with better body composition and higher aerobic capacity tend to be at the lower end of the range (2-7%), while less healthy individuals show higher values.',
+                    sources: 'Scientific sources',
+                    source1: 'PMC - National Library of Medicine',
+                    source2: 'Heads Up Health - HRV CV Tracking'
                 }
             },
 
