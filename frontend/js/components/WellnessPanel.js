@@ -11,7 +11,9 @@ import {
     formatSleepHours,
     secondsToHours,
     evaluateHRVStatus,
-    calculateReadiness
+    calculateReadiness,
+    coefficientOfVariation,
+    rollingCoefficientOfVariation
 } from '../statsUtils.js';
 import { t } from '../i18n.js';
 import { createDTFPanel } from './DTFPanel.js';
@@ -122,6 +124,7 @@ function renderWellnessPanelContent(container, data) {
             <!-- Métricas en grid -->
             <div class="wellness-metrics-grid">
                 ${renderHRVCard(data)}
+                ${renderHRVCVCard(data)}
                 ${renderRestingHRCard(data)}
                 ${renderSleepDurationCard(data)}
                 ${renderSleepScoreCard(data)}
@@ -163,6 +166,7 @@ function renderWellnessPanelContent(container, data) {
     // Renderizar gráficos de la pestaña Métricas
     chartInstances.hrvZScore = renderHRVZScoreChartInstance(data);
     chartInstances.hrv = renderHRVChart(data);
+    chartInstances.hrvCV = renderHRVCVChart(data);
     chartInstances.rhr = renderRestingHRChart(data);
     chartInstances.sleepDuration = renderSleepDurationChart(data);
     chartInstances.sleepScore = renderSleepScoreChart(data);
@@ -450,6 +454,11 @@ function processWellnessData(data, activities = null) {
     const sleepTrend = calculateTrend(sleepHours, 7);
     const sleepScoreTrend = calculateTrend(sleepScoreValues, 7);
 
+    // Calcular Coeficiente de Variación del HRV
+    const hrvCV = coefficientOfVariation(hrvRaw);
+    const hrvCVRolling = rollingCoefficientOfVariation(hrvRaw, 7);
+    const hrvCVTrend = calculateTrend(hrvCVRolling.filter(v => v !== null), 7);
+
     return {
         dates,
         hrv: {
@@ -464,7 +473,10 @@ function processWellnessData(data, activities = null) {
             latest: latestHRV,
             latestZScore,
             status: hrvStatus,
-            trend: hrvTrend
+            trend: hrvTrend,
+            cv: hrvCV,
+            cvRolling: hrvCVRolling,
+            cvTrend: hrvCVTrend
         },
         rhr: {
             data: restingHR,
@@ -592,6 +604,81 @@ function renderHRVCard(data) {
                     <div class="stat-item">
                         <span class="stat-label" data-i18n="wellness.hrv.stdDev">${t('wellness.hrv.stdDev')}</span>
                         <span class="stat-value">${hrv.baseline.std ? hrv.baseline.std.toFixed(2) : t('common.na')}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Card del Coeficiente de Variación del HRV
+ */
+function renderHRVCVCard(data) {
+    const { hrv, dates } = data;
+    const cv = hrv.cv;
+    const cvRolling = hrv.cvRolling;
+    const latestCV = cvRolling[cvRolling.length - 1];
+    const trendIcon = renderTrendIcon(hrv.cvTrend, true); // Mayor CV puede ser positivo (más variabilidad)
+    
+    // Determinar el estado del CV
+    let cvStatus = { color: '#3b82f6', key: 'normal' };
+    if (latestCV !== null) {
+        if (latestCV < 5) {
+            cvStatus = { color: '#ef4444', key: 'low' }; // Rojo - muy baja variabilidad
+        } else if (latestCV > 10) {
+            cvStatus = { color: '#f59e0b', key: 'high' }; // Amarillo - alta variabilidad
+        } else {
+            cvStatus = { color: '#10b981', key: 'normal' }; // Verde - variabilidad normal
+        }
+    }
+
+    return `
+        <div class="metric-card">
+            <div class="metric-card-header">
+                <h3 data-i18n="wellness.hrvCV.title">${t('wellness.hrvCV.title')}</h3>
+                <div class="metric-badge" style="background-color: ${cvStatus.color}20; color: ${cvStatus.color};">
+                    ${t('wellness.hrvCV.interpretation.' + cvStatus.key)}
+                </div>
+            </div>
+            <div class="metric-card-body">
+                <div class="metric-value-group">
+                    <div class="metric-primary">
+                        <span class="metric-label" data-i18n="wellness.hrvCV.current">${t('wellness.hrvCV.current')}</span>
+                        <span class="metric-value">
+                            ${latestCV !== null ? latestCV.toFixed(1) : t('common.na')}
+                            <span class="metric-unit">%</span>
+                            ${trendIcon}
+                        </span>
+                    </div>
+                    <div class="metric-secondary">
+                        <span class="metric-label" data-i18n="wellness.hrvCV.average">${t('wellness.hrvCV.average')}</span>
+                        <span class="metric-value">
+                            ${cv !== null ? cv.toFixed(1) : t('common.na')}%
+                        </span>
+                    </div>
+                </div>
+                <div class="metric-status-text">
+                    ${t('wellness.hrvCV.interpretation.' + cvStatus.key + 'Desc')}
+                </div>
+                <div class="metric-chart-container">
+                    <button class="chart-fullscreen-btn" data-chart="hrvCV" title="${t('wellness.chart.fullscreen')}">⛶</button>
+                    <div class="metric-chart">
+                        <canvas id="hrv-cv-chart"></canvas>
+                    </div>
+                </div>
+                <div class="metric-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">${t('wellness.hrvCV.interpretation.low')}</span>
+                        <span class="stat-value" style="color: #ef4444;">< 5%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">${t('wellness.hrvCV.interpretation.normal')}</span>
+                        <span class="stat-value" style="color: #10b981;">5-10%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">${t('wellness.hrvCV.interpretation.high')}</span>
+                        <span class="stat-value" style="color: #f59e0b;">> 10%</span>
                     </div>
                 </div>
             </div>
@@ -924,6 +1011,99 @@ function renderHRVChart(data) {
             ]
         },
         options: getChartOptions('LnRMSSD')
+    });
+}
+
+/**
+ * Renderiza gráfico del Coeficiente de Variación del HRV
+ */
+function renderHRVCVChart(data) {
+    const ctx = document.getElementById('hrv-cv-chart');
+    if (!ctx) return null;
+
+    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const isDark = theme === 'dark';
+    const textColor = isDark ? '#f1f5f9' : '#0f172a';
+
+    return new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.dates,
+            datasets: [
+                {
+                    label: 'CV %',
+                    data: data.hrv.cvRolling,
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 3,
+                    pointHoverRadius: 6
+                },
+                {
+                    label: t('wellness.hrvCV.interpretation.low') + ' (5%)',
+                    data: new Array(data.dates.length).fill(5),
+                    borderColor: 'rgba(239, 68, 68, 0.5)',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0
+                },
+                {
+                    label: t('wellness.hrvCV.interpretation.high') + ' (10%)',
+                    data: new Array(data.dates.length).fill(10),
+                    borderColor: 'rgba(245, 158, 11, 0.5)',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            ...getChartOptions('%'),
+            plugins: {
+                ...getChartOptions('%').plugins,
+                annotation: {
+                    annotations: {
+                        lowZone: {
+                            type: 'box',
+                            yMin: 0,
+                            yMax: 5,
+                            backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                            borderWidth: 0
+                        },
+                        normalZone: {
+                            type: 'box',
+                            yMin: 5,
+                            yMax: 10,
+                            backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                            borderWidth: 0
+                        },
+                        highZone: {
+                            type: 'box',
+                            yMin: 10,
+                            yMax: 20,
+                            backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                            borderWidth: 0
+                        }
+                    }
+                }
+            },
+            scales: {
+                ...getChartOptions('%').scales,
+                y: {
+                    ...getChartOptions('%').scales?.y,
+                    min: 0,
+                    suggestedMax: 15,
+                    ticks: {
+                        color: textColor,
+                        callback: (value) => value + '%'
+                    }
+                }
+            }
+        }
     });
 }
 

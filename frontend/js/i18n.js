@@ -186,6 +186,30 @@ const translations = {
                 }
             },
 
+            // HRV Coefficient of Variation
+            hrvCV: {
+                title: 'Coeficiente de Variación del HRV',
+                subtitle: 'Variabilidad relativa del HRV (CV%)',
+                current: 'CV Actual',
+                average: 'CV Promedio',
+                trend: 'Tendencia',
+                interpretation: {
+                    title: 'Interpretación del CV',
+                    low: 'CV Bajo (< 5%)',
+                    lowDesc: 'Variabilidad muy baja. Puede indicar fatiga acumulada o sobreentrenamiento.',
+                    normal: 'CV Normal (5-10%)',
+                    normalDesc: 'Variabilidad saludable. Indica buena adaptación al entrenamiento.',
+                    high: 'CV Alto (> 10%)',
+                    highDesc: 'Alta variabilidad. Puede indicar estrés, recuperación activa o adaptación.'
+                },
+                info: {
+                    tooltip: 'Información sobre el CV del HRV',
+                    what: 'El Coeficiente de Variación (CV) mide la variabilidad relativa del HRV como porcentaje. Se calcula como (Desviación Estándar / Media) × 100.',
+                    why: 'A diferencia del valor absoluto del HRV, el CV permite comparar la variabilidad entre diferentes personas o períodos, independientemente de los valores base.',
+                    how: 'Un CV estable entre 5-10% generalmente indica buena salud cardiovascular y adaptación al entrenamiento.'
+                }
+            },
+
             // Readiness Card
             readiness: {
                 title: 'PREPARACIÓN',
@@ -576,6 +600,30 @@ const translations = {
                     lit: 'LIT (-1.5 ≤ Z < -0.5)',
                     normal: 'NORMAL (-0.5 ≤ Z < 0.5)',
                     hiit: 'HIIT (Z ≥ 0.5)'
+                }
+            },
+
+            // HRV Coefficient of Variation
+            hrvCV: {
+                title: 'HRV Coefficient of Variation',
+                subtitle: 'Relative HRV variability (CV%)',
+                current: 'Current CV',
+                average: 'Average CV',
+                trend: 'Trend',
+                interpretation: {
+                    title: 'CV Interpretation',
+                    low: 'Low CV (< 5%)',
+                    lowDesc: 'Very low variability. May indicate accumulated fatigue or overtraining.',
+                    normal: 'Normal CV (5-10%)',
+                    normalDesc: 'Healthy variability. Indicates good training adaptation.',
+                    high: 'High CV (> 10%)',
+                    highDesc: 'High variability. May indicate stress, active recovery, or adaptation.'
+                },
+                info: {
+                    tooltip: 'Information about HRV CV',
+                    what: 'The Coefficient of Variation (CV) measures the relative variability of HRV as a percentage. It is calculated as (Standard Deviation / Mean) × 100.',
+                    why: 'Unlike the absolute HRV value, CV allows comparing variability between different people or periods, regardless of baseline values.',
+                    how: 'A stable CV between 5-10% generally indicates good cardiovascular health and training adaptation.'
                 }
             },
 

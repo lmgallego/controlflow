@@ -56,6 +56,45 @@ export function zScore(value, avg, std) {
 }
 
 /**
+ * Calcula el Coeficiente de Variación (CV)
+ * CV = (Desviación Estándar / Media) × 100
+ * Mide la variabilidad relativa, útil para comparar variabilidad entre diferentes escalas
+ * @param {number[]} values - Array de valores
+ * @returns {number} - Coeficiente de variación en porcentaje
+ */
+export function coefficientOfVariation(values) {
+    const filtered = values.filter(v => v !== null && v !== undefined && !isNaN(v));
+    if (filtered.length < 2) return null;
+    
+    const avg = mean(filtered);
+    if (avg === 0 || avg === null) return null;
+    
+    const std = standardDeviation(filtered, avg);
+    if (std === null) return null;
+    
+    return (std / avg) * 100;
+}
+
+/**
+ * Calcula el Coeficiente de Variación móvil (rolling CV)
+ * Útil para ver la evolución de la variabilidad del HRV en el tiempo
+ * @param {number[]} data - Array de valores
+ * @param {number} window - Tamaño de la ventana (default: 7 días)
+ * @returns {number[]} - Array de CV móviles
+ */
+export function rollingCoefficientOfVariation(data, window = 7) {
+    const result = [];
+    
+    for (let i = 0; i < data.length; i++) {
+        const start = Math.max(0, i - window + 1);
+        const windowData = data.slice(start, i + 1);
+        result.push(coefficientOfVariation(windowData));
+    }
+    
+    return result;
+}
+
+/**
  * Calcula media móvil (rolling average)
  * @param {number[]} data - Array de valores
  * @param {number} window - Tamaño de la ventana
