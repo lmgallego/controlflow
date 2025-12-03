@@ -396,7 +396,19 @@ const translations = {
             type: 'Tipo',
             time: 'Tiempo',
             distance: 'Distancia (km)',
-            load: 'Carga (TSS)'
+            load: 'Carga (TSS)',
+            calendar: {
+                title: 'Calendario de Actividades',
+                today: 'Hoy',
+                prevMonth: 'Mes anterior',
+                nextMonth: 'Mes siguiente',
+                completed: 'Completado',
+                restDay: 'Día de descanso',
+                noActivities: 'No hay actividades este día',
+                activities: 'Actividades',
+                months: 'Enero,Febrero,Marzo,Abril,Mayo,Junio,Julio,Agosto,Septiembre,Octubre,Noviembre,Diciembre',
+                days: 'Dom,Lun,Mar,Mié,Jue,Vie,Sáb'
+            }
         },
 
         // Analysis tabs
@@ -859,7 +871,19 @@ const translations = {
             type: 'Type',
             time: 'Time',
             distance: 'Distance (km)',
-            load: 'Load (TSS)'
+            load: 'Load (TSS)',
+            calendar: {
+                title: 'Activity Calendar',
+                today: 'Today',
+                prevMonth: 'Previous month',
+                nextMonth: 'Next month',
+                completed: 'Completed',
+                restDay: 'Rest day',
+                noActivities: 'No activities this day',
+                activities: 'Activities',
+                months: 'January,February,March,April,May,June,July,August,September,October,November,December',
+                days: 'Sun,Mon,Tue,Wed,Thu,Fri,Sat'
+            }
         },
 
         // Analysis tabs
