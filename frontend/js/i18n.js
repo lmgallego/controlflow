@@ -407,7 +407,7 @@ const translations = {
                 noActivities: 'No hay actividades este día',
                 activities: 'Actividades',
                 months: 'Enero,Febrero,Marzo,Abril,Mayo,Junio,Julio,Agosto,Septiembre,Octubre,Noviembre,Diciembre',
-                days: 'Dom,Lun,Mar,Mié,Jue,Vie,Sáb'
+                days: 'Lun,Mar,Mié,Jue,Vie,Sáb,Dom'
             }
         },
 
@@ -882,7 +882,7 @@ const translations = {
                 noActivities: 'No activities this day',
                 activities: 'Activities',
                 months: 'January,February,March,April,May,June,July,August,September,October,November,December',
-                days: 'Sun,Mon,Tue,Wed,Thu,Fri,Sat'
+                days: 'Mon,Tue,Wed,Thu,Fri,Sat,Sun'
             }
         },
 

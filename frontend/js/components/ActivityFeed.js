@@ -94,11 +94,13 @@ async function loadAndRenderCalendar() {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     
-    // Extender rango para días visibles de meses adyacentes
+    // Extender rango para días visibles de meses adyacentes (semana empieza en lunes)
     const startDate = new Date(firstDay);
-    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    const firstDayOfWeek = (firstDay.getDay() + 6) % 7; // Lunes = 0, Domingo = 6
+    startDate.setDate(startDate.getDate() - firstDayOfWeek);
     const endDate = new Date(lastDay);
-    endDate.setDate(endDate.getDate() + (6 - lastDay.getDay()));
+    const lastDayOfWeek = (lastDay.getDay() + 6) % 7;
+    endDate.setDate(endDate.getDate() + (6 - lastDayOfWeek));
 
     const oldest = startDate.toISOString().split('T')[0];
     const newest = endDate.toISOString().split('T')[0];
