@@ -4116,6 +4116,84 @@ a {
     transform: translateX(4px);
 }
 
+/* Adaptation State Card */
+.adaptation-state-card {
+    background: var(--bg-tertiary);
+    border: 2px solid;
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.adaptation-state-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.adaptation-icon {
+    font-size: 1.4rem;
+}
+
+.adaptation-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.adaptation-desc {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0 0 8px 0;
+}
+
+.adaptation-action {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color);
+}
+
+.adaptation-action strong {
+    color: var(--primary-color);
+}
+
+/* Practical Steps in Info Modal */
+.hrv-cv-info-section.practical-steps {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-top: 24px;
+}
+
+.practical-step {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.practical-step:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.practical-step h5 {
+    color: var(--primary-color);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+}
+
+.practical-step p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
 /* Light mode adjustments */
 [data-theme="light"] .hrv-cv-info-modal {
     background: rgba(0, 0, 0, 0.5);

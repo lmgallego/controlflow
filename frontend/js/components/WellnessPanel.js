@@ -623,6 +623,66 @@ function renderHRVCard(data) {
 }
 
 /**
+ * Determina el estado de adaptación basado en tendencia HRV y CV
+ * Basado en la matriz de interpretación científica
+ */
+function getAdaptationState(hrvTrend, cvTrend, latestCV) {
+    // hrvTrend: 'up', 'down', 'stable' (basado en tendencia de rMSSD)
+    // cvTrend: 'up', 'down', 'stable'
+    // latestCV: valor actual del CV
+    
+    const isHRVStableOrUp = hrvTrend === 'up' || hrvTrend === 'stable';
+    const isHRVDown = hrvTrend === 'down';
+    const isCVLowStable = latestCV !== null && latestCV <= 7;
+    const isCVModerate = latestCV !== null && latestCV > 7 && latestCV <= 10;
+    const isCVHigh = latestCV !== null && latestCV > 10;
+    const isCVIncreasing = cvTrend === 'up';
+    
+    // Adaptación Positiva: HRV estable/aumentando + CV bajo y estable
+    if (isHRVStableOrUp && isCVLowStable && !isCVIncreasing) {
+        return {
+            key: 'positive',
+            color: '#10b981', // Verde
+            icon: '🟢'
+        };
+    }
+    
+    // Fatiga Funcional: HRV ligera disminución o estable + CV moderado aumentando
+    if ((hrvTrend === 'stable' || hrvTrend === 'down') && isCVModerate) {
+        return {
+            key: 'functional',
+            color: '#f59e0b', // Ámbar
+            icon: '🟡'
+        };
+    }
+    
+    // Mala Adaptación: HRV disminuyendo sostenidamente + CV alto o aumentando
+    if (isHRVDown && (isCVHigh || isCVIncreasing)) {
+        return {
+            key: 'maladaptation',
+            color: '#ef4444', // Rojo
+            icon: '🔴'
+        };
+    }
+    
+    // Señal Confusa: HRV alta pero CV alto y volátil
+    if (isHRVStableOrUp && isCVHigh) {
+        return {
+            key: 'paradox',
+            color: '#6366f1', // Índigo
+            icon: '🔵'
+        };
+    }
+    
+    // Default: estado atlético normal
+    return {
+        key: 'athletic',
+        color: '#3b82f6',
+        icon: '🔵'
+    };
+}
+
+/**
  * Card del Coeficiente de Variación del HRV
  */
 function renderHRVCVCard(data) {
@@ -630,40 +690,59 @@ function renderHRVCVCard(data) {
     const cv = hrv.cv;
     const cvRolling = hrv.cvRolling;
     const latestCV = cvRolling[cvRolling.length - 1];
-    const trendIcon = renderTrendIcon(hrv.cvTrend, false); // Menor CV es mejor (más estabilidad)
+    const cvTrendIcon = renderTrendIcon(hrv.cvTrend, false); // Menor CV es mejor (más estabilidad)
     
-    // Determinar el estado del CV según rangos científicos
-    // Élite: 2-7%, Atlético: 7-12%, General: 2-20%
-    let cvStatus = { color: '#3b82f6', key: 'athletic' };
+    // Determinar tendencias para el estado de adaptación
+    const hrvTrendDir = hrv.trend > 0.5 ? 'up' : (hrv.trend < -0.5 ? 'down' : 'stable');
+    const cvTrendDir = hrv.cvTrend > 0.5 ? 'up' : (hrv.cvTrend < -0.5 ? 'down' : 'stable');
+    
+    // Obtener estado de adaptación
+    const adaptationState = getAdaptationState(hrvTrendDir, cvTrendDir, latestCV);
+    
+    // Determinar el rango del CV
+    let cvRange = { color: '#3b82f6', key: 'athletic' };
     if (latestCV !== null) {
         if (latestCV <= 7) {
-            cvStatus = { color: '#10b981', key: 'elite' }; // Verde - nivel élite
+            cvRange = { color: '#10b981', key: 'elite' };
         } else if (latestCV <= 12) {
-            cvStatus = { color: '#3b82f6', key: 'athletic' }; // Azul - nivel atlético
+            cvRange = { color: '#3b82f6', key: 'athletic' };
         } else {
-            cvStatus = { color: '#f59e0b', key: 'general' }; // Amarillo - población general
+            cvRange = { color: '#f59e0b', key: 'general' };
         }
     }
 
+    // SVG del icono de información
+    const infoIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+
     return `
-        <div class="metric-card">
+        <div class="metric-card hrv-cv-card">
             <div class="metric-card-header">
                 <h3 data-i18n="wellness.hrvCV.title">${t('wellness.hrvCV.title')}</h3>
                 <button class="hrv-cv-info-btn" id="hrv-cv-info-btn" title="${t('wellness.hrvCV.info.title')}">
-                    <i data-lucide="help-circle"></i>
+                    ${infoIcon}
                 </button>
-                <div class="metric-badge" style="background-color: ${cvStatus.color}20; color: ${cvStatus.color};">
-                    ${t('wellness.hrvCV.interpretation.' + cvStatus.key)}
+                <div class="metric-badge" style="background-color: ${cvRange.color}20; color: ${cvRange.color};">
+                    ${t('wellness.hrvCV.interpretation.' + cvRange.key)}
                 </div>
             </div>
             <div class="metric-card-body">
+                <!-- Estado de Adaptación -->
+                <div class="adaptation-state-card" style="border-color: ${adaptationState.color};">
+                    <div class="adaptation-state-header">
+                        <span class="adaptation-icon">${adaptationState.icon}</span>
+                        <span class="adaptation-title">${t('wellness.hrvCV.adaptation.' + adaptationState.key + '.title')}</span>
+                    </div>
+                    <p class="adaptation-desc">${t('wellness.hrvCV.adaptation.' + adaptationState.key + '.desc')}</p>
+                    <p class="adaptation-action"><strong>${t('wellness.hrvCV.adaptation.action')}:</strong> ${t('wellness.hrvCV.adaptation.' + adaptationState.key + '.action')}</p>
+                </div>
+                
                 <div class="metric-value-group">
                     <div class="metric-primary">
                         <span class="metric-label" data-i18n="wellness.hrvCV.current">${t('wellness.hrvCV.current')}</span>
                         <span class="metric-value">
                             ${latestCV !== null ? latestCV.toFixed(1) : t('common.na')}
                             <span class="metric-unit">%</span>
-                            ${trendIcon}
+                            ${cvTrendIcon}
                         </span>
                     </div>
                     <div class="metric-secondary">
@@ -672,9 +751,6 @@ function renderHRVCVCard(data) {
                             ${cv !== null ? cv.toFixed(1) : t('common.na')}%
                         </span>
                     </div>
-                </div>
-                <div class="metric-status-text">
-                    ${t('wellness.hrvCV.interpretation.' + cvStatus.key + 'Desc')}
                 </div>
                 <div class="metric-chart-container">
                     <button class="chart-fullscreen-btn" data-chart="hrvCV" title="${t('wellness.chart.fullscreen')}">⛶</button>
@@ -1595,6 +1671,22 @@ function showHRVCVInfo() {
                     <p>${t('wellness.hrvCV.info.performanceDesc')}</p>
                 </div>
 
+                <div class="hrv-cv-info-section practical-steps">
+                    <h4>${t('wellness.hrvCV.info.practicalTitle')}</h4>
+                    <div class="practical-step">
+                        <h5>${t('wellness.hrvCV.info.practical1Title')}</h5>
+                        <p>${t('wellness.hrvCV.info.practical1Desc')}</p>
+                    </div>
+                    <div class="practical-step">
+                        <h5>${t('wellness.hrvCV.info.practical2Title')}</h5>
+                        <p>${t('wellness.hrvCV.info.practical2Desc')}</p>
+                    </div>
+                    <div class="practical-step">
+                        <h5>${t('wellness.hrvCV.info.practical3Title')}</h5>
+                        <p>${t('wellness.hrvCV.info.practical3Desc')}</p>
+                    </div>
+                </div>
+
                 <div class="hrv-cv-info-section sources">
                     <h4>${t('wellness.hrvCV.info.sources')}</h4>
                     <ul class="hrv-cv-sources-list">
@@ -1606,6 +1698,11 @@ function showHRVCVInfo() {
                         <li>
                             <a href="https://headsuphealth.com/features/tracking-the-oura-hrv-coefficient-of-variation-hrv-cv/" target="_blank" rel="noopener noreferrer">
                                 📄 ${t('wellness.hrvCV.info.source2')}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://elitehrv.com/improving-hrv-data-interpretation-coefficient-variation" target="_blank" rel="noopener noreferrer">
+                                📄 ${t('wellness.hrvCV.info.source3')}
                             </a>
                         </li>
                     </ul>

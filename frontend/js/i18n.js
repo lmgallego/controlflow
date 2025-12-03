@@ -202,6 +202,34 @@ const translations = {
                     general: 'General (2-20%)',
                     generalDesc: 'Rango amplio de la población general.'
                 },
+                adaptation: {
+                    action: 'Acción',
+                    positive: {
+                        title: 'Adaptación Positiva',
+                        desc: 'El atleta está asimilando la carga de entrenamiento. El sistema nervioso autónomo es estable y resiliente.',
+                        action: 'Se puede continuar con la progresión de carga planificada.'
+                    },
+                    functional: {
+                        title: 'Fatiga Funcional',
+                        desc: 'El cuerpo está bajo estrés agudo (p.ej., bloque de carga alta). Es una fatiga esperada y necesaria para la supercompensación.',
+                        action: 'Monitorizar de cerca. Asegurar una recuperación adecuada (sueño, nutrición). Considerar un día de descanso o baja intensidad si la tendencia persiste.'
+                    },
+                    maladaptation: {
+                        title: 'Mala Adaptación',
+                        desc: 'El atleta no se está recuperando de la carga. Hay riesgo de sobreentrenamiento no funcional (NFO) o enfermedad. El sistema es inestable y la recuperación es impredecible.',
+                        action: 'Reducir drásticamente la carga de entrenamiento. Priorizar la recuperación total. Investigar otros factores de estrés (sueño, nutrición, estrés mental).'
+                    },
+                    paradox: {
+                        title: 'Señal Confusa / Paradoja',
+                        desc: 'Podría indicar una respuesta parasimpática saturada o la influencia de un estresor no relacionado con el entrenamiento (enfermedad incipiente, estrés emocional). Aunque la HRV es alta, la inestabilidad (CV alto) es una señal de alerta.',
+                        action: 'Investigar a fondo. Combinar con métricas subjetivas (cómo se siente el atleta) y otros datos objetivos.'
+                    },
+                    athletic: {
+                        title: 'Estado Normal',
+                        desc: 'Variabilidad dentro del rango atlético esperado.',
+                        action: 'Continuar con el plan de entrenamiento actual.'
+                    }
+                },
                 info: {
                     title: 'Coeficiente de Variación del HRV (CV-HRV)',
                     formula: 'CV (%) = (Desviación Estándar / Media) × 100',
@@ -214,9 +242,17 @@ const translations = {
                     rangeGeneral: 'Población general: CV entre 2-20%',
                     performanceTitle: 'Interpretación según el rendimiento',
                     performanceDesc: 'Los valores más bajos de CV-HRV indican mayor estabilidad del sistema nervioso autónomo y mejor adaptación al entrenamiento. Las personas más jóvenes, sin enfermedades, con mejor composición corporal y mayor capacidad aeróbica tienden a situarse en el extremo inferior del rango (2-7%), mientras que individuos menos saludables presentan valores más altos.',
+                    practicalTitle: 'Pasos Prácticos para la Implementación',
+                    practical1Title: '1. Establecer la Línea Base',
+                    practical1Desc: 'Durante un período de baja carga o descanso (1-2 semanas), mide diariamente la HRV para establecer el rMSSD promedio y el CV de HRV normal para el atleta. Este es su "rango óptimo".',
+                    practical2Title: '2. Monitorizar la Tendencia Semanal',
+                    practical2Desc: 'No reacciones a las fluctuaciones diarias. Analiza la media móvil de 7 días tanto para el rMSSD como para el CV. Un aumento en la carga de entrenamiento debería ir seguido de una respuesta en estas métricas.',
+                    practical3Title: '3. Contextualizar los Datos',
+                    practical3Desc: 'Un CV que aumenta no siempre se debe al entrenamiento. Considera siempre otros factores: calidad del sueño, estrés laboral/personal, viajes o una posible enfermedad.',
                     sources: 'Fuentes científicas',
                     source1: 'PMC - National Library of Medicine',
-                    source2: 'Heads Up Health - HRV CV Tracking'
+                    source2: 'Heads Up Health - HRV CV Tracking',
+                    source3: 'Elite HRV - Improving Data Interpretation'
                 }
             },
 
@@ -629,6 +665,34 @@ const translations = {
                     general: 'General (2-20%)',
                     generalDesc: 'Wide range for general population.'
                 },
+                adaptation: {
+                    action: 'Action',
+                    positive: {
+                        title: 'Positive Adaptation',
+                        desc: 'The athlete is assimilating the training load. The autonomic nervous system is stable and resilient.',
+                        action: 'Continue with the planned load progression.'
+                    },
+                    functional: {
+                        title: 'Functional Fatigue',
+                        desc: 'The body is under acute stress (e.g., high load block). This is expected and necessary fatigue for supercompensation.',
+                        action: 'Monitor closely. Ensure adequate recovery (sleep, nutrition). Consider a rest day or low intensity if the trend persists.'
+                    },
+                    maladaptation: {
+                        title: 'Maladaptation',
+                        desc: 'The athlete is not recovering from the load. There is risk of non-functional overtraining (NFO) or illness. The system is unstable and recovery is unpredictable.',
+                        action: 'Drastically reduce training load. Prioritize total recovery. Investigate other stress factors (sleep, nutrition, mental stress).'
+                    },
+                    paradox: {
+                        title: 'Confusing Signal / Paradox',
+                        desc: 'Could indicate a saturated parasympathetic response or the influence of a non-training stressor (incipient illness, emotional stress). Although HRV is high, instability (high CV) is a warning sign.',
+                        action: 'Investigate thoroughly. Combine with subjective metrics (how the athlete feels) and other objective data.'
+                    },
+                    athletic: {
+                        title: 'Normal State',
+                        desc: 'Variability within the expected athletic range.',
+                        action: 'Continue with the current training plan.'
+                    }
+                },
                 info: {
                     title: 'HRV Coefficient of Variation (CV-HRV)',
                     formula: 'CV (%) = (Standard Deviation / Mean) × 100',
@@ -641,9 +705,17 @@ const translations = {
                     rangeGeneral: 'General population: CV between 2-20%',
                     performanceTitle: 'Performance interpretation',
                     performanceDesc: 'Lower CV-HRV values indicate greater autonomic nervous system stability and better training adaptation. Younger individuals without diseases, with better body composition and higher aerobic capacity tend to be at the lower end of the range (2-7%), while less healthy individuals show higher values.',
+                    practicalTitle: 'Practical Implementation Steps',
+                    practical1Title: '1. Establish Baseline',
+                    practical1Desc: 'During a low load or rest period (1-2 weeks), measure HRV daily to establish the average rMSSD and normal HRV CV for the athlete. This is their "optimal range".',
+                    practical2Title: '2. Monitor Weekly Trend',
+                    practical2Desc: 'Do not react to daily fluctuations. Analyze the 7-day moving average for both rMSSD and CV. An increase in training load should be followed by a response in these metrics.',
+                    practical3Title: '3. Contextualize Data',
+                    practical3Desc: 'An increasing CV is not always due to training. Always consider other factors: sleep quality, work/personal stress, travel, or possible illness.',
                     sources: 'Scientific sources',
                     source1: 'PMC - National Library of Medicine',
-                    source2: 'Heads Up Health - HRV CV Tracking'
+                    source2: 'Heads Up Health - HRV CV Tracking',
+                    source3: 'Elite HRV - Improving Data Interpretation'
                 }
             },
 
