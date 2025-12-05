@@ -119,46 +119,39 @@ function formatDuration(seconds) {
 }
 
 /**
- * Calcula el modelo CP (Critical Power) usando regresión
+ * Calcula el modelo CP (Critical Power) usando método de 2 puntos
  * Modelo: P = W' / t + CP
  * Donde W' es la capacidad anaeróbica y CP es la potencia crítica
  */
 function calculateCPModel(secs, values) {
-    // Usar puntos entre 2 minutos y 20 minutos para la regresión
-    const validPoints = [];
-    for (let i = 0; i < secs.length; i++) {
-        if (secs[i] >= 120 && secs[i] <= 1200 && values[i] > 0) {
-            validPoints.push({ t: secs[i], p: values[i] });
-        }
+    // Obtener potencias a 3min y 12min (método clásico de 2 puntos)
+    const p3min = getValueAtDuration(secs, values, 180);
+    const p12min = getValueAtDuration(secs, values, 720);
+    
+    if (!p3min || !p12min || p3min <= 0 || p12min <= 0) {
+        // Fallback si no hay datos suficientes
+        const p5min = getValueAtDuration(secs, values, 300) || 200;
+        const p20min = getValueAtDuration(secs, values, 1200) || 180;
+        const cp = p20min * 0.95;
+        const wprime = (p5min - cp) * 300;
+        return { cp, wprime: Math.max(wprime, 10000), maxPower: getValueAtDuration(secs, values, 1) || p5min * 2 };
     }
 
-    if (validPoints.length < 3) {
-        // Fallback: usar valores por defecto basados en los datos
-        const p5min = getValueAtDuration(secs, values, 300) || 250;
-        const p20min = getValueAtDuration(secs, values, 1200) || 220;
-        return { cp: p20min * 0.95, wprime: (p5min - p20min * 0.95) * 300 };
-    }
-
-    // Regresión lineal: P * t = W' + CP * t => y = a + b*x
-    // Donde y = P*t (trabajo), x = t (tiempo), a = W', b = CP
-    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
-    const n = validPoints.length;
-
-    validPoints.forEach(point => {
-        const x = point.t;
-        const y = point.p * point.t; // Trabajo = Potencia * Tiempo
-        sumX += x;
-        sumY += y;
-        sumXY += x * y;
-        sumX2 += x * x;
-    });
-
-    const cp = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-    const wprime = (sumY - cp * sumX) / n;
+    // Método de 2 puntos: CP = (t2*P2 - t1*P1) / (t2 - t1)
+    // W' = t1 * (P1 - CP)
+    const t1 = 180;  // 3 minutos
+    const t2 = 720;  // 12 minutos
+    
+    const cp = (t2 * p12min - t1 * p3min) / (t2 - t1);
+    const wprime = t1 * (p3min - cp);
+    
+    // Obtener potencia máxima real de los datos
+    const maxPower = getValueAtDuration(secs, values, 1) || getValueAtDuration(secs, values, 5) || p3min * 1.5;
 
     return { 
-        cp: Math.max(cp, 100), // CP mínimo razonable
-        wprime: Math.max(wprime, 5000) // W' mínimo razonable (5kJ)
+        cp: Math.max(cp, 50),
+        wprime: Math.max(wprime, 5000),
+        maxPower: maxPower
     };
 }
 
@@ -181,9 +174,9 @@ function getValueAtDuration(secs, values, targetSecs) {
 }
 
 /**
- * Genera puntos para la curva modelada
+ * Genera puntos para la curva modelada (limitada por potencia máxima real)
  */
-function generateModeledCurve(cp, wprime, maxSeconds) {
+function generateModeledCurve(cp, wprime, maxSeconds, maxPower) {
     const points = [];
     // Generar puntos logarítmicamente espaciados
     const durations = [1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120, 180, 240, 300, 
@@ -192,8 +185,10 @@ function generateModeledCurve(cp, wprime, maxSeconds) {
     
     durations.forEach(t => {
         if (t <= maxSeconds) {
-            // Modelo: P = W' / t + CP
-            const power = (wprime / t) + cp;
+            // Modelo: P = W' / t + CP, pero limitado por la potencia máxima real
+            let power = (wprime / t) + cp;
+            // Limitar la potencia máxima para duraciones cortas
+            power = Math.min(power, maxPower * 1.1);
             points.push({ x: t, y: Math.round(power) });
         }
     });
@@ -227,10 +222,10 @@ function renderPowerCurveChart(curveData) {
     }
 
     // Calcular modelo CP y generar curva modelada
-    const { cp, wprime } = calculateCPModel(secs, values);
-    const modeledDataPoints = generateModeledCurve(cp, wprime, maxSeconds);
+    const { cp, wprime, maxPower } = calculateCPModel(secs, values);
+    const modeledDataPoints = generateModeledCurve(cp, wprime, maxSeconds, maxPower);
 
-    console.log('CP Model:', { cp: Math.round(cp), wprime: Math.round(wprime / 1000) + 'kJ' });
+    console.log('CP Model:', { cp: Math.round(cp), wprime: Math.round(wprime / 1000) + 'kJ', maxPower });
 
     // Etiquetas específicas para el eje X
     const tickValues = [1, 5, 10, 20, 30, 60, 120, 300, 600, 1200, 1800, 3600, 7200];

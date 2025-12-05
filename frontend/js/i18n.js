@@ -431,7 +431,7 @@ const translations = {
 
         // PDC (Power Duration Curve)
         pdc: {
-            title: 'Curva de Potencia (PDC)',
+            title: 'PDC',
             bestEfforts: 'Mejores Esfuerzos',
             power: 'Potencia',
             duration: 'Duración',
@@ -944,7 +944,7 @@ const translations = {
 
         // PDC (Power Duration Curve)
         pdc: {
-            title: 'Power Duration Curve (PDC)',
+            title: 'PDC',
             bestEfforts: 'Best Efforts',
             power: 'Power',
             duration: 'Duration',
