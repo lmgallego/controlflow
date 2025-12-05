@@ -437,8 +437,8 @@ const translations = {
             duration: 'Duración',
             watts: 'Vatios (W)',
             noData: 'No hay datos de potencia disponibles',
-            realCurve: 'Curva Real',
-            modeledCurve: 'Curva Modelada (CP)',
+            realCurve: 'Datos Reales',
+            modeledCurve: 'Curva Suavizada',
             selected: 'Selección',
             allTime: 'Histórico',
             periods: {
@@ -950,8 +950,8 @@ const translations = {
             duration: 'Duration',
             watts: 'Watts (W)',
             noData: 'No power data available',
-            realCurve: 'Real Curve',
-            modeledCurve: 'Modeled Curve (CP)',
+            realCurve: 'Real Data',
+            modeledCurve: 'Smoothed Curve',
             selected: 'Selected',
             allTime: 'All Time',
             periods: {

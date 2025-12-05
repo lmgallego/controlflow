@@ -119,43 +119,6 @@ function formatDuration(seconds) {
 }
 
 /**
- * Calcula el modelo CP (Critical Power) usando método de 2 puntos
- * Modelo: P = W' / t + CP
- * Donde W' es la capacidad anaeróbica y CP es la potencia crítica
- */
-function calculateCPModel(secs, values) {
-    // Obtener potencias a 3min y 12min (método clásico de 2 puntos)
-    const p3min = getValueAtDuration(secs, values, 180);
-    const p12min = getValueAtDuration(secs, values, 720);
-    
-    if (!p3min || !p12min || p3min <= 0 || p12min <= 0) {
-        // Fallback si no hay datos suficientes
-        const p5min = getValueAtDuration(secs, values, 300) || 200;
-        const p20min = getValueAtDuration(secs, values, 1200) || 180;
-        const cp = p20min * 0.95;
-        const wprime = (p5min - cp) * 300;
-        return { cp, wprime: Math.max(wprime, 10000), maxPower: getValueAtDuration(secs, values, 1) || p5min * 2 };
-    }
-
-    // Método de 2 puntos: CP = (t2*P2 - t1*P1) / (t2 - t1)
-    // W' = t1 * (P1 - CP)
-    const t1 = 180;  // 3 minutos
-    const t2 = 720;  // 12 minutos
-    
-    const cp = (t2 * p12min - t1 * p3min) / (t2 - t1);
-    const wprime = t1 * (p3min - cp);
-    
-    // Obtener potencia máxima real de los datos
-    const maxPower = getValueAtDuration(secs, values, 1) || getValueAtDuration(secs, values, 5) || p3min * 1.5;
-
-    return { 
-        cp: Math.max(cp, 50),
-        wprime: Math.max(wprime, 5000),
-        maxPower: maxPower
-    };
-}
-
-/**
  * Obtiene el valor de potencia para una duración específica
  */
 function getValueAtDuration(secs, values, targetSecs) {
@@ -174,24 +137,43 @@ function getValueAtDuration(secs, values, targetSecs) {
 }
 
 /**
- * Genera puntos para la curva modelada (limitada por potencia máxima real)
+ * Genera curva modelada suavizada usando los datos reales
+ * Aplica suavizado con media móvil ponderada en escala logarítmica
  */
-function generateModeledCurve(cp, wprime, maxSeconds, maxPower) {
+function generateSmoothedCurve(secs, values) {
     const points = [];
-    // Generar puntos logarítmicamente espaciados
-    const durations = [1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120, 180, 240, 300, 
-                       360, 420, 480, 600, 720, 900, 1200, 1500, 1800, 2400, 3000, 3600, 
-                       4500, 5400, 7200, 10800];
     
-    durations.forEach(t => {
-        if (t <= maxSeconds) {
-            // Modelo: P = W' / t + CP, pero limitado por la potencia máxima real
-            let power = (wprime / t) + cp;
-            // Limitar la potencia máxima para duraciones cortas
-            power = Math.min(power, maxPower * 1.1);
-            points.push({ x: t, y: Math.round(power) });
+    // Crear pares válidos de datos
+    const validData = [];
+    for (let i = 0; i < secs.length; i++) {
+        if (values[i] && values[i] > 0 && secs[i] > 0) {
+            validData.push({ x: Math.log10(secs[i]), y: values[i], origX: secs[i] });
         }
-    });
+    }
+    
+    if (validData.length < 5) return [];
+    
+    // Ordenar por tiempo
+    validData.sort((a, b) => a.x - b.x);
+    
+    // Aplicar suavizado con ventana adaptativa
+    const windowSize = Math.max(5, Math.floor(validData.length * 0.08));
+    
+    for (let i = 0; i < validData.length; i++) {
+        let sumWeight = 0;
+        let sumValue = 0;
+        
+        for (let j = Math.max(0, i - windowSize); j <= Math.min(validData.length - 1, i + windowSize); j++) {
+            // Peso gaussiano basado en distancia
+            const dist = Math.abs(i - j);
+            const weight = Math.exp(-0.5 * Math.pow(dist / (windowSize / 2), 2));
+            sumWeight += weight;
+            sumValue += validData[j].y * weight;
+        }
+        
+        const smoothedValue = sumValue / sumWeight;
+        points.push({ x: validData[i].origX, y: Math.round(smoothedValue) });
+    }
     
     return points;
 }
@@ -221,11 +203,10 @@ function renderPowerCurveChart(curveData) {
         }
     }
 
-    // Calcular modelo CP y generar curva modelada
-    const { cp, wprime, maxPower } = calculateCPModel(secs, values);
-    const modeledDataPoints = generateModeledCurve(cp, wprime, maxSeconds, maxPower);
+    // Generar curva modelada suavizada
+    const modeledDataPoints = generateSmoothedCurve(secs, values);
 
-    console.log('CP Model:', { cp: Math.round(cp), wprime: Math.round(wprime / 1000) + 'kJ', maxPower });
+    console.log('PDC Data points:', realDataPoints.length, 'Smoothed points:', modeledDataPoints.length);
 
     // Etiquetas específicas para el eje X
     const tickValues = [1, 5, 10, 20, 30, 60, 120, 300, 600, 1200, 1800, 3600, 7200];
