@@ -313,24 +313,27 @@ function renderZoneCard(data, type, title) {
         '#a855f7'  // Z7 - Púrpura
     ];
 
-    const powerZones = data.power_zones || [];
+    const powerZones = data.power_zones || []; // Estos son porcentajes del FTP
     const zoneNames = data.power_zone_names || ['Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6', 'Z7'];
     const ftp = data.ftp || 0;
 
     let zonesHtml = '';
     for (let i = 0; i < powerZones.length; i++) {
         const zoneName = zoneNames[i] || `Z${i + 1}`;
-        const zoneMax = powerZones[i];
-        const zoneMin = i === 0 ? 0 : powerZones[i - 1];
+        const zoneMaxPercent = powerZones[i]; // Porcentaje del FTP
+        const zoneMinPercent = i === 0 ? 0 : powerZones[i - 1];
         const color = zoneColors[i] || zoneColors[zoneColors.length - 1];
-        const percentage = ftp > 0 ? Math.round((zoneMax / ftp) * 100) : 0;
+        
+        // Calcular watts a partir del porcentaje del FTP
+        const zoneMinWatts = Math.round((zoneMinPercent / 100) * ftp);
+        const zoneMaxWatts = Math.round((zoneMaxPercent / 100) * ftp);
 
         zonesHtml += `
             <div class="zone-row">
                 <div class="zone-color" style="background: ${color}"></div>
                 <div class="zone-name">${zoneName}</div>
-                <div class="zone-range">${zoneMin} - ${zoneMax} W</div>
-                <div class="zone-percentage">${percentage}%</div>
+                <div class="zone-range">${zoneMinWatts} - ${zoneMaxWatts} W</div>
+                <div class="zone-percentage">${zoneMaxPercent}%</div>
             </div>
         `;
     }
