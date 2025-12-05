@@ -469,6 +469,7 @@ const translations = {
 
         // Common
         common: {
+            locale: 'es-ES',
             na: 'N/A',
             loading: 'Cargando...',
             error: 'Error',
@@ -955,6 +956,7 @@ const translations = {
 
         // Common
         common: {
+            locale: 'en-US',
             na: 'N/A',
             loading: 'Loading...',
             error: 'Error',
