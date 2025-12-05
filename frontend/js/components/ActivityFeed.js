@@ -6,6 +6,7 @@ let currentAthleteId = null;
 let activitiesData = [];
 let eventsData = [];
 let calendarContainer = null;
+let currentView = 'month'; // 'month' o 'week'
 
 /**
  * Renderiza el calendario de actividades.
@@ -19,15 +20,27 @@ export async function renderActivityFeed(container, athleteId) {
         <div class="activity-calendar-container">
             <div class="calendar-header">
                 <h2>${t('activities.calendar.title')}</h2>
-                <div class="calendar-nav">
-                    <button class="calendar-nav-btn" id="prev-month" title="${t('activities.calendar.prevMonth')}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                    </button>
-                    <span class="calendar-month-year" id="month-year"></span>
-                    <button class="calendar-nav-btn" id="next-month" title="${t('activities.calendar.nextMonth')}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                    </button>
-                    <button class="calendar-today-btn" id="today-btn">${t('activities.calendar.today')}</button>
+                <div class="calendar-controls">
+                    <div class="view-toggle">
+                        <button class="view-btn active" id="view-month" title="${t('activities.calendar.monthView')}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            ${t('activities.calendar.month')}
+                        </button>
+                        <button class="view-btn" id="view-week" title="${t('activities.calendar.weekView')}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v4M16 2v4M3 10h18M21 8v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            ${t('activities.calendar.week')}
+                        </button>
+                    </div>
+                    <div class="calendar-nav">
+                        <button class="calendar-nav-btn" id="prev-period" title="${t('activities.calendar.previous')}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        </button>
+                        <span class="calendar-month-year" id="period-label"></span>
+                        <button class="calendar-nav-btn" id="next-period" title="${t('activities.calendar.next')}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                        <button class="calendar-today-btn" id="today-btn">${t('activities.calendar.today')}</button>
+                    </div>
                 </div>
             </div>
             <div class="calendar-legend">
@@ -62,20 +75,61 @@ export async function renderActivityFeed(container, athleteId) {
  * Configura los event listeners del calendario
  */
 function setupCalendarListeners(container) {
-    container.querySelector('#prev-month')?.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() - 1);
+    // Navegación anterior
+    container.querySelector('#prev-period')?.addEventListener('click', () => {
+        if (currentView === 'month') {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+        } else {
+            currentDate.setDate(currentDate.getDate() - 7);
+        }
         loadAndRenderCalendar();
     });
 
-    container.querySelector('#next-month')?.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() + 1);
+    // Navegación siguiente
+    container.querySelector('#next-period')?.addEventListener('click', () => {
+        if (currentView === 'month') {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+        } else {
+            currentDate.setDate(currentDate.getDate() + 7);
+        }
         loadAndRenderCalendar();
     });
 
+    // Botón Hoy
     container.querySelector('#today-btn')?.addEventListener('click', () => {
         currentDate = new Date();
         loadAndRenderCalendar();
     });
+
+    // Cambio de vista: Mes
+    container.querySelector('#view-month')?.addEventListener('click', () => {
+        if (currentView !== 'month') {
+            currentView = 'month';
+            updateViewButtons();
+            loadAndRenderCalendar();
+        }
+    });
+
+    // Cambio de vista: Semana
+    container.querySelector('#view-week')?.addEventListener('click', () => {
+        if (currentView !== 'week') {
+            currentView = 'week';
+            updateViewButtons();
+            loadAndRenderCalendar();
+        }
+    });
+}
+
+/**
+ * Actualiza los botones de vista activos
+ */
+function updateViewButtons() {
+    document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+    if (currentView === 'month') {
+        document.getElementById('view-month')?.classList.add('active');
+    } else {
+        document.getElementById('view-week')?.classList.add('active');
+    }
 }
 
 /**
@@ -83,9 +137,9 @@ function setupCalendarListeners(container) {
  */
 async function loadAndRenderCalendar() {
     const grid = document.getElementById('calendar-grid');
-    const monthYear = document.getElementById('month-year');
+    const periodLabel = document.getElementById('period-label');
     
-    if (!grid || !monthYear) return;
+    if (!grid || !periodLabel) return;
 
     grid.innerHTML = `
         <div class="calendar-loading">
@@ -94,25 +148,51 @@ async function loadAndRenderCalendar() {
         </div>
     `;
 
+    let startDate, endDate;
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    
-    // Extender rango para días visibles de meses adyacentes (semana empieza en lunes)
-    const startDate = new Date(firstDay);
-    const firstDayOfWeek = (firstDay.getDay() + 6) % 7; // Lunes = 0, Domingo = 6
-    startDate.setDate(startDate.getDate() - firstDayOfWeek);
-    const endDate = new Date(lastDay);
-    const lastDayOfWeek = (lastDay.getDay() + 6) % 7;
-    endDate.setDate(endDate.getDate() + (6 - lastDayOfWeek));
+    const monthNames = t('activities.calendar.months').split(',');
+    const locale = t('common.locale') || 'es-ES';
+
+    if (currentView === 'month') {
+        // Vista mensual
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        
+        startDate = new Date(firstDay);
+        const firstDayOfWeek = (firstDay.getDay() + 6) % 7;
+        startDate.setDate(startDate.getDate() - firstDayOfWeek);
+        
+        endDate = new Date(lastDay);
+        const lastDayOfWeek = (lastDay.getDay() + 6) % 7;
+        endDate.setDate(endDate.getDate() + (6 - lastDayOfWeek));
+
+        periodLabel.textContent = `${monthNames[month]} ${year}`;
+    } else {
+        // Vista semanal - encontrar lunes de la semana actual
+        startDate = new Date(currentDate);
+        const dayOfWeek = (startDate.getDay() + 6) % 7;
+        startDate.setDate(startDate.getDate() - dayOfWeek);
+        startDate.setHours(0, 0, 0, 0);
+        
+        endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 6);
+
+        // Formato: "2 - 8 Dic 2025"
+        const startDay = startDate.getDate();
+        const endDay = endDate.getDate();
+        const startMonth = monthNames[startDate.getMonth()].substring(0, 3);
+        const endMonth = monthNames[endDate.getMonth()].substring(0, 3);
+        
+        if (startDate.getMonth() === endDate.getMonth()) {
+            periodLabel.textContent = `${startDay} - ${endDay} ${startMonth} ${endDate.getFullYear()}`;
+        } else {
+            periodLabel.textContent = `${startDay} ${startMonth} - ${endDay} ${endMonth} ${endDate.getFullYear()}`;
+        }
+    }
 
     const oldest = formatDateLocal(startDate);
     const newest = formatDateLocal(endDate);
-
-    // Actualizar título del mes
-    const monthNames = t('activities.calendar.months').split(',');
-    monthYear.textContent = `${monthNames[month]} ${year}`;
 
     try {
         // Cargar actividades y eventos en paralelo
@@ -122,7 +202,15 @@ async function loadAndRenderCalendar() {
         ]);
         activitiesData = Array.isArray(activities) ? activities : [];
         eventsData = Array.isArray(events) ? events : [];
-        renderCalendarGrid(year, month, startDate, endDate);
+        
+        console.log('Activities loaded:', activitiesData.length);
+        console.log('Events loaded:', eventsData.length, eventsData);
+        
+        if (currentView === 'month') {
+            renderCalendarGrid(year, month, startDate, endDate);
+        } else {
+            renderWeekView(startDate, endDate);
+        }
     } catch (error) {
         console.error('Error loading calendar data:', error);
         grid.innerHTML = `<div class="calendar-error">${t('common.error')}</div>`;
@@ -149,10 +237,11 @@ function renderCalendarGrid(year, month, startDate, endDate) {
         }
     });
 
-    // Crear mapa de eventos programados por fecha
+    // Crear mapa de eventos programados por fecha (eventos usan start_date, no start_date_local)
     const eventMap = new Map();
     eventsData.forEach(event => {
-        const date = event.start_date_local?.split('T')[0];
+        // Los eventos de Intervals.icu usan 'start_date' (formato YYYY-MM-DD)
+        const date = event.start_date_local?.split('T')[0] || event.start_date;
         if (date) {
             if (!eventMap.has(date)) eventMap.set(date, []);
             eventMap.get(date).push(event);
@@ -237,6 +326,147 @@ function renderCalendarGrid(year, month, startDate, endDate) {
 }
 
 /**
+ * Renderiza la vista semanal
+ */
+function renderWeekView(startDate, endDate) {
+    const grid = document.getElementById('calendar-grid');
+    if (!grid) return;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Crear mapas de actividades y eventos
+    const activityMap = new Map();
+    activitiesData.forEach(activity => {
+        const date = activity.start_date_local?.split('T')[0];
+        if (date) {
+            if (!activityMap.has(date)) activityMap.set(date, []);
+            activityMap.get(date).push(activity);
+        }
+    });
+
+    const eventMap = new Map();
+    eventsData.forEach(event => {
+        const date = event.start_date_local?.split('T')[0] || event.start_date;
+        if (date) {
+            if (!eventMap.has(date)) eventMap.set(date, []);
+            eventMap.get(date).push(event);
+        }
+    });
+
+    const dayNames = t('activities.calendar.daysLong').split(',');
+    const locale = t('common.locale') || 'es-ES';
+    
+    let html = '<div class="week-view">';
+
+    const currentDay = new Date(startDate);
+    for (let i = 0; i < 7; i++) {
+        const dateStr = formatDateLocal(currentDay);
+        const isToday = currentDay.getTime() === today.getTime();
+        const dayActivities = activityMap.get(dateStr) || [];
+        const dayEvents = eventMap.get(dateStr) || [];
+        const hasActivities = dayActivities.length > 0;
+        const hasEvents = dayEvents.length > 0;
+
+        const totalTSS = dayActivities.reduce((sum, a) => sum + (a.icu_training_load || 0), 0);
+        const plannedLoad = dayEvents.reduce((sum, e) => sum + (e.icu_training_load || e.load_target || 0), 0);
+
+        let dayClass = 'week-day';
+        if (isToday) dayClass += ' today';
+        if (hasActivities) dayClass += ' has-activities';
+        if (hasEvents && !hasActivities) dayClass += ' has-events';
+
+        html += `
+            <div class="${dayClass}" data-date="${dateStr}">
+                <div class="week-day-header">
+                    <span class="week-day-name">${dayNames[i]}</span>
+                    <span class="week-day-date ${isToday ? 'today-badge' : ''}">${currentDay.getDate()}</span>
+                </div>
+                <div class="week-day-content">
+        `;
+
+        // Mostrar eventos programados
+        if (hasEvents) {
+            html += '<div class="week-events-section">';
+            dayEvents.forEach(event => {
+                const load = event.icu_training_load || event.load_target || 0;
+                const duration = event.moving_time ? formatDuration(event.moving_time) : '';
+                html += `
+                    <div class="week-event-card">
+                        <div class="week-event-header">
+                            <span class="week-event-icon">📋</span>
+                            <span class="week-event-name">${event.name || event.description || t('activities.calendar.workout')}</span>
+                        </div>
+                        ${event.description && event.description !== event.name ? `
+                            <div class="week-event-desc">${truncate(event.description, 100)}</div>
+                        ` : ''}
+                        <div class="week-event-metrics">
+                            ${duration ? `<span>⏱️ ${duration}</span>` : ''}
+                            ${load > 0 ? `<span>💪 TSS ${Math.round(load)}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+
+        // Mostrar actividades completadas
+        if (hasActivities) {
+            html += '<div class="week-activities-section">';
+            dayActivities.forEach(activity => {
+                const duration = formatDuration(activity.moving_time);
+                const distance = activity.distance ? (activity.distance / 1000).toFixed(1) + ' km' : '';
+                html += `
+                    <div class="week-activity-card">
+                        <div class="week-activity-header">
+                            <span class="week-activity-icon">${getActivityIcon(activity.type)}</span>
+                            <span class="week-activity-name">${activity.name}</span>
+                        </div>
+                        <div class="week-activity-metrics">
+                            <span>⏱️ ${duration}</span>
+                            ${distance ? `<span>📏 ${distance}</span>` : ''}
+                            ${activity.icu_training_load ? `<span>💪 TSS ${Math.round(activity.icu_training_load)}</span>` : ''}
+                            ${activity.average_watts ? `<span>⚡ ${activity.average_watts}W</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+
+        // Si no hay nada
+        if (!hasEvents && !hasActivities) {
+            html += `<div class="week-empty">${t('activities.calendar.restDay')}</div>`;
+        }
+
+        // Resumen del día
+        if (totalTSS > 0 || plannedLoad > 0) {
+            html += `
+                <div class="week-day-summary">
+                    ${plannedLoad > 0 ? `<span class="planned-badge">📋 ${Math.round(plannedLoad)}</span>` : ''}
+                    ${totalTSS > 0 ? `<span class="completed-badge">✅ ${Math.round(totalTSS)}</span>` : ''}
+                </div>
+            `;
+        }
+
+        html += `
+                </div>
+            </div>
+        `;
+
+        currentDay.setDate(currentDay.getDate() + 1);
+    }
+
+    html += '</div>';
+    grid.innerHTML = html;
+
+    // Event listeners para los días
+    grid.querySelectorAll('.week-day').forEach(day => {
+        day.addEventListener('click', () => showDayDetail(day.dataset.date));
+    });
+}
+
+/**
  * Muestra el detalle de un día
  */
 function showDayDetail(dateStr) {
@@ -245,7 +475,8 @@ function showDayDetail(dateStr) {
 
     const date = new Date(dateStr + 'T00:00:00');
     const dayActivities = activitiesData.filter(a => a.start_date_local?.split('T')[0] === dateStr);
-    const dayEvents = eventsData.filter(e => e.start_date_local?.split('T')[0] === dateStr);
+    // Los eventos usan start_date (YYYY-MM-DD) no start_date_local
+    const dayEvents = eventsData.filter(e => (e.start_date_local?.split('T')[0] || e.start_date) === dateStr);
 
     // Formatear fecha
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };

@@ -400,8 +400,14 @@ const translations = {
             calendar: {
                 title: 'Calendario de Actividades',
                 today: 'Hoy',
+                previous: 'Anterior',
+                next: 'Siguiente',
                 prevMonth: 'Mes anterior',
                 nextMonth: 'Mes siguiente',
+                month: 'Mes',
+                week: 'Semana',
+                monthView: 'Vista mensual',
+                weekView: 'Vista semanal',
                 completed: 'Completado',
                 planned: 'Planificado',
                 restDay: 'Día de descanso',
@@ -411,7 +417,8 @@ const translations = {
                 plannedWorkouts: 'Entrenamientos Planificados',
                 completedActivities: 'Actividades Completadas',
                 months: 'Enero,Febrero,Marzo,Abril,Mayo,Junio,Julio,Agosto,Septiembre,Octubre,Noviembre,Diciembre',
-                days: 'Lun,Mar,Mié,Jue,Vie,Sáb,Dom'
+                days: 'Lun,Mar,Mié,Jue,Vie,Sáb,Dom',
+                daysLong: 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado,Domingo'
             }
         },
 
@@ -879,8 +886,14 @@ const translations = {
             calendar: {
                 title: 'Activity Calendar',
                 today: 'Today',
+                previous: 'Previous',
+                next: 'Next',
                 prevMonth: 'Previous month',
                 nextMonth: 'Next month',
+                month: 'Month',
+                week: 'Week',
+                monthView: 'Month view',
+                weekView: 'Week view',
                 completed: 'Completed',
                 planned: 'Planned',
                 restDay: 'Rest day',
@@ -890,7 +903,8 @@ const translations = {
                 plannedWorkouts: 'Planned Workouts',
                 completedActivities: 'Completed Activities',
                 months: 'January,February,March,April,May,June,July,August,September,October,November,December',
-                days: 'Mon,Tue,Wed,Thu,Fri,Sat,Sun'
+                days: 'Mon,Tue,Wed,Thu,Fri,Sat,Sun',
+                daysLong: 'Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday'
             }
         },
 
