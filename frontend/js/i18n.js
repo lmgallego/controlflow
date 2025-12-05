@@ -455,6 +455,16 @@ const translations = {
             }
         },
 
+        // Training Zones
+        zones: {
+            title: 'Zonas de Entrenamiento',
+            outdoor: 'Exterior (Ride)',
+            indoor: 'Interior (VirtualRide)',
+            noData: 'No hay zonas configuradas',
+            power: 'Potencia',
+            heartRate: 'Frecuencia Cardíaca'
+        },
+
         // PMC (Performance Management Chart)
         pmc: {
             title: 'Análisis de Carga',
@@ -505,6 +515,7 @@ const translations = {
             close: 'Cerrar',
             apply: 'Aplicar',
             reset: 'Restablecer',
+            expand: 'Expandir',
             types: 'Tipos',
             units: {
                 ms: 'ms',
@@ -968,6 +979,16 @@ const translations = {
             }
         },
 
+        // Training Zones
+        zones: {
+            title: 'Training Zones',
+            outdoor: 'Outdoor (Ride)',
+            indoor: 'Indoor (VirtualRide)',
+            noData: 'No zones configured',
+            power: 'Power',
+            heartRate: 'Heart Rate'
+        },
+
         // PMC (Performance Management Chart)
         pmc: {
             title: 'Load Analysis',
@@ -1018,6 +1039,7 @@ const translations = {
             close: 'Close',
             apply: 'Apply',
             reset: 'Reset',
+            expand: 'Expand',
             types: 'Types',
             units: {
                 ms: 'ms',

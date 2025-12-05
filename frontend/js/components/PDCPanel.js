@@ -1,14 +1,18 @@
-import { getPowerCurves } from '../apiService.js';
+import { getPowerCurves, getTrainingZones } from '../apiService.js';
 import { t } from '../i18n.js';
 
 let powerCurveChart = null;
+let modalChart = null;
 let currentPeriodData = null;
 let historicalData = null;
+let currentAthleteId = null;
 
 /**
  * Renderiza el panel de Curva de Potencia (PDC)
  */
 export async function renderPDCPanel(container, athleteId) {
+    currentAthleteId = athleteId;
+    
     container.innerHTML = `
         <div class="pdc-panel">
             <div class="pdc-header">
@@ -26,6 +30,11 @@ export async function renderPDCPanel(container, athleteId) {
                         <option value="VirtualRide">${t('pdc.types.virtualRide')}</option>
                         <option value="Run">${t('pdc.types.run')}</option>
                     </select>
+                    <button id="pdc-expand-btn" class="pdc-expand-btn" title="${t('common.expand')}">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
             <div class="pdc-content">
@@ -48,14 +57,304 @@ export async function renderPDCPanel(container, athleteId) {
                 </div>
             </div>
         </div>
+        
+        <!-- Sección de Zonas de Entrenamiento -->
+        <div class="zones-panel">
+            <div class="zones-header">
+                <h3>${t('zones.title')}</h3>
+            </div>
+            <div class="zones-content" id="zones-content">
+                <div class="pdc-loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal para PDC expandido -->
+        <div id="pdc-modal" class="pdc-modal">
+            <div class="pdc-modal-content">
+                <div class="pdc-modal-header">
+                    <h3>${t('pdc.title')}</h3>
+                    <button id="pdc-modal-close" class="pdc-modal-close">&times;</button>
+                </div>
+                <div class="pdc-modal-body">
+                    <div class="pdc-modal-chart-section">
+                        <div class="pdc-chart-legend">
+                            <span class="legend-item"><span class="legend-line dashed"></span>${t('pdc.realCurve')}</span>
+                            <span class="legend-item"><span class="legend-line solid"></span>${t('pdc.modeledCurve')}</span>
+                        </div>
+                        <div class="pdc-modal-chart-container">
+                            <canvas id="pdc-modal-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="pdc-modal-cards-section">
+                        <h4>${t('pdc.bestEfforts')}</h4>
+                        <div class="pdc-cards" id="pdc-modal-cards"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     `;
 
-    // Event listeners para los selectores
+    // Event listeners
     document.getElementById('pdc-period')?.addEventListener('change', () => loadPowerCurveData(athleteId));
     document.getElementById('pdc-type')?.addEventListener('change', () => loadPowerCurveData(athleteId));
+    document.getElementById('pdc-expand-btn')?.addEventListener('click', openPDCModal);
+    document.getElementById('pdc-modal-close')?.addEventListener('click', closePDCModal);
+    document.getElementById('pdc-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'pdc-modal') closePDCModal();
+    });
 
     // Cargar datos iniciales
-    await loadPowerCurveData(athleteId);
+    await Promise.all([
+        loadPowerCurveData(athleteId),
+        loadTrainingZones(athleteId)
+    ]);
+}
+
+/**
+ * Abre el modal con el PDC expandido
+ */
+function openPDCModal() {
+    const modal = document.getElementById('pdc-modal');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Renderizar gráfico en el modal
+        if (currentPeriodData) {
+            setTimeout(() => {
+                renderModalChart(currentPeriodData);
+                renderModalCards();
+            }, 100);
+        }
+    }
+}
+
+/**
+ * Cierra el modal
+ */
+function closePDCModal() {
+    const modal = document.getElementById('pdc-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+        if (modalChart) {
+            modalChart.destroy();
+            modalChart = null;
+        }
+    }
+}
+
+/**
+ * Renderiza el gráfico en el modal
+ */
+function renderModalChart(curveData) {
+    const ctx = document.getElementById('pdc-modal-chart');
+    if (!ctx) return;
+
+    if (modalChart) {
+        modalChart.destroy();
+    }
+
+    const secs = curveData.secs || [];
+    const values = curveData.watts || curveData.values || [];
+
+    const realDataPoints = [];
+    let maxSeconds = 0;
+    for (let i = 0; i < secs.length; i++) {
+        if (values[i] && values[i] > 0) {
+            realDataPoints.push({ x: secs[i], y: values[i] });
+            maxSeconds = Math.max(maxSeconds, secs[i]);
+        }
+    }
+
+    const modeledDataPoints = generateSmoothedCurve(secs, values);
+    const tickValues = [1, 5, 10, 20, 30, 60, 120, 300, 600, 1200, 1800, 3600, 7200];
+
+    modalChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [
+                {
+                    label: t('pdc.realCurve'),
+                    data: realDataPoints,
+                    borderColor: 'rgba(251, 191, 36, 0.8)',
+                    backgroundColor: 'rgba(251, 191, 36, 0.15)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    order: 2
+                },
+                {
+                    label: t('pdc.modeledCurve'),
+                    data: modeledDataPoints,
+                    borderColor: '#ef4444',
+                    backgroundColor: 'transparent',
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    borderWidth: 2.5,
+                    order: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    type: 'logarithmic',
+                    min: 1,
+                    max: maxSeconds || 7200,
+                    title: { display: true, text: t('pdc.duration'), color: '#9ca3af' },
+                    ticks: {
+                        color: '#9ca3af',
+                        callback: (value) => tickValues.includes(value) ? formatDuration(value) : ''
+                    },
+                    afterBuildTicks: (axis) => {
+                        axis.ticks = tickValues.filter(v => v <= (maxSeconds || 7200)).map(v => ({ value: v }));
+                    },
+                    grid: { color: 'rgba(255, 255, 255, 0.06)' }
+                },
+                y: {
+                    title: { display: true, text: t('pdc.watts'), color: '#9ca3af' },
+                    ticks: { color: '#9ca3af' },
+                    grid: { color: 'rgba(255, 255, 255, 0.06)' }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                    callbacks: {
+                        title: (ctx) => formatDuration(ctx[0].parsed.x),
+                        label: (ctx) => `${ctx.dataset.label}: ${Math.round(ctx.parsed.y)} W`
+                    }
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Renderiza los cards en el modal
+ */
+function renderModalCards() {
+    const container = document.getElementById('pdc-modal-cards');
+    const sourceContainer = document.getElementById('pdc-cards');
+    if (container && sourceContainer) {
+        container.innerHTML = sourceContainer.innerHTML;
+    }
+}
+
+/**
+ * Carga las zonas de entrenamiento
+ */
+async function loadTrainingZones(athleteId) {
+    const container = document.getElementById('zones-content');
+    if (!container) return;
+
+    try {
+        const zones = await getTrainingZones(athleteId);
+        renderTrainingZones(zones);
+    } catch (error) {
+        console.error('Error loading training zones:', error);
+        container.innerHTML = `<p class="error-message">${t('common.error')}</p>`;
+    }
+}
+
+/**
+ * Renderiza las zonas de entrenamiento
+ */
+function renderTrainingZones(zones) {
+    const container = document.getElementById('zones-content');
+    if (!container) return;
+
+    const hasOutdoor = zones.outdoor && zones.outdoor.ftp;
+    const hasIndoor = zones.indoor && zones.indoor.ftp;
+
+    if (!hasOutdoor && !hasIndoor) {
+        container.innerHTML = `<p class="no-data">${t('zones.noData')}</p>`;
+        return;
+    }
+
+    let html = '<div class="zones-grid">';
+
+    // Zonas Outdoor (Ride)
+    if (hasOutdoor) {
+        html += renderZoneCard(zones.outdoor, 'outdoor', t('zones.outdoor'));
+    }
+
+    // Zonas Indoor (VirtualRide)
+    if (hasIndoor) {
+        html += renderZoneCard(zones.indoor, 'indoor', t('zones.indoor'));
+    }
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+/**
+ * Renderiza una tarjeta de zonas
+ */
+function renderZoneCard(data, type, title) {
+    const zoneColors = [
+        '#94a3b8', // Z1 - Gris
+        '#3b82f6', // Z2 - Azul
+        '#22c55e', // Z3 - Verde
+        '#eab308', // Z4 - Amarillo
+        '#f97316', // Z5 - Naranja
+        '#ef4444', // Z6 - Rojo
+        '#a855f7'  // Z7 - Púrpura
+    ];
+
+    const powerZones = data.power_zones || [];
+    const zoneNames = data.power_zone_names || ['Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6', 'Z7'];
+    const ftp = data.ftp || 0;
+
+    let zonesHtml = '';
+    for (let i = 0; i < powerZones.length; i++) {
+        const zoneName = zoneNames[i] || `Z${i + 1}`;
+        const zoneMax = powerZones[i];
+        const zoneMin = i === 0 ? 0 : powerZones[i - 1];
+        const color = zoneColors[i] || zoneColors[zoneColors.length - 1];
+        const percentage = ftp > 0 ? Math.round((zoneMax / ftp) * 100) : 0;
+
+        zonesHtml += `
+            <div class="zone-row">
+                <div class="zone-color" style="background: ${color}"></div>
+                <div class="zone-name">${zoneName}</div>
+                <div class="zone-range">${zoneMin} - ${zoneMax} W</div>
+                <div class="zone-percentage">${percentage}%</div>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="zone-card ${type}">
+            <div class="zone-card-header">
+                <h4>${title}</h4>
+                <div class="zone-ftp">
+                    <span class="ftp-label">FTP</span>
+                    <span class="ftp-value">${ftp} W</span>
+                </div>
+            </div>
+            <div class="zone-card-body">
+                ${zonesHtml}
+            </div>
+            ${data.w_prime ? `
+                <div class="zone-card-footer">
+                    <span>W': ${Math.round(data.w_prime / 1000)} kJ</span>
+                    ${data.p_max ? `<span>Pmax: ${data.p_max} W</span>` : ''}
+                </div>
+            ` : ''}
+        </div>
+    `;
 }
 
 /**

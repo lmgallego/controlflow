@@ -68,3 +68,61 @@ def get_power_curves():
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+@activities_api.route('/training-zones', methods=['GET'])
+@token_required
+def get_training_zones():
+    """Obtiene las zonas de entrenamiento del atleta desde sportSettings."""
+    try:
+        client = get_user_client()
+        athlete_id = request.args.get('athlete_id')
+        
+        if not athlete_id:
+            return jsonify({"error": "Se requiere athlete_id"}), 400
+        
+        # Obtener perfil completo del atleta
+        profile = client.get_athlete_profile(athlete_id)
+        if isinstance(profile, tuple):
+            return jsonify(profile[0]), profile[1]
+        
+        # Extraer sportSettings
+        sport_settings = profile.get('sportSettings', [])
+        
+        # Buscar configuraciones de Ride (exterior) y VirtualRide (interior)
+        zones_data = {
+            'outdoor': None,  # Ride
+            'indoor': None    # VirtualRide
+        }
+        
+        for setting in sport_settings:
+            sport_type = setting.get('types', [])
+            
+            if 'Ride' in sport_type:
+                zones_data['outdoor'] = {
+                    'ftp': setting.get('ftp'),
+                    'w_prime': setting.get('w_prime'),
+                    'p_max': setting.get('p_max'),
+                    'power_zones': setting.get('power_zones', []),
+                    'power_zone_names': setting.get('power_zone_names', []),
+                    'lthr': setting.get('lthr'),
+                    'max_hr': setting.get('max_hr'),
+                    'hr_zones': setting.get('hr_zones', []),
+                    'hr_zone_names': setting.get('hr_zone_names', [])
+                }
+            
+            if 'VirtualRide' in sport_type:
+                zones_data['indoor'] = {
+                    'ftp': setting.get('indoor_ftp') or setting.get('ftp'),
+                    'w_prime': setting.get('w_prime'),
+                    'p_max': setting.get('p_max'),
+                    'power_zones': setting.get('power_zones', []),
+                    'power_zone_names': setting.get('power_zone_names', []),
+                    'lthr': setting.get('lthr'),
+                    'max_hr': setting.get('max_hr'),
+                    'hr_zones': setting.get('hr_zones', []),
+                    'hr_zone_names': setting.get('hr_zone_names', [])
+                }
+        
+        return jsonify(zones_data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400

@@ -88,6 +88,11 @@ export async function getPowerCurves(athleteId, type = 'Ride', curves = '90d', i
     return fetchAuth(`/power-curves?${params}`);
 }
 
+export async function getTrainingZones(athleteId) {
+    const params = new URLSearchParams({ athlete_id: athleteId });
+    return fetchAuth(`/training-zones?${params}`);
+}
+
 /**
  * Guarda las credenciales de Intervals.icu del usuario en el backend.
  *
