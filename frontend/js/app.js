@@ -119,6 +119,12 @@ async function initializeApp() {
         userEmailDisplay.textContent = user.email;
         athleteSelect.innerHTML = '<option>Cargando atletas...</option>';
         athleteSelect.disabled = true;
+        
+        // Ocultar métricas del header inicialmente si la vista es athletes
+        const headerMetrics = document.getElementById('athlete-metrics-header');
+        if (headerMetrics && (currentView === 'athletes' || currentView === 'settings')) {
+            headerMetrics.style.display = 'none';
+        }
 
         const athletes = await getAthletes();
 
@@ -135,14 +141,13 @@ async function initializeApp() {
             athleteSelect.value = currentAthleteId;
             athleteSelect.disabled = false;
             
-            // Actualizar métricas del header
-            updateAthleteHeaderMetrics(currentAthleteId);
-            
             // Cargar la vista por defecto
-            // Si es 'athletes', no necesita athleteId
+            // Si es 'athletes', no necesita athleteId ni métricas del header
             if (currentView === 'athletes') {
                 await loadView('athletes');
             } else {
+                // Solo actualizar métricas del header si NO es vista de athletes/settings
+                updateAthleteHeaderMetrics(currentAthleteId);
                 await loadView(currentView, currentAthleteId);
             }
         } else {

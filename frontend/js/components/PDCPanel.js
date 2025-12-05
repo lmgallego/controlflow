@@ -70,26 +70,20 @@ export async function renderPDCPanel(container, athleteId) {
             </div>
         </div>
         
-        <!-- Modal para PDC expandido -->
+        <!-- Modal para PDC expandido (solo gráfico) -->
         <div id="pdc-modal" class="pdc-modal">
-            <div class="pdc-modal-content">
+            <div class="pdc-modal-content pdc-modal-chart-only">
                 <div class="pdc-modal-header">
                     <h3>${t('pdc.title')}</h3>
                     <button id="pdc-modal-close" class="pdc-modal-close">&times;</button>
                 </div>
-                <div class="pdc-modal-body">
-                    <div class="pdc-modal-chart-section">
-                        <div class="pdc-chart-legend">
-                            <span class="legend-item"><span class="legend-line dashed"></span>${t('pdc.realCurve')}</span>
-                            <span class="legend-item"><span class="legend-line solid"></span>${t('pdc.modeledCurve')}</span>
-                        </div>
-                        <div class="pdc-modal-chart-container">
-                            <canvas id="pdc-modal-chart"></canvas>
-                        </div>
+                <div class="pdc-modal-body-chart-only">
+                    <div class="pdc-chart-legend">
+                        <span class="legend-item"><span class="legend-line dashed"></span>${t('pdc.realCurve')}</span>
+                        <span class="legend-item"><span class="legend-line solid"></span>${t('pdc.modeledCurve')}</span>
                     </div>
-                    <div class="pdc-modal-cards-section">
-                        <h4>${t('pdc.bestEfforts')}</h4>
-                        <div class="pdc-cards" id="pdc-modal-cards"></div>
+                    <div class="pdc-modal-chart-container">
+                        <canvas id="pdc-modal-chart"></canvas>
                     </div>
                 </div>
             </div>
@@ -125,7 +119,6 @@ function openPDCModal() {
         if (currentPeriodData) {
             setTimeout(() => {
                 renderModalChart(currentPeriodData);
-                renderModalCards();
             }, 100);
         }
     }
@@ -239,17 +232,6 @@ function renderModalChart(curveData) {
             }
         }
     });
-}
-
-/**
- * Renderiza los cards en el modal
- */
-function renderModalCards() {
-    const container = document.getElementById('pdc-modal-cards');
-    const sourceContainer = document.getElementById('pdc-cards');
-    if (container && sourceContainer) {
-        container.innerHTML = sourceContainer.innerHTML;
-    }
 }
 
 /**

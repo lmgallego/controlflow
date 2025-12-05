@@ -302,6 +302,7 @@ a {
 /* --- View Container --- */
 .view-container {
     padding: 32px;
+    padding-bottom: 60px;
     overflow-y: auto;
     flex-grow: 1;
 }
@@ -5585,6 +5586,21 @@ a {
     overflow-y: auto;
 }
 
+/* Modal solo con gráfico */
+.pdc-modal-chart-only {
+    max-width: 1200px;
+}
+
+.pdc-modal-body-chart-only {
+    padding: 24px;
+}
+
+.pdc-modal-body-chart-only .pdc-modal-chart-container {
+    height: 70vh;
+    min-height: 500px;
+    position: relative;
+}
+
 .pdc-modal-chart-section {
     background: var(--bg-tertiary);
     border: 1px solid var(--border-color);
@@ -5597,21 +5613,6 @@ a {
     position: relative;
 }
 
-.pdc-modal-cards-section {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.pdc-modal-cards-section h4 {
-    margin: 0 0 16px 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
 @media (max-width: 1024px) {
     .pdc-modal-body {
         grid-template-columns: 1fr;
@@ -5619,6 +5620,11 @@ a {
 
     .pdc-modal-chart-container {
         height: 400px;
+    }
+    
+    .pdc-modal-body-chart-only .pdc-modal-chart-container {
+        height: 60vh;
+        min-height: 350px;
     }
 }
 
