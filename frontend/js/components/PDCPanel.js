@@ -2,6 +2,8 @@ import { getPowerCurves } from '../apiService.js';
 import { t } from '../i18n.js';
 
 let powerCurveChart = null;
+let currentPeriodData = null;
+let historicalData = null;
 
 /**
  * Renderiza el panel de Curva de Potencia (PDC)
@@ -28,6 +30,10 @@ export async function renderPDCPanel(container, athleteId) {
             </div>
             <div class="pdc-content">
                 <div class="pdc-chart-section">
+                    <div class="pdc-chart-legend">
+                        <span class="legend-item"><span class="legend-line dashed"></span>${t('pdc.realCurve')}</span>
+                        <span class="legend-item"><span class="legend-line solid"></span>${t('pdc.modeledCurve')}</span>
+                    </div>
                     <div class="pdc-chart-container">
                         <canvas id="pdc-chart"></canvas>
                     </div>
@@ -53,7 +59,7 @@ export async function renderPDCPanel(container, athleteId) {
 }
 
 /**
- * Carga los datos de la curva de potencia
+ * Carga los datos de la curva de potencia (período seleccionado + histórico)
  */
 async function loadPowerCurveData(athleteId) {
     const period = document.getElementById('pdc-period')?.value || '90d';
@@ -69,13 +75,21 @@ async function loadPowerCurveData(athleteId) {
     }
 
     try {
-        const data = await getPowerCurves(athleteId, type, period, true, 3);
-        console.log('Power curves data:', data);
+        // Cargar datos del período seleccionado y datos históricos en paralelo
+        const [periodData, allTimeData] = await Promise.all([
+            getPowerCurves(athleteId, type, period, true, 3),
+            period !== 'all' ? getPowerCurves(athleteId, type, 'all', true, 3) : null
+        ]);
 
-        if (data && data.list && data.list.length > 0) {
-            const curveData = data.list[0];
-            renderPowerCurveChart(curveData);
-            renderBestEffortsCards(curveData);
+        console.log('Power curves data:', periodData);
+        console.log('Historical data:', allTimeData);
+
+        if (periodData && periodData.list && periodData.list.length > 0) {
+            currentPeriodData = periodData.list[0];
+            historicalData = allTimeData?.list?.[0] || currentPeriodData;
+            
+            renderPowerCurveChart(currentPeriodData);
+            renderBestEffortsCards(currentPeriodData, historicalData);
         } else {
             if (cardsContainer) {
                 cardsContainer.innerHTML = `<p class="no-data">${t('pdc.noData')}</p>`;
@@ -90,7 +104,105 @@ async function loadPowerCurveData(athleteId) {
 }
 
 /**
- * Renderiza el gráfico de la curva de potencia
+ * Formatea duración en segundos a formato legible
+ */
+function formatDuration(seconds) {
+    if (seconds < 60) return `${Math.round(seconds)}s`;
+    if (seconds < 3600) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return secs > 0 ? `${mins}m${secs}s` : `${mins}m`;
+    }
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    return mins > 0 ? `${hours}h${mins}m` : `${hours}h`;
+}
+
+/**
+ * Calcula el modelo CP (Critical Power) usando regresión
+ * Modelo: P = W' / t + CP
+ * Donde W' es la capacidad anaeróbica y CP es la potencia crítica
+ */
+function calculateCPModel(secs, values) {
+    // Usar puntos entre 2 minutos y 20 minutos para la regresión
+    const validPoints = [];
+    for (let i = 0; i < secs.length; i++) {
+        if (secs[i] >= 120 && secs[i] <= 1200 && values[i] > 0) {
+            validPoints.push({ t: secs[i], p: values[i] });
+        }
+    }
+
+    if (validPoints.length < 3) {
+        // Fallback: usar valores por defecto basados en los datos
+        const p5min = getValueAtDuration(secs, values, 300) || 250;
+        const p20min = getValueAtDuration(secs, values, 1200) || 220;
+        return { cp: p20min * 0.95, wprime: (p5min - p20min * 0.95) * 300 };
+    }
+
+    // Regresión lineal: P * t = W' + CP * t => y = a + b*x
+    // Donde y = P*t (trabajo), x = t (tiempo), a = W', b = CP
+    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+    const n = validPoints.length;
+
+    validPoints.forEach(point => {
+        const x = point.t;
+        const y = point.p * point.t; // Trabajo = Potencia * Tiempo
+        sumX += x;
+        sumY += y;
+        sumXY += x * y;
+        sumX2 += x * x;
+    });
+
+    const cp = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+    const wprime = (sumY - cp * sumX) / n;
+
+    return { 
+        cp: Math.max(cp, 100), // CP mínimo razonable
+        wprime: Math.max(wprime, 5000) // W' mínimo razonable (5kJ)
+    };
+}
+
+/**
+ * Obtiene el valor de potencia para una duración específica
+ */
+function getValueAtDuration(secs, values, targetSecs) {
+    let closestIndex = -1;
+    let minDiff = Infinity;
+    
+    for (let i = 0; i < secs.length; i++) {
+        const diff = Math.abs(secs[i] - targetSecs);
+        if (diff < minDiff && values[i] > 0) {
+            minDiff = diff;
+            closestIndex = i;
+        }
+    }
+    
+    return closestIndex >= 0 ? values[closestIndex] : null;
+}
+
+/**
+ * Genera puntos para la curva modelada
+ */
+function generateModeledCurve(cp, wprime, maxSeconds) {
+    const points = [];
+    // Generar puntos logarítmicamente espaciados
+    const durations = [1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120, 180, 240, 300, 
+                       360, 420, 480, 600, 720, 900, 1200, 1500, 1800, 2400, 3000, 3600, 
+                       4500, 5400, 7200, 10800];
+    
+    durations.forEach(t => {
+        if (t <= maxSeconds) {
+            // Modelo: P = W' / t + CP
+            const power = (wprime / t) + cp;
+            points.push({ x: t, y: Math.round(power) });
+        }
+    });
+    
+    return points;
+}
+
+/**
+ * Renderiza el gráfico de la curva de potencia con curva modelada
  */
 function renderPowerCurveChart(curveData) {
     const ctx = document.getElementById('pdc-chart');
@@ -104,36 +216,57 @@ function renderPowerCurveChart(curveData) {
     const secs = curveData.secs || [];
     const values = curveData.watts || curveData.values || [];
 
-    // Filtrar valores válidos y crear pares
-    const dataPoints = [];
+    // Filtrar valores válidos y crear pares para la curva real
+    const realDataPoints = [];
+    let maxSeconds = 0;
     for (let i = 0; i < secs.length; i++) {
         if (values[i] && values[i] > 0) {
-            dataPoints.push({ x: secs[i], y: values[i] });
+            realDataPoints.push({ x: secs[i], y: values[i] });
+            maxSeconds = Math.max(maxSeconds, secs[i]);
         }
     }
 
-    // Crear labels legibles para el eje X
-    const formatDuration = (seconds) => {
-        if (seconds < 60) return `${seconds}s`;
-        if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
-        return `${Math.floor(seconds / 3600)}h`;
-    };
+    // Calcular modelo CP y generar curva modelada
+    const { cp, wprime } = calculateCPModel(secs, values);
+    const modeledDataPoints = generateModeledCurve(cp, wprime, maxSeconds);
+
+    console.log('CP Model:', { cp: Math.round(cp), wprime: Math.round(wprime / 1000) + 'kJ' });
+
+    // Etiquetas específicas para el eje X
+    const tickValues = [1, 5, 10, 20, 30, 60, 120, 300, 600, 1200, 1800, 3600, 7200];
 
     powerCurveChart = new Chart(ctx, {
         type: 'line',
         data: {
-            datasets: [{
-                label: t('pdc.power'),
-                data: dataPoints,
-                borderColor: '#6366f1',
-                backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                fill: true,
-                tension: 0.4,
-                pointRadius: 0,
-                pointHoverRadius: 6,
-                pointHoverBackgroundColor: '#6366f1',
-                borderWidth: 2
-            }]
+            datasets: [
+                {
+                    label: t('pdc.realCurve'),
+                    data: realDataPoints,
+                    borderColor: 'rgba(251, 191, 36, 0.8)',
+                    backgroundColor: 'rgba(251, 191, 36, 0.15)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: '#fbbf24',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    order: 2
+                },
+                {
+                    label: t('pdc.modeledCurve'),
+                    data: modeledDataPoints,
+                    borderColor: '#ef4444',
+                    backgroundColor: 'transparent',
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: '#ef4444',
+                    borderWidth: 2.5,
+                    order: 1
+                }
+            ]
         },
         options: {
             responsive: true,
@@ -145,32 +278,48 @@ function renderPowerCurveChart(curveData) {
             scales: {
                 x: {
                     type: 'logarithmic',
+                    min: 1,
+                    max: maxSeconds || 7200,
                     title: {
                         display: true,
                         text: t('pdc.duration'),
-                        color: '#9ca3af'
+                        color: '#9ca3af',
+                        font: { size: 12, weight: '600' }
                     },
                     ticks: {
                         color: '#9ca3af',
+                        maxRotation: 45,
+                        minRotation: 0,
+                        autoSkip: false,
                         callback: function(value) {
-                            return formatDuration(value);
+                            // Solo mostrar etiquetas específicas
+                            if (tickValues.includes(value)) {
+                                return formatDuration(value);
+                            }
+                            return '';
                         }
                     },
+                    afterBuildTicks: function(axis) {
+                        axis.ticks = tickValues
+                            .filter(v => v <= (maxSeconds || 7200))
+                            .map(v => ({ value: v }));
+                    },
                     grid: {
-                        color: 'rgba(255, 255, 255, 0.05)'
+                        color: 'rgba(255, 255, 255, 0.06)'
                     }
                 },
                 y: {
                     title: {
                         display: true,
                         text: t('pdc.watts'),
-                        color: '#9ca3af'
+                        color: '#9ca3af',
+                        font: { size: 12, weight: '600' }
                     },
                     ticks: {
                         color: '#9ca3af'
                     },
                     grid: {
-                        color: 'rgba(255, 255, 255, 0.05)'
+                        color: 'rgba(255, 255, 255, 0.06)'
                     }
                 }
             },
@@ -191,7 +340,8 @@ function renderPowerCurveChart(curveData) {
                             return formatDuration(seconds);
                         },
                         label: function(context) {
-                            return `${Math.round(context.parsed.y)} W`;
+                            const label = context.dataset.label || '';
+                            return `${label}: ${Math.round(context.parsed.y)} W`;
                         }
                     }
                 }
@@ -201,62 +351,80 @@ function renderPowerCurveChart(curveData) {
 }
 
 /**
- * Renderiza las tarjetas de mejores esfuerzos
+ * Renderiza las tarjetas de mejores esfuerzos con comparación histórica
  */
-function renderBestEffortsCards(curveData) {
+function renderBestEffortsCards(currentData, historicalData) {
     const cardsContainer = document.getElementById('pdc-cards');
     if (!cardsContainer) return;
 
-    const secs = curveData.secs || [];
-    const values = curveData.watts || curveData.values || [];
+    const currentSecs = currentData.secs || [];
+    const currentValues = currentData.watts || currentData.values || [];
+    const historicalSecs = historicalData?.secs || currentSecs;
+    const historicalValues = historicalData?.watts || historicalData?.values || currentValues;
 
     // Duraciones clave que queremos mostrar
     const keyDurations = [
-        { seconds: 5, label: '5s', icon: '⚡' },
-        { seconds: 30, label: '30s', icon: '🔥' },
-        { seconds: 60, label: '1m', icon: '💪' },
-        { seconds: 180, label: '3m', icon: '🚴' },
-        { seconds: 300, label: '5m', icon: '⏱️' },
-        { seconds: 720, label: '12m', icon: '📈' },
-        { seconds: 1200, label: '20m', icon: '🎯' },
-        { seconds: 3600, label: '1h', icon: '🏆' }
+        { seconds: 5, label: '5s' },
+        { seconds: 30, label: '30s' },
+        { seconds: 60, label: '1min' },
+        { seconds: 180, label: '3min' },
+        { seconds: 300, label: '5min' },
+        { seconds: 720, label: '12min' },
+        { seconds: 1200, label: '20min' },
+        { seconds: 3600, label: '1h' }
     ];
 
     // Encontrar los valores para cada duración clave
     const efforts = keyDurations.map(duration => {
-        // Buscar el índice más cercano
-        let closestIndex = -1;
-        let minDiff = Infinity;
-        
-        for (let i = 0; i < secs.length; i++) {
-            const diff = Math.abs(secs[i] - duration.seconds);
-            if (diff < minDiff) {
-                minDiff = diff;
-                closestIndex = i;
-            }
-        }
-
-        const power = closestIndex >= 0 ? values[closestIndex] : null;
+        const currentPower = getValueAtDuration(currentSecs, currentValues, duration.seconds);
+        const historicalPower = getValueAtDuration(historicalSecs, historicalValues, duration.seconds);
         
         return {
             ...duration,
-            power: power && power > 0 ? Math.round(power) : null
+            current: currentPower && currentPower > 0 ? Math.round(currentPower) : null,
+            historical: historicalPower && historicalPower > 0 ? Math.round(historicalPower) : null
         };
     });
 
-    // Calcular W/kg si tenemos el peso del atleta (asumimos 70kg por defecto si no está disponible)
-    const weight = curveData.athlete_weight || 70;
+    // Obtener el período seleccionado para el label
+    const periodSelect = document.getElementById('pdc-period');
+    const periodLabel = periodSelect?.options[periodSelect.selectedIndex]?.text || '90 días';
 
     let html = '';
     efforts.forEach(effort => {
-        if (effort.power) {
-            const wkg = (effort.power / weight).toFixed(2);
+        if (effort.current || effort.historical) {
+            const current = effort.current || 0;
+            const historical = effort.historical || current;
+            const percentage = historical > 0 ? Math.round((current / historical) * 100) : 100;
+            const diff = current - historical;
+            const diffClass = diff >= 0 ? 'positive' : 'negative';
+            const diffSign = diff >= 0 ? '+' : '';
+            
             html += `
-                <div class="pdc-card">
-                    <div class="pdc-card-icon">${effort.icon}</div>
-                    <div class="pdc-card-duration">${effort.label}</div>
-                    <div class="pdc-card-power">${effort.power}<span class="unit">W</span></div>
-                    <div class="pdc-card-wkg">${wkg}<span class="unit">W/kg</span></div>
+                <div class="pdc-card-new">
+                    <div class="pdc-card-header">
+                        <span class="pdc-card-duration">${effort.label}</span>
+                    </div>
+                    <div class="pdc-card-body">
+                        <div class="pdc-card-column current">
+                            <span class="column-label">${t('pdc.selected')}</span>
+                            <span class="column-value">${current}<small>W</small></span>
+                        </div>
+                        <div class="pdc-card-column historical">
+                            <span class="column-label">${t('pdc.allTime')}</span>
+                            <span class="column-value">${historical}<small>W</small></span>
+                        </div>
+                        <div class="pdc-card-column chart">
+                            <div class="mini-chart">
+                                <div class="mini-chart-bar">
+                                    <div class="mini-chart-fill" style="width: ${Math.min(percentage, 100)}%"></div>
+                                    <div class="mini-chart-target"></div>
+                                </div>
+                                <span class="mini-chart-label ${diffClass}">${diffSign}${diff}W</span>
+                            </div>
+                            <span class="percentage-label">${percentage}%</span>
+                        </div>
+                    </div>
                 </div>
             `;
         }

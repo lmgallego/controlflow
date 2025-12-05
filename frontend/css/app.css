@@ -5160,6 +5160,41 @@ a {
     padding: 20px;
 }
 
+.pdc-chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 16px;
+}
+
+.pdc-chart-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.pdc-chart-legend .legend-line {
+    width: 24px;
+    height: 3px;
+    border-radius: 2px;
+}
+
+.pdc-chart-legend .legend-line.dashed {
+    background: repeating-linear-gradient(
+        90deg,
+        #fbbf24 0px,
+        #fbbf24 4px,
+        transparent 4px,
+        transparent 8px
+    );
+}
+
+.pdc-chart-legend .legend-line.solid {
+    background: #ef4444;
+}
+
 .pdc-chart-container {
     height: 400px;
     position: relative;
@@ -5256,6 +5291,153 @@ a {
     font-style: italic;
 }
 
+/* New PDC Cards with 3 columns */
+.pdc-card-new {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.pdc-card-new:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+.pdc-card-header {
+    background: var(--bg-tertiary);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.pdc-card-new .pdc-card-duration {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pdc-card-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.5fr;
+    gap: 0;
+    padding: 0;
+}
+
+.pdc-card-column {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid var(--border-color);
+}
+
+.pdc-card-column:last-child {
+    border-right: none;
+}
+
+.pdc-card-column.current {
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.pdc-card-column.historical {
+    background: rgba(251, 191, 36, 0.05);
+}
+
+.pdc-card-column.chart {
+    background: var(--bg-card);
+    padding: 8px 12px;
+}
+
+.column-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.column-value {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.column-value small {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-left: 2px;
+}
+
+.pdc-card-column.current .column-value {
+    color: var(--primary-color);
+}
+
+.pdc-card-column.historical .column-value {
+    color: #fbbf24;
+}
+
+/* Mini Chart */
+.mini-chart {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.mini-chart-bar {
+    width: 100%;
+    height: 12px;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+}
+
+.mini-chart-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #818cf8);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+}
+
+.mini-chart-target {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: #fbbf24;
+}
+
+.mini-chart-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.mini-chart-label.positive {
+    color: #10b981;
+}
+
+.mini-chart-label.negative {
+    color: #ef4444;
+}
+
+.percentage-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 2px;
+}
+
 /* PDC Responsive */
 @media (max-width: 1200px) {
     .pdc-content {
@@ -5282,16 +5464,34 @@ a {
     }
 
     .pdc-cards {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
     }
 
     .pdc-card-power {
         font-size: 1.4rem;
+    }
+
+    .pdc-card-body {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .pdc-card-column.chart {
+        grid-column: span 2;
+    }
+
+    .column-value {
+        font-size: 1.1rem;
     }
 }
 
 @media (max-width: 480px) {
     .pdc-cards {
         grid-template-columns: 1fr;
+    }
+
+    .pdc-chart-legend {
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
     }
 }

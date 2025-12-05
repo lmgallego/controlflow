@@ -437,6 +437,10 @@ const translations = {
             duration: 'Duración',
             watts: 'Vatios (W)',
             noData: 'No hay datos de potencia disponibles',
+            realCurve: 'Curva Real',
+            modeledCurve: 'Curva Modelada (CP)',
+            selected: 'Selección',
+            allTime: 'Histórico',
             periods: {
                 '42d': 'Últimos 42 días',
                 '90d': 'Últimos 90 días',
@@ -946,6 +950,10 @@ const translations = {
             duration: 'Duration',
             watts: 'Watts (W)',
             noData: 'No power data available',
+            realCurve: 'Real Curve',
+            modeledCurve: 'Modeled Curve (CP)',
+            selected: 'Selected',
+            allTime: 'All Time',
             periods: {
                 '42d': 'Last 42 days',
                 '90d': 'Last 90 days',
