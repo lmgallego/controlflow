@@ -200,6 +200,11 @@ async function loadHRCurveData(athleteId) {
     const type = document.getElementById('hr-type')?.value || 'Ride';
     const cardsContainer = document.getElementById('hr-cards');
 
+    // Mostrar loading
+    if (cardsContainer) {
+        cardsContainer.innerHTML = `<div class="hr-loading"><div class="spinner"></div></div>`;
+    }
+
     try {
         // Cargar período seleccionado y histórico en paralelo
         const [currentData, allTimeData] = await Promise.all([
@@ -207,9 +212,17 @@ async function loadHRCurveData(athleteId) {
             getHRCurves(athleteId, type, 'all')
         ]);
 
-        // Extraer datos de la respuesta
-        currentPeriodData = currentData.list?.[0] || currentData;
-        historicalData = allTimeData.list?.[0] || allTimeData;
+        // Extraer datos de la respuesta - la API devuelve { list: [...] }
+        currentPeriodData = currentData?.list?.[0] || currentData;
+        historicalData = allTimeData?.list?.[0] || allTimeData;
+
+        // Verificar que tenemos datos válidos
+        if (!currentPeriodData || !currentPeriodData.secs || currentPeriodData.secs.length === 0) {
+            if (cardsContainer) {
+                cardsContainer.innerHTML = `<p class="no-data-message">${t('common.na')}</p>`;
+            }
+            return;
+        }
 
         renderHRCurveChart(currentPeriodData);
         renderHRCards(currentPeriodData, historicalData);
@@ -218,7 +231,7 @@ async function loadHRCurveData(athleteId) {
     } catch (error) {
         console.error('Error loading HR curve data:', error);
         if (cardsContainer) {
-            cardsContainer.innerHTML = `<p class="error-message">${t('common.error')}</p>`;
+            cardsContainer.innerHTML = `<p class="error-message">${t('common.error')}: ${error.message || 'Error desconocido'}</p>`;
         }
     }
 }
@@ -462,6 +475,8 @@ function renderHRCards(currentData, historicalData) {
 /**
  * Renderiza el gráfico de distribución por zonas
  */
+let zonesChartInstance = null;
+
 function renderZonesChart(curveData) {
     const ctx = document.getElementById('hr-zones-chart');
     if (!ctx || !hrZonesData) return;
@@ -469,26 +484,33 @@ function renderZonesChart(curveData) {
     const outdoor = hrZonesData.outdoor || hrZonesData.indoor;
     if (!outdoor || !outdoor.hr_zones) return;
 
+    // Destruir gráfico anterior si existe
+    if (zonesChartInstance) {
+        zonesChartInstance.destroy();
+        zonesChartInstance = null;
+    }
+
+    // hr_zones son límites SUPERIORES absolutos en bpm para cada zona
+    // Ejemplo: [123, 140, 149, 157, 165, 173] significa:
+    // Z1: 0-123, Z2: 124-140, Z3: 141-149, Z4: 150-157, Z5: 158-165, Z6: 166-173
     const hrZones = outdoor.hr_zones;
-    const zoneNames = outdoor.hr_zone_names || ['Z1', 'Z2', 'Z3', 'Z4', 'Z5'];
-    const maxHR = outdoor.max_hr || 200;
+    const zoneNames = outdoor.hr_zone_names || ['Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6'];
 
     // Colores para zonas de FC
     const zoneColors = [
-        'rgba(148, 163, 184, 0.8)', // Z1 - Gris
-        'rgba(59, 130, 246, 0.8)',  // Z2 - Azul
-        'rgba(34, 197, 94, 0.8)',   // Z3 - Verde
-        'rgba(234, 179, 8, 0.8)',   // Z4 - Amarillo
-        'rgba(239, 68, 68, 0.8)'    // Z5 - Rojo
+        'rgba(148, 163, 184, 0.8)', // Z1 - Gris (Active Recovery)
+        'rgba(59, 130, 246, 0.8)',  // Z2 - Azul (Endurance)
+        'rgba(34, 197, 94, 0.8)',   // Z3 - Verde (Tempo)
+        'rgba(234, 179, 8, 0.8)',   // Z4 - Amarillo (Threshold)
+        'rgba(249, 115, 22, 0.8)',  // Z5 - Naranja (VO2max)
+        'rgba(239, 68, 68, 0.8)'    // Z6 - Rojo (Anaerobic)
     ];
 
-    // Calcular rangos de zonas
+    // Calcular rangos de zonas - los valores son límites superiores absolutos en bpm
     const zoneRanges = [];
     for (let i = 0; i < hrZones.length; i++) {
-        const minPercent = i === 0 ? 0 : hrZones[i - 1];
-        const maxPercent = hrZones[i];
-        const minBpm = Math.round((minPercent / 100) * maxHR);
-        const maxBpm = Math.round((maxPercent / 100) * maxHR);
+        const minBpm = i === 0 ? 0 : hrZones[i - 1] + 1;
+        const maxBpm = hrZones[i];
         zoneRanges.push({
             name: zoneNames[i] || `Z${i + 1}`,
             min: minBpm,
@@ -516,7 +538,7 @@ function renderZonesChart(curveData) {
     const total = zoneCounts.reduce((a, b) => a + b, 0);
     const zonePercentages = zoneCounts.map(c => total > 0 ? Math.round((c / total) * 100) : 0);
 
-    new Chart(ctx, {
+    zonesChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: zoneRanges.map(z => `${z.name} (${z.min}-${z.max})`),
