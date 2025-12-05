@@ -403,9 +403,13 @@ const translations = {
                 prevMonth: 'Mes anterior',
                 nextMonth: 'Mes siguiente',
                 completed: 'Completado',
+                planned: 'Planificado',
                 restDay: 'Día de descanso',
                 noActivities: 'No hay actividades este día',
                 activities: 'Actividades',
+                workout: 'Entrenamiento',
+                plannedWorkouts: 'Entrenamientos Planificados',
+                completedActivities: 'Actividades Completadas',
                 months: 'Enero,Febrero,Marzo,Abril,Mayo,Junio,Julio,Agosto,Septiembre,Octubre,Noviembre,Diciembre',
                 days: 'Lun,Mar,Mié,Jue,Vie,Sáb,Dom'
             }
@@ -878,9 +882,13 @@ const translations = {
                 prevMonth: 'Previous month',
                 nextMonth: 'Next month',
                 completed: 'Completed',
+                planned: 'Planned',
                 restDay: 'Rest day',
                 noActivities: 'No activities this day',
                 activities: 'Activities',
+                workout: 'Workout',
+                plannedWorkouts: 'Planned Workouts',
+                completedActivities: 'Completed Activities',
                 months: 'January,February,March,April,May,June,July,August,September,October,November,December',
                 days: 'Mon,Tue,Wed,Thu,Fri,Sat,Sun'
             }

@@ -1,9 +1,10 @@
-import { getActivityData } from '../apiService.js';
+import { getActivityData, getEventsData } from '../apiService.js';
 import { t } from '../i18n.js';
 
 let currentDate = new Date();
 let currentAthleteId = null;
 let activitiesData = [];
+let eventsData = [];
 let calendarContainer = null;
 
 /**
@@ -33,6 +34,10 @@ export async function renderActivityFeed(container, athleteId) {
                 <div class="legend-item">
                     <span class="legend-dot completed"></span>
                     <span>${t('activities.calendar.completed')}</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot planned"></span>
+                    <span>${t('activities.calendar.planned')}</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-dot rest"></span>
@@ -110,8 +115,13 @@ async function loadAndRenderCalendar() {
     monthYear.textContent = `${monthNames[month]} ${year}`;
 
     try {
-        const activities = await getActivityData(currentAthleteId, oldest, newest);
+        // Cargar actividades y eventos en paralelo
+        const [activities, events] = await Promise.all([
+            getActivityData(currentAthleteId, oldest, newest),
+            getEventsData(currentAthleteId, oldest, newest)
+        ]);
         activitiesData = Array.isArray(activities) ? activities : [];
+        eventsData = Array.isArray(events) ? events : [];
         renderCalendarGrid(year, month, startDate, endDate);
     } catch (error) {
         console.error('Error loading calendar data:', error);
@@ -139,6 +149,16 @@ function renderCalendarGrid(year, month, startDate, endDate) {
         }
     });
 
+    // Crear mapa de eventos programados por fecha
+    const eventMap = new Map();
+    eventsData.forEach(event => {
+        const date = event.start_date_local?.split('T')[0];
+        if (date) {
+            if (!eventMap.has(date)) eventMap.set(date, []);
+            eventMap.get(date).push(event);
+        }
+    });
+
     const dayNames = t('activities.calendar.days').split(',');
     
     let html = `
@@ -155,29 +175,51 @@ function renderCalendarGrid(year, month, startDate, endDate) {
         const isToday = currentDay.getTime() === today.getTime();
         
         const dayActivities = activityMap.get(dateStr) || [];
+        const dayEvents = eventMap.get(dateStr) || [];
         const hasActivities = dayActivities.length > 0;
+        const hasEvents = dayEvents.length > 0;
         
-        // Calcular TSS total del día
+        // Calcular TSS total del día (actividades completadas)
         const totalTSS = dayActivities.reduce((sum, a) => sum + (a.icu_training_load || 0), 0);
+        // Calcular carga planificada
+        const plannedLoad = dayEvents.reduce((sum, e) => sum + (e.icu_training_load || e.load_target || 0), 0);
 
         let dayClass = 'calendar-day';
         if (!isCurrentMonth) dayClass += ' other-month';
         if (isToday) dayClass += ' today';
         if (hasActivities) dayClass += ' has-activities';
+        if (hasEvents && !hasActivities) dayClass += ' has-events';
 
         html += `
             <div class="${dayClass}" data-date="${dateStr}">
                 <span class="day-number">${currentDay.getDate()}</span>
-                ${hasActivities ? `
-                    <div class="day-activities">
-                        ${dayActivities.slice(0, 2).map(a => `
-                            <div class="activity-pill" title="${a.name}">
-                                ${getActivityIcon(a.type)} ${truncate(a.name, 10)}
-                            </div>
-                        `).join('')}
-                        ${dayActivities.length > 2 ? `<div class="more-activities">+${dayActivities.length - 2}</div>` : ''}
+                <div class="day-content">
+                    ${hasEvents ? `
+                        <div class="day-events">
+                            ${dayEvents.slice(0, 2).map(e => `
+                                <div class="event-pill" title="${e.name || e.description || t('activities.calendar.planned')}">
+                                    📋 ${truncate(e.name || e.description || t('activities.calendar.workout'), 10)}
+                                </div>
+                            `).join('')}
+                            ${dayEvents.length > 2 ? `<div class="more-events">+${dayEvents.length - 2}</div>` : ''}
+                        </div>
+                    ` : ''}
+                    ${hasActivities ? `
+                        <div class="day-activities">
+                            ${dayActivities.slice(0, 2).map(a => `
+                                <div class="activity-pill" title="${a.name}">
+                                    ${getActivityIcon(a.type)} ${truncate(a.name, 10)}
+                                </div>
+                            `).join('')}
+                            ${dayActivities.length > 2 ? `<div class="more-activities">+${dayActivities.length - 2}</div>` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+                ${totalTSS > 0 || plannedLoad > 0 ? `
+                    <div class="day-load-info">
+                        ${plannedLoad > 0 ? `<span class="planned-load">📋 ${Math.round(plannedLoad)}</span>` : ''}
+                        ${totalTSS > 0 ? `<span class="actual-load">✅ ${Math.round(totalTSS)}</span>` : ''}
                     </div>
-                    ${totalTSS > 0 ? `<div class="day-tss">TSS: ${Math.round(totalTSS)}</div>` : ''}
                 ` : ''}
             </div>
         `;
@@ -203,13 +245,14 @@ function showDayDetail(dateStr) {
 
     const date = new Date(dateStr + 'T00:00:00');
     const dayActivities = activitiesData.filter(a => a.start_date_local?.split('T')[0] === dateStr);
+    const dayEvents = eventsData.filter(e => e.start_date_local?.split('T')[0] === dateStr);
 
     // Formatear fecha
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const locale = t('common.locale') || 'es-ES';
     const formattedDate = date.toLocaleDateString(locale, options);
 
-    if (dayActivities.length === 0) {
+    if (dayActivities.length === 0 && dayEvents.length === 0) {
         detailContainer.innerHTML = `
             <div class="detail-header">
                 <h3>${formattedDate}</h3>
@@ -224,6 +267,7 @@ function showDayDetail(dateStr) {
     const totalTSS = dayActivities.reduce((sum, a) => sum + (a.icu_training_load || 0), 0);
     const totalTime = dayActivities.reduce((sum, a) => sum + (a.moving_time || 0), 0);
     const totalDistance = dayActivities.reduce((sum, a) => sum + (a.distance || 0), 0);
+    const plannedLoad = dayEvents.reduce((sum, e) => sum + (e.icu_training_load || e.load_target || 0), 0);
 
     let html = `
         <div class="detail-header">
@@ -231,18 +275,36 @@ function showDayDetail(dateStr) {
             <button class="detail-close" onclick="this.parentElement.parentElement.classList.remove('active')">&times;</button>
         </div>
         <div class="detail-summary">
-            <div class="summary-item">
-                <span class="summary-value">${dayActivities.length}</span>
-                <span class="summary-label">${t('activities.calendar.activities')}</span>
-            </div>
-            <div class="summary-item">
-                <span class="summary-value">${Math.round(totalTSS)}</span>
-                <span class="summary-label">TSS</span>
-            </div>
-            <div class="summary-item">
-                <span class="summary-value">${formatDuration(totalTime)}</span>
-                <span class="summary-label">${t('activities.time')}</span>
-            </div>
+            ${dayEvents.length > 0 ? `
+                <div class="summary-item">
+                    <span class="summary-value">${dayEvents.length}</span>
+                    <span class="summary-label">${t('activities.calendar.planned')}</span>
+                </div>
+            ` : ''}
+            ${dayActivities.length > 0 ? `
+                <div class="summary-item">
+                    <span class="summary-value">${dayActivities.length}</span>
+                    <span class="summary-label">${t('activities.calendar.completed')}</span>
+                </div>
+            ` : ''}
+            ${plannedLoad > 0 ? `
+                <div class="summary-item">
+                    <span class="summary-value">${Math.round(plannedLoad)}</span>
+                    <span class="summary-label">TSS ${t('activities.calendar.planned')}</span>
+                </div>
+            ` : ''}
+            ${totalTSS > 0 ? `
+                <div class="summary-item">
+                    <span class="summary-value">${Math.round(totalTSS)}</span>
+                    <span class="summary-label">TSS ${t('activities.calendar.completed')}</span>
+                </div>
+            ` : ''}
+            ${totalTime > 0 ? `
+                <div class="summary-item">
+                    <span class="summary-value">${formatDuration(totalTime)}</span>
+                    <span class="summary-label">${t('activities.time')}</span>
+                </div>
+            ` : ''}
             ${totalDistance > 0 ? `
                 <div class="summary-item">
                     <span class="summary-value">${(totalDistance / 1000).toFixed(1)}</span>
@@ -250,59 +312,150 @@ function showDayDetail(dateStr) {
                 </div>
             ` : ''}
         </div>
-        <div class="detail-activities-list">
     `;
 
-    dayActivities.forEach(activity => {
-        const duration = formatDuration(activity.moving_time);
-        const distance = activity.distance ? (activity.distance / 1000).toFixed(1) + ' km' : '';
-        
+    // Mostrar eventos programados
+    if (dayEvents.length > 0) {
         html += `
-            <div class="detail-activity-card">
-                <div class="activity-card-header">
-                    <span class="activity-icon">${getActivityIcon(activity.type)}</span>
-                    <div class="activity-info">
-                        <span class="activity-name">${activity.name}</span>
-                        <span class="activity-type">${activity.type}</span>
+            <h4 class="detail-section-title">📋 ${t('activities.calendar.plannedWorkouts')}</h4>
+            <div class="detail-events-list">
+        `;
+        
+        dayEvents.forEach(event => {
+            const duration = event.moving_time ? formatDuration(event.moving_time) : (event.duration ? formatDuration(event.duration) : '');
+            const load = event.icu_training_load || event.load_target || 0;
+            
+            html += `
+                <div class="detail-event-card">
+                    <div class="event-card-header">
+                        <span class="event-icon">📋</span>
+                        <div class="event-info">
+                            <span class="event-name">${event.name || event.description || t('activities.calendar.workout')}</span>
+                            <span class="event-type">${event.type || event.category || 'Workout'}</span>
+                        </div>
+                    </div>
+                    ${event.description && event.description !== event.name ? `
+                        <div class="event-description">${event.description}</div>
+                    ` : ''}
+                    <div class="event-card-metrics">
+                        ${duration ? `
+                            <div class="metric-item">
+                                <span class="metric-icon">⏱️</span>
+                                <span>${duration}</span>
+                            </div>
+                        ` : ''}
+                        ${load > 0 ? `
+                            <div class="metric-item">
+                                <span class="metric-icon">💪</span>
+                                <span>TSS ${Math.round(load)}</span>
+                            </div>
+                        ` : ''}
+                        ${event.distance ? `
+                            <div class="metric-item">
+                                <span class="metric-icon">📏</span>
+                                <span>${(event.distance / 1000).toFixed(1)} km</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    ${event.workout_doc ? renderWorkoutSteps(event.workout_doc) : ''}
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+    }
+
+    // Mostrar actividades completadas
+    if (dayActivities.length > 0) {
+        html += `
+            <h4 class="detail-section-title">✅ ${t('activities.calendar.completedActivities')}</h4>
+            <div class="detail-activities-list">
+        `;
+
+        dayActivities.forEach(activity => {
+            const duration = formatDuration(activity.moving_time);
+            const distance = activity.distance ? (activity.distance / 1000).toFixed(1) + ' km' : '';
+            
+            html += `
+                <div class="detail-activity-card">
+                    <div class="activity-card-header">
+                        <span class="activity-icon">${getActivityIcon(activity.type)}</span>
+                        <div class="activity-info">
+                            <span class="activity-name">${activity.name}</span>
+                            <span class="activity-type">${activity.type}</span>
+                        </div>
+                    </div>
+                    <div class="activity-card-metrics">
+                        <div class="metric-item">
+                            <span class="metric-icon">⏱️</span>
+                            <span>${duration}</span>
+                        </div>
+                        ${distance ? `
+                            <div class="metric-item">
+                                <span class="metric-icon">📏</span>
+                                <span>${distance}</span>
+                            </div>
+                        ` : ''}
+                        ${activity.icu_training_load ? `
+                            <div class="metric-item">
+                                <span class="metric-icon">💪</span>
+                                <span>TSS ${Math.round(activity.icu_training_load)}</span>
+                            </div>
+                        ` : ''}
+                        ${activity.average_watts ? `
+                            <div class="metric-item">
+                                <span class="metric-icon">⚡</span>
+                                <span>${activity.average_watts}W</span>
+                            </div>
+                        ` : ''}
+                        ${activity.average_heartrate ? `
+                            <div class="metric-item">
+                                <span class="metric-icon">❤️</span>
+                                <span>${Math.round(activity.average_heartrate)} bpm</span>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
-                <div class="activity-card-metrics">
-                    <div class="metric-item">
-                        <span class="metric-icon">⏱️</span>
-                        <span>${duration}</span>
+            `;
+        });
+
+        html += '</div>';
+    }
+
+    detailContainer.innerHTML = html;
+    detailContainer.classList.add('active');
+}
+
+/**
+ * Renderiza los pasos de un workout estructurado
+ */
+function renderWorkoutSteps(workoutDoc) {
+    if (!workoutDoc || !workoutDoc.steps || workoutDoc.steps.length === 0) return '';
+    
+    let html = '<div class="workout-steps">';
+    
+    workoutDoc.steps.forEach((step, index) => {
+        const duration = step.duration ? formatDuration(step.duration) : '';
+        const power = step.power ? `${step.power.value}${step.power.units === 'PERCENT_FTP' ? '% FTP' : 'W'}` : '';
+        const cadence = step.cadence ? `${step.cadence.value} rpm` : '';
+        
+        html += `
+            <div class="workout-step ${step.ramp ? 'ramp' : ''}">
+                <span class="step-number">${index + 1}</span>
+                <div class="step-details">
+                    ${step.name ? `<span class="step-name">${step.name}</span>` : ''}
+                    <div class="step-metrics">
+                        ${duration ? `<span>⏱️ ${duration}</span>` : ''}
+                        ${power ? `<span>⚡ ${power}</span>` : ''}
+                        ${cadence ? `<span>🔄 ${cadence}</span>` : ''}
                     </div>
-                    ${distance ? `
-                        <div class="metric-item">
-                            <span class="metric-icon">📏</span>
-                            <span>${distance}</span>
-                        </div>
-                    ` : ''}
-                    ${activity.icu_training_load ? `
-                        <div class="metric-item">
-                            <span class="metric-icon">💪</span>
-                            <span>TSS ${Math.round(activity.icu_training_load)}</span>
-                        </div>
-                    ` : ''}
-                    ${activity.average_watts ? `
-                        <div class="metric-item">
-                            <span class="metric-icon">⚡</span>
-                            <span>${activity.average_watts}W</span>
-                        </div>
-                    ` : ''}
-                    ${activity.average_heartrate ? `
-                        <div class="metric-item">
-                            <span class="metric-icon">❤️</span>
-                            <span>${Math.round(activity.average_heartrate)} bpm</span>
-                        </div>
-                    ` : ''}
                 </div>
             </div>
         `;
     });
-
+    
     html += '</div>';
-    detailContainer.innerHTML = html;
-    detailContainer.classList.add('active');
+    return html;
 }
 
 /**

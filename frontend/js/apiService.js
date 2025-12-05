@@ -72,6 +72,11 @@ export async function getActivityData(athleteId, oldest, newest) {
     return fetchAuth(`/activities?${params}`);
 }
 
+export async function getEventsData(athleteId, oldest, newest, category = 'WORKOUT') {
+    const params = new URLSearchParams({ athlete_id: athleteId, oldest, newest, category });
+    return fetchAuth(`/events?${params}`);
+}
+
 /**
  * Guarda las credenciales de Intervals.icu del usuario en el backend.
  *

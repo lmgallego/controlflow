@@ -71,3 +71,14 @@ class IntervalsClient:
         endpoint = f"/athlete/{athlete_id}/power-curves"
         params = {"type": type, "curves": curves}
         return self._get(endpoint, params)
+
+    def get_events(self, athlete_id, oldest, newest, category="WORKOUT"):
+        """ Obtiene eventos/entrenamientos programados de un atleta. """
+        endpoint = f"/athlete/{athlete_id}/events"
+        params = {
+            "oldest": oldest,
+            "newest": newest,
+            "category": category,
+            "resolve": "true"
+        }
+        return self._get(endpoint, params)

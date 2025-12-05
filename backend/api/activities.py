@@ -24,3 +24,25 @@ def get_activities():
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+@activities_api.route('/events', methods=['GET'])
+@token_required
+def get_events():
+    """Obtiene los entrenamientos programados de un atleta."""
+    try:
+        client = get_user_client()
+        athlete_id = request.args.get('athlete_id')
+        today = date.today()
+        oldest = request.args.get('oldest', today.isoformat())
+        newest = request.args.get('newest', (today + timedelta(days=30)).isoformat())
+        category = request.args.get('category', 'WORKOUT')
+        
+        if not athlete_id:
+            return jsonify({"error": "Se requiere athlete_id"}), 400
+        
+        data = client.get_events(athlete_id, oldest, newest, category)
+        if isinstance(data, tuple):
+            return jsonify(data[0]), data[1]
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
