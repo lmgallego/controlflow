@@ -77,6 +77,17 @@ export async function getEventsData(athleteId, oldest, newest, category = 'WORKO
     return fetchAuth(`/events?${params}`);
 }
 
+export async function getPowerCurves(athleteId, type = 'Ride', curves = '90d', includeRanks = true, subMaxEfforts = 3) {
+    const params = new URLSearchParams({ 
+        athlete_id: athleteId, 
+        type, 
+        curves,
+        includeRanks: includeRanks.toString(),
+        subMaxEfforts: subMaxEfforts.toString()
+    });
+    return fetchAuth(`/power-curves?${params}`);
+}
+
 /**
  * Guarda las credenciales de Intervals.icu del usuario en el backend.
  *

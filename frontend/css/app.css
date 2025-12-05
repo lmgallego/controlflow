@@ -5089,3 +5089,209 @@ a {
         justify-content: center;
     }
 }
+
+/* =====================================================
+   PDC Panel Styles (Power Duration Curve)
+   ===================================================== */
+
+.pdc-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+}
+
+.pdc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.pdc-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.pdc-controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.pdc-select {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pdc-select:hover {
+    border-color: var(--primary-color);
+}
+
+.pdc-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.pdc-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.pdc-chart-section {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+.pdc-chart-container {
+    height: 400px;
+    position: relative;
+}
+
+.pdc-cards-section {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+.pdc-cards-section h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    color: var(--text-primary);
+}
+
+.pdc-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.pdc-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.pdc-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+.pdc-card-icon {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+
+.pdc-card-duration {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.pdc-card-power {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.pdc-card-power .unit {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-left: 2px;
+}
+
+.pdc-card-wkg {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-top: 6px;
+}
+
+.pdc-card-wkg .unit {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-left: 2px;
+}
+
+.pdc-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+.pdc-panel .no-data,
+.pdc-panel .error-message {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px;
+    font-style: italic;
+}
+
+/* PDC Responsive */
+@media (max-width: 1200px) {
+    .pdc-content {
+        grid-template-columns: 1fr;
+    }
+
+    .pdc-chart-container {
+        height: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .pdc-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pdc-controls {
+        width: 100%;
+    }
+
+    .pdc-select {
+        flex: 1;
+    }
+
+    .pdc-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pdc-card-power {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .pdc-cards {
+        grid-template-columns: 1fr;
+    }
+}

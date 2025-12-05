@@ -425,8 +425,30 @@ const translations = {
         // Analysis tabs
         analysis: {
             loadAnalysis: 'Análisis de Carga',
-            powerAnalysis: 'Análisis de Potencia',
+            pdcAnalysis: 'Curva de Potencia',
             performanceAnalysis: 'Análisis de Rendimiento'
+        },
+
+        // PDC (Power Duration Curve)
+        pdc: {
+            title: 'Curva de Potencia (PDC)',
+            bestEfforts: 'Mejores Esfuerzos',
+            power: 'Potencia',
+            duration: 'Duración',
+            watts: 'Vatios (W)',
+            noData: 'No hay datos de potencia disponibles',
+            periods: {
+                '42d': 'Últimos 42 días',
+                '90d': 'Últimos 90 días',
+                '180d': 'Últimos 6 meses',
+                '1y': 'Último año',
+                'all': 'Todo el historial'
+            },
+            types: {
+                ride: 'Ciclismo',
+                virtualRide: 'Ciclismo Virtual',
+                run: 'Carrera'
+            }
         },
 
         // PMC (Performance Management Chart)
@@ -912,8 +934,30 @@ const translations = {
         // Analysis tabs
         analysis: {
             loadAnalysis: 'Load Analysis',
-            powerAnalysis: 'Power Analysis',
+            pdcAnalysis: 'Power Curve',
             performanceAnalysis: 'Performance Analysis'
+        },
+
+        // PDC (Power Duration Curve)
+        pdc: {
+            title: 'Power Duration Curve (PDC)',
+            bestEfforts: 'Best Efforts',
+            power: 'Power',
+            duration: 'Duration',
+            watts: 'Watts (W)',
+            noData: 'No power data available',
+            periods: {
+                '42d': 'Last 42 days',
+                '90d': 'Last 90 days',
+                '180d': 'Last 6 months',
+                '1y': 'Last year',
+                'all': 'All time'
+            },
+            types: {
+                ride: 'Cycling',
+                virtualRide: 'Virtual Cycling',
+                run: 'Running'
+            }
         },
 
         // PMC (Performance Management Chart)

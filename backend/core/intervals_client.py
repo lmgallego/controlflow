@@ -65,11 +65,24 @@ class IntervalsClient:
         params = {"oldest": oldest, "newest": newest}
         return self._get(endpoint, params)
 
-    def get_power_curves(self, athlete_id, type="Ride", curves="42d,1y"):
-        """ Obtiene curvas de potencia. """
-        #
+    def get_power_curves(self, athlete_id, type="Ride", curves="90d", include_ranks=True, sub_max_efforts=3):
+        """ 
+        Obtiene curvas de potencia.
+        
+        Args:
+            athlete_id: ID del atleta
+            type: Tipo de actividad (Ride, Run, etc.)
+            curves: Períodos de curvas (90d, 1y, all, etc.)
+            include_ranks: Incluir rankings
+            sub_max_efforts: Número de esfuerzos submáximos
+        """
         endpoint = f"/athlete/{athlete_id}/power-curves"
-        params = {"type": type, "curves": curves}
+        params = {
+            "type": type, 
+            "curves": curves,
+            "includeRanks": str(include_ranks).lower(),
+            "subMaxEfforts": sub_max_efforts
+        }
         return self._get(endpoint, params)
 
     def get_events(self, athlete_id, oldest, newest, category="WORKOUT"):
