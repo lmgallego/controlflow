@@ -426,6 +426,7 @@ const translations = {
         analysis: {
             loadAnalysis: 'Análisis de Carga',
             pdcAnalysis: 'Curva de Potencia',
+            hrAnalysis: 'Frecuencia Cardíaca',
             performanceAnalysis: 'Análisis de Rendimiento'
         },
 
@@ -463,6 +464,22 @@ const translations = {
             noData: 'No hay zonas configuradas',
             power: 'Potencia',
             heartRate: 'Frecuencia Cardíaca'
+        },
+
+        // HR (Heart Rate Curves)
+        hr: {
+            title: 'Frecuencia Cardíaca',
+            realCurve: 'Datos Reales',
+            smoothedCurve: 'Curva Suavizada',
+            bpm: 'Latidos por minuto (bpm)',
+            maxHR: 'FC Máxima',
+            lthr: 'Umbral Lactato (LTHR)',
+            aerobicThreshold: 'Umbral Aeróbico',
+            hrReserve: 'Reserva de FC',
+            keyDurations: 'Duraciones Clave',
+            zonesAnalysis: 'Distribución por Zonas',
+            distribution: 'Distribución',
+            lagWarning: 'Nota: Los valores para duraciones < 30s no son representativos debido al lag de respuesta de la FC'
         },
 
         // PMC (Performance Management Chart)
@@ -950,6 +967,7 @@ const translations = {
         analysis: {
             loadAnalysis: 'Load Analysis',
             pdcAnalysis: 'Power Curve',
+            hrAnalysis: 'Heart Rate',
             performanceAnalysis: 'Performance Analysis'
         },
 
@@ -987,6 +1005,22 @@ const translations = {
             noData: 'No zones configured',
             power: 'Power',
             heartRate: 'Heart Rate'
+        },
+
+        // HR (Heart Rate Curves)
+        hr: {
+            title: 'Heart Rate',
+            realCurve: 'Real Data',
+            smoothedCurve: 'Smoothed Curve',
+            bpm: 'Beats per minute (bpm)',
+            maxHR: 'Max HR',
+            lthr: 'Lactate Threshold (LTHR)',
+            aerobicThreshold: 'Aerobic Threshold',
+            hrReserve: 'HR Reserve',
+            keyDurations: 'Key Durations',
+            zonesAnalysis: 'Zone Distribution',
+            distribution: 'Distribution',
+            lagWarning: 'Note: Values for durations < 30s are not representative due to HR response lag'
         },
 
         // PMC (Performance Management Chart)

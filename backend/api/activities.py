@@ -69,6 +69,27 @@ def get_power_curves():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+@activities_api.route('/hr-curves', methods=['GET'])
+@token_required
+def get_hr_curves():
+    """Obtiene las curvas de frecuencia cardíaca de un atleta."""
+    try:
+        client = get_user_client()
+        athlete_id = request.args.get('athlete_id')
+        activity_type = request.args.get('type', 'Ride')
+        curves = request.args.get('curves', '90d')
+        sub_max_efforts = int(request.args.get('subMaxEfforts', 0))
+        
+        if not athlete_id:
+            return jsonify({"error": "Se requiere athlete_id"}), 400
+        
+        data = client.get_hr_curves(athlete_id, activity_type, curves, sub_max_efforts)
+        if isinstance(data, tuple):
+            return jsonify(data[0]), data[1]
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
 @activities_api.route('/training-zones', methods=['GET'])
 @token_required
 def get_training_zones():

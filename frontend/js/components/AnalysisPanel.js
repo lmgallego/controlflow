@@ -1,10 +1,11 @@
 import { t } from '../i18n.js';
 import { renderPMCPanel } from './PMCPanel.js';
 import { renderPDCPanel } from './PDCPanel.js';
+import { renderHRPanel } from './HRPanel.js';
 
 /**
  * Panel de Análisis con pestañas
- * Contiene diferentes tipos de análisis: Carga, Potencia (PDC), Rendimiento
+ * Contiene diferentes tipos de análisis: Carga, Potencia (PDC), FC, Rendimiento
  */
 export async function renderAnalysisPanel(container, athleteId) {
     // Renderizar estructura con pestañas
@@ -16,6 +17,9 @@ export async function renderAnalysisPanel(container, athleteId) {
                 </button>
                 <button class="analysis-tab" data-tab="pdc" data-i18n="analysis.pdcAnalysis">
                     ${t('analysis.pdcAnalysis')}
+                </button>
+                <button class="analysis-tab" data-tab="hr" data-i18n="analysis.hrAnalysis">
+                    ${t('analysis.hrAnalysis')}
                 </button>
                 <button class="analysis-tab" data-tab="performance" data-i18n="analysis.performanceAnalysis">
                     ${t('analysis.performanceAnalysis')}
@@ -49,6 +53,9 @@ export async function renderAnalysisPanel(container, athleteId) {
                 break;
             case 'pdc':
                 await renderPDCPanel(tabContent, athleteId);
+                break;
+            case 'hr':
+                await renderHRPanel(tabContent, athleteId);
                 break;
             case 'performance':
                 tabContent.innerHTML = `

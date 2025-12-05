@@ -5775,3 +5775,432 @@ a {
         gap: 8px;
     }
 }
+
+/* =====================================================
+   Heart Rate Panel Styles
+   ===================================================== */
+
+.hr-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.hr-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.hr-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(135deg, var(--text-primary) 0%, #ef4444 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hr-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.hr-select {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.hr-expand-btn {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hr-expand-btn:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+/* HR Dashboard Metrics */
+.hr-dashboard {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 20px;
+}
+
+.hr-metrics-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.hr-metric-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+}
+
+.hr-metric-card.hr-max {
+    border-left: 3px solid #ef4444;
+}
+
+.hr-metric-card.hr-lthr {
+    border-left: 3px solid #f97316;
+}
+
+.hr-metric-card.hr-aerobic {
+    border-left: 3px solid #22c55e;
+}
+
+.hr-metric-card.hr-reserve {
+    border-left: 3px solid #3b82f6;
+}
+
+.hr-metric-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: var(--radius-md);
+    color: #ef4444;
+}
+
+.hr-metric-card.hr-lthr .hr-metric-icon {
+    background: rgba(249, 115, 22, 0.1);
+    color: #f97316;
+}
+
+.hr-metric-card.hr-aerobic .hr-metric-icon {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.hr-metric-card.hr-reserve .hr-metric-icon {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.hr-metric-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.hr-metric-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hr-metric-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.hr-metric-unit {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* HR Content */
+.hr-content {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 24px;
+}
+
+.hr-chart-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 20px;
+}
+
+.hr-chart-legend {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.hr-chart-legend .legend-line.hr-real {
+    background: #ef4444;
+}
+
+.hr-chart-legend .legend-line.hr-smoothed {
+    background: #f97316;
+}
+
+.hr-chart-container {
+    height: 350px;
+    position: relative;
+}
+
+.hr-cards-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 20px;
+}
+
+.hr-cards-section h4 {
+    margin: 0 0 16px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.hr-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hr-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+}
+
+.hr-card-header {
+    margin-bottom: 8px;
+}
+
+.hr-card-duration {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ef4444;
+}
+
+.hr-card-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    align-items: center;
+}
+
+.hr-card-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.hr-card-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hr-card-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.hr-card-value.current {
+    color: #ef4444;
+}
+
+.hr-card-value.historical {
+    color: #f97316;
+}
+
+.hr-card-value small {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-left: 2px;
+}
+
+.hr-card-column.progress-col {
+    align-items: flex-end;
+}
+
+.hr-mini-progress {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-secondary);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.hr-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ef4444, #f97316);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.hr-card-diff {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.hr-card-diff.positive {
+    color: #22c55e;
+}
+
+.hr-card-diff.negative {
+    color: #ef4444;
+}
+
+.hr-card-diff.neutral {
+    color: var(--text-muted);
+}
+
+/* HR Zones Analysis */
+.hr-zones-analysis {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 20px;
+}
+
+.hr-zones-analysis h4 {
+    margin: 0 0 16px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.hr-zones-chart-container {
+    height: 200px;
+    position: relative;
+}
+
+/* HR Modal */
+.hr-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.hr-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hr-modal-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    width: 95%;
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.hr-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.hr-modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.hr-modal-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.hr-modal-close:hover {
+    color: var(--text-primary);
+}
+
+.hr-modal-body-chart-only {
+    padding: 24px;
+}
+
+.hr-modal-body-chart-only .hr-modal-chart-container {
+    height: 70vh;
+    min-height: 500px;
+    position: relative;
+}
+
+.hr-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .hr-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .hr-metrics-row {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .hr-card-body {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .hr-card-column.progress-col {
+        grid-column: span 2;
+        align-items: stretch;
+    }
+}
+
+@media (max-width: 480px) {
+    .hr-metrics-row {
+        grid-template-columns: 1fr;
+    }
+}

@@ -95,3 +95,21 @@ class IntervalsClient:
             "resolve": "true"
         }
         return self._get(endpoint, params)
+
+    def get_hr_curves(self, athlete_id, type="Ride", curves="90d", sub_max_efforts=0):
+        """ 
+        Obtiene curvas de frecuencia cardíaca.
+        
+        Args:
+            athlete_id: ID del atleta
+            type: Tipo de actividad (Ride, Run, etc.)
+            curves: Períodos de curvas (90d, 1y, all, etc.)
+            sub_max_efforts: Número de esfuerzos submáximos
+        """
+        endpoint = f"/athlete/{athlete_id}/hr-curves"
+        params = {
+            "type": type, 
+            "curves": curves,
+            "subMaxEfforts": sub_max_efforts
+        }
+        return self._get(endpoint, params)
