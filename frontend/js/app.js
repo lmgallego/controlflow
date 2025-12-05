@@ -37,10 +37,16 @@ async function loadView(view, athleteId) {
 
         // Mostrar/ocultar selector de atletas según la vista
         const athleteSelectContainer = document.querySelector('.controls');
+        const headerMetrics = document.getElementById('athlete-metrics-header');
+        
         if (view === 'athletes' || view === 'settings') {
             athleteSelectContainer.style.display = 'none';
+            // Ocultar métricas del header en vistas generales
+            if (headerMetrics) headerMetrics.style.display = 'none';
         } else {
             athleteSelectContainer.style.display = 'flex';
+            // Mostrar métricas del header en vistas de atleta
+            if (headerMetrics) headerMetrics.style.display = 'flex';
         }
 
         // Si se proporciona un athleteId, actualizar el selector y el estado global
