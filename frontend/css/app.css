@@ -6079,24 +6079,110 @@ a {
     color: var(--text-muted);
 }
 
-/* HR Zones Analysis */
-.hr-zones-analysis {
+/* HR Zones Panel */
+.hr-zones-panel {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-xl);
-    padding: 20px;
+    padding: 24px;
+    margin-bottom: 40px;
 }
 
-.hr-zones-analysis h4 {
-    margin: 0 0 16px 0;
-    font-size: 1.1rem;
+.hr-zones-header {
+    margin-bottom: 20px;
+}
+
+.hr-zones-header h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.hr-zones-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.hr-zones-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(249, 115, 22, 0.05) 100%);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.hr-zones-card-title {
     font-weight: 600;
     color: var(--text-primary);
 }
 
-.hr-zones-chart-container {
-    height: 200px;
-    position: relative;
+.hr-zones-lthr {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.hr-zones-lthr strong {
+    color: #ef4444;
+    font-weight: 700;
+}
+
+.hr-zones-list {
+    padding: 12px 0;
+}
+
+.hr-zone-row {
+    display: grid;
+    grid-template-columns: 12px 1fr auto auto;
+    gap: 16px;
+    align-items: center;
+    padding: 10px 20px;
+    transition: background 0.2s ease;
+}
+
+.hr-zone-row:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.hr-zone-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.hr-zone-name {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.hr-zone-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.hr-zone-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.hr-zone-range {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    min-width: 120px;
+    text-align: right;
+}
+
+.hr-zone-percent {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    min-width: 60px;
+    text-align: right;
 }
 
 /* HR Modal */

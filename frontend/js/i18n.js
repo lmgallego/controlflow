@@ -477,9 +477,18 @@ const translations = {
             aerobicThreshold: 'Umbral Aeróbico',
             hrReserve: 'Reserva de FC',
             keyDurations: 'Duraciones Clave',
+            hrZones: 'Zonas de Frecuencia Cardíaca',
             zonesAnalysis: 'Distribución por Zonas',
             distribution: 'Distribución',
-            lagWarning: 'Nota: Los valores para duraciones < 30s no son representativos debido al lag de respuesta de la FC'
+            lagWarning: 'Nota: Los valores para duraciones < 30s no son representativos debido al lag de respuesta de la FC',
+            zoneNames: {
+                recovery: 'Recuperación Activa',
+                endurance: 'Resistencia',
+                tempo: 'Tempo',
+                threshold: 'Umbral',
+                vo2max: 'VO2 Máx',
+                anaerobic: 'Anaeróbico'
+            }
         },
 
         // PMC (Performance Management Chart)
@@ -1018,9 +1027,18 @@ const translations = {
             aerobicThreshold: 'Aerobic Threshold',
             hrReserve: 'HR Reserve',
             keyDurations: 'Key Durations',
+            hrZones: 'Heart Rate Zones',
             zonesAnalysis: 'Zone Distribution',
             distribution: 'Distribution',
-            lagWarning: 'Note: Values for durations < 30s are not representative due to HR response lag'
+            lagWarning: 'Note: Values for durations < 30s are not representative due to HR response lag',
+            zoneNames: {
+                recovery: 'Active Recovery',
+                endurance: 'Endurance',
+                tempo: 'Tempo',
+                threshold: 'Threshold',
+                vo2max: 'VO2 Max',
+                anaerobic: 'Anaerobic'
+            }
         },
 
         // PMC (Performance Management Chart)

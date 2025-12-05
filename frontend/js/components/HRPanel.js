@@ -114,11 +114,15 @@ export async function renderHRPanel(container, athleteId) {
                 </div>
             </div>
             
-            <!-- Análisis de zonas -->
-            <div class="hr-zones-analysis">
-                <h4>${t('hr.zonesAnalysis')}</h4>
-                <div class="hr-zones-chart-container">
-                    <canvas id="hr-zones-chart"></canvas>
+            <!-- Zonas de Frecuencia Cardíaca -->
+            <div class="hr-zones-panel">
+                <div class="hr-zones-header">
+                    <h3>${t('hr.hrZones')}</h3>
+                </div>
+                <div class="hr-zones-content" id="hr-zones-content">
+                    <div class="hr-loading">
+                        <div class="spinner"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -163,6 +167,8 @@ export async function renderHRPanel(container, athleteId) {
  * Carga las zonas de FC del atleta
  */
 async function loadHRZones(athleteId) {
+    const zonesContainer = document.getElementById('hr-zones-content');
+    
     try {
         const zones = await getTrainingZones(athleteId);
         hrZonesData = zones;
@@ -186,10 +192,90 @@ async function loadHRZones(athleteId) {
                 // Reserva de FC (diferencia entre max y LTHR)
                 document.getElementById('hr-reserve-value').textContent = maxHR - lthr;
             }
+            
+            // Renderizar zonas de FC
+            renderHRZones(outdoor, maxHR);
+        } else if (zonesContainer) {
+            zonesContainer.innerHTML = `<p class="no-data-message">${t('zones.noData')}</p>`;
         }
     } catch (error) {
         console.error('Error loading HR zones:', error);
+        if (zonesContainer) {
+            zonesContainer.innerHTML = `<p class="error-message">${t('common.error')}</p>`;
+        }
     }
+}
+
+/**
+ * Renderiza las zonas de FC visualmente
+ */
+function renderHRZones(zoneData, maxHR) {
+    const container = document.getElementById('hr-zones-content');
+    if (!container || !zoneData.hr_zones) return;
+
+    const hrZones = zoneData.hr_zones;
+    const zoneNames = zoneData.hr_zone_names || ['Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6'];
+    const lthr = zoneData.lthr || maxHR;
+
+    // Colores para zonas de FC
+    const zoneColors = [
+        '#94a3b8', // Z1 - Gris (Active Recovery)
+        '#3b82f6', // Z2 - Azul (Endurance)
+        '#22c55e', // Z3 - Verde (Tempo)
+        '#eab308', // Z4 - Amarillo (Threshold)
+        '#f97316', // Z5 - Naranja (VO2max)
+        '#ef4444'  // Z6 - Rojo (Anaerobic)
+    ];
+
+    // Nombres descriptivos de zonas
+    const zoneDescriptions = [
+        t('hr.zoneNames.recovery'),
+        t('hr.zoneNames.endurance'),
+        t('hr.zoneNames.tempo'),
+        t('hr.zoneNames.threshold'),
+        t('hr.zoneNames.vo2max'),
+        t('hr.zoneNames.anaerobic')
+    ];
+
+    let html = `
+        <div class="hr-zones-card">
+            <div class="hr-zones-card-header">
+                <span class="hr-zones-card-title">${t('hr.hrZones')}</span>
+                <span class="hr-zones-lthr">LTHR: <strong>${lthr}</strong> bpm</span>
+            </div>
+            <div class="hr-zones-list">
+    `;
+
+    for (let i = 0; i < hrZones.length; i++) {
+        const minBpm = i === 0 ? 0 : hrZones[i - 1] + 1;
+        const maxBpm = hrZones[i];
+        const color = zoneColors[i] || zoneColors[zoneColors.length - 1];
+        const zoneName = zoneNames[i] || `Z${i + 1}`;
+        const description = zoneDescriptions[i] || '';
+        
+        // Calcular porcentaje del LTHR
+        const minPercent = Math.round((minBpm / lthr) * 100);
+        const maxPercent = Math.round((maxBpm / lthr) * 100);
+
+        html += `
+            <div class="hr-zone-row">
+                <div class="hr-zone-color" style="background-color: ${color}"></div>
+                <div class="hr-zone-name">
+                    <span class="hr-zone-label">${zoneName}</span>
+                    <span class="hr-zone-desc">${description}</span>
+                </div>
+                <div class="hr-zone-range">${minBpm} - ${maxBpm} bpm</div>
+                <div class="hr-zone-percent">${minPercent}-${maxPercent}%</div>
+            </div>
+        `;
+    }
+
+    html += `
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = html;
 }
 
 /**
@@ -226,7 +312,6 @@ async function loadHRCurveData(athleteId) {
 
         renderHRCurveChart(currentPeriodData);
         renderHRCards(currentPeriodData, historicalData);
-        renderZonesChart(currentPeriodData);
 
     } catch (error) {
         console.error('Error loading HR curve data:', error);
@@ -470,115 +555,6 @@ function renderHRCards(currentData, historicalData) {
     });
 
     container.innerHTML = html;
-}
-
-/**
- * Renderiza el gráfico de distribución por zonas
- */
-let zonesChartInstance = null;
-
-function renderZonesChart(curveData) {
-    const ctx = document.getElementById('hr-zones-chart');
-    if (!ctx || !hrZonesData) return;
-
-    const outdoor = hrZonesData.outdoor || hrZonesData.indoor;
-    if (!outdoor || !outdoor.hr_zones) return;
-
-    // Destruir gráfico anterior si existe
-    if (zonesChartInstance) {
-        zonesChartInstance.destroy();
-        zonesChartInstance = null;
-    }
-
-    // hr_zones son límites SUPERIORES absolutos en bpm para cada zona
-    // Ejemplo: [123, 140, 149, 157, 165, 173] significa:
-    // Z1: 0-123, Z2: 124-140, Z3: 141-149, Z4: 150-157, Z5: 158-165, Z6: 166-173
-    const hrZones = outdoor.hr_zones;
-    const zoneNames = outdoor.hr_zone_names || ['Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6'];
-
-    // Colores para zonas de FC
-    const zoneColors = [
-        'rgba(148, 163, 184, 0.8)', // Z1 - Gris (Active Recovery)
-        'rgba(59, 130, 246, 0.8)',  // Z2 - Azul (Endurance)
-        'rgba(34, 197, 94, 0.8)',   // Z3 - Verde (Tempo)
-        'rgba(234, 179, 8, 0.8)',   // Z4 - Amarillo (Threshold)
-        'rgba(249, 115, 22, 0.8)',  // Z5 - Naranja (VO2max)
-        'rgba(239, 68, 68, 0.8)'    // Z6 - Rojo (Anaerobic)
-    ];
-
-    // Calcular rangos de zonas - los valores son límites superiores absolutos en bpm
-    const zoneRanges = [];
-    for (let i = 0; i < hrZones.length; i++) {
-        const minBpm = i === 0 ? 0 : hrZones[i - 1] + 1;
-        const maxBpm = hrZones[i];
-        zoneRanges.push({
-            name: zoneNames[i] || `Z${i + 1}`,
-            min: minBpm,
-            max: maxBpm,
-            color: zoneColors[i] || zoneColors[zoneColors.length - 1]
-        });
-    }
-
-    // Analizar en qué zona cae cada punto de la curva
-    const secs = curveData.secs || [];
-    const values = curveData.values || [];
-    const zoneCounts = new Array(zoneRanges.length).fill(0);
-
-    for (let i = 0; i < values.length; i++) {
-        if (values[i] > 0 && secs[i] >= 60) { // Solo duraciones >= 1min
-            for (let z = 0; z < zoneRanges.length; z++) {
-                if (values[i] >= zoneRanges[z].min && values[i] <= zoneRanges[z].max) {
-                    zoneCounts[z]++;
-                    break;
-                }
-            }
-        }
-    }
-
-    const total = zoneCounts.reduce((a, b) => a + b, 0);
-    const zonePercentages = zoneCounts.map(c => total > 0 ? Math.round((c / total) * 100) : 0);
-
-    zonesChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: zoneRanges.map(z => `${z.name} (${z.min}-${z.max})`),
-            datasets: [{
-                label: t('hr.distribution'),
-                data: zonePercentages,
-                backgroundColor: zoneRanges.map(z => z.color),
-                borderColor: zoneRanges.map(z => z.color.replace('0.8', '1')),
-                borderWidth: 1,
-                borderRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: 'y',
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    max: 100,
-                    title: { display: true, text: '%', color: '#9ca3af' },
-                    ticks: { color: '#9ca3af' },
-                    grid: { color: 'rgba(255, 255, 255, 0.06)' }
-                },
-                y: {
-                    ticks: { color: '#9ca3af' },
-                    grid: { display: false }
-                }
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                    callbacks: {
-                        label: (ctx) => `${ctx.parsed.x}% de esfuerzos máximos`
-                    }
-                }
-            }
-        }
-    });
 }
 
 /**
