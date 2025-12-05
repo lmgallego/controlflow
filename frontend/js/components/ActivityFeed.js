@@ -102,8 +102,8 @@ async function loadAndRenderCalendar() {
     const lastDayOfWeek = (lastDay.getDay() + 6) % 7;
     endDate.setDate(endDate.getDate() + (6 - lastDayOfWeek));
 
-    const oldest = startDate.toISOString().split('T')[0];
-    const newest = endDate.toISOString().split('T')[0];
+    const oldest = formatDateLocal(startDate);
+    const newest = formatDateLocal(endDate);
 
     // Actualizar título del mes
     const monthNames = t('activities.calendar.months').split(',');
@@ -150,7 +150,7 @@ function renderCalendarGrid(year, month, startDate, endDate) {
 
     const currentDay = new Date(startDate);
     while (currentDay <= endDate) {
-        const dateStr = currentDay.toISOString().split('T')[0];
+        const dateStr = formatDateLocal(currentDay);
         const isCurrentMonth = currentDay.getMonth() === month;
         const isToday = currentDay.getTime() === today.getTime();
         
@@ -345,4 +345,14 @@ function formatDuration(seconds) {
 function truncate(text, maxLength) {
     if (!text) return '';
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+}
+
+/**
+ * Formatea una fecha a YYYY-MM-DD en zona local (evita problemas con UTC)
+ */
+function formatDateLocal(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
