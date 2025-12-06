@@ -3019,7 +3019,8 @@ a {
 
 .analysis-content {
     flex: 1;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     background: var(--bg-primary);
 }
 
@@ -5784,6 +5785,7 @@ a {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    padding-bottom: 40px;
 }
 
 .hr-header {
