@@ -457,6 +457,14 @@ function renderHRCurveChart(curveData) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            hover: {
+                mode: 'index',
+                intersect: false
+            },
             scales: {
                 x: {
                     type: 'logarithmic',
@@ -483,11 +491,14 @@ function renderHRCurveChart(curveData) {
             plugins: {
                 legend: { display: false },
                 tooltip: {
+                    enabled: true,
                     backgroundColor: 'rgba(17, 24, 39, 0.95)',
                     titleColor: '#f3f4f6',
                     bodyColor: '#d1d5db',
                     borderColor: 'rgba(239, 68, 68, 0.3)',
                     borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
                     callbacks: {
                         title: (ctx) => formatDuration(ctx[0].parsed.x),
                         label: (ctx) => `${ctx.dataset.label}: ${Math.round(ctx.parsed.y)} bpm`
@@ -651,6 +662,14 @@ function renderModalChart(curveData) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            hover: {
+                mode: 'index',
+                intersect: false
+            },
             scales: {
                 x: {
                     type: 'logarithmic',
@@ -677,7 +696,14 @@ function renderModalChart(curveData) {
             plugins: {
                 legend: { display: false },
                 tooltip: {
+                    enabled: true,
                     backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                    titleColor: '#f3f4f6',
+                    bodyColor: '#d1d5db',
+                    borderColor: 'rgba(239, 68, 68, 0.3)',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
                     callbacks: {
                         title: (ctx) => formatDuration(ctx[0].parsed.x),
                         label: (ctx) => `${ctx.dataset.label}: ${Math.round(ctx.parsed.y)} bpm`
