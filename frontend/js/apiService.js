@@ -104,6 +104,18 @@ export async function getHRCurves(athleteId, type = 'Ride', curves = '90d', subM
 }
 
 /**
+ * Obtiene los tiempos agregados en cada zona de potencia y FC para un periodo.
+ */
+export async function getZoneTimes(athleteId, oldest, newest) {
+    const params = new URLSearchParams({ 
+        athlete_id: athleteId, 
+        oldest,
+        newest
+    });
+    return fetchAuth(`/zone-times?${params}`);
+}
+
+/**
  * Guarda las credenciales de Intervals.icu del usuario en el backend.
  *
  */

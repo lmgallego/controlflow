@@ -5777,6 +5777,204 @@ a {
     }
 }
 
+/* Zone Times Section */
+.zones-config-section {
+    flex: 1;
+    min-width: 0;
+}
+
+.zone-times-section {
+    flex: 1;
+    min-width: 0;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+.zone-times-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.zone-times-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.zone-times-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.zone-times-custom-dates {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.zone-times-date-input {
+    padding: 6px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+}
+
+.zone-times-content {
+    min-height: 200px;
+}
+
+.zone-times-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+}
+
+.zone-times-tab {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+}
+
+.zone-times-tab:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.zone-times-tab.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.zone-times-info {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.zone-times-panel {
+    display: none;
+}
+
+.zone-times-panel.active {
+    display: block;
+}
+
+.zone-times-total {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.zone-times-total strong {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.zone-times-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.zone-time-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 100px;
+    gap: 12px;
+    align-items: center;
+}
+
+.zone-time-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.zone-time-color {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.zone-time-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.zone-time-bar-container {
+    height: 20px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.zone-time-bar {
+    height: 100%;
+    border-radius: var(--radius-sm);
+    transition: width 0.3s ease;
+}
+
+.zone-time-values {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.zone-time-duration {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 50px;
+    text-align: right;
+}
+
+.zone-time-percent {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    min-width: 35px;
+    text-align: right;
+}
+
+@media (max-width: 1200px) {
+    .zones-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .zone-time-row {
+        grid-template-columns: 80px 1fr 80px;
+        gap: 8px;
+    }
+    
+    .zone-times-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
 /* =====================================================
    Heart Rate Panel Styles
    ===================================================== */

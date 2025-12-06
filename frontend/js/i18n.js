@@ -463,7 +463,19 @@ const translations = {
             indoor: 'Interior (VirtualRide)',
             noData: 'No hay zonas configuradas',
             power: 'Potencia',
-            heartRate: 'Frecuencia Cardíaca'
+            heartRate: 'Frecuencia Cardíaca',
+            timeInZone: 'Tiempo en Zona',
+            totalTime: 'Tiempo total',
+            activities: 'actividades',
+            selectDates: 'Selecciona las fechas',
+            periods: {
+                '7d': 'Últimos 7 días',
+                '15d': 'Últimos 15 días',
+                '30d': 'Últimos 30 días',
+                '42d': 'Últimos 42 días',
+                '90d': 'Últimos 90 días',
+                'custom': 'Personalizado'
+            }
         },
 
         // HR (Heart Rate Curves)
@@ -1013,7 +1025,19 @@ const translations = {
             indoor: 'Indoor (VirtualRide)',
             noData: 'No zones configured',
             power: 'Power',
-            heartRate: 'Heart Rate'
+            heartRate: 'Heart Rate',
+            timeInZone: 'Time in Zone',
+            totalTime: 'Total time',
+            activities: 'activities',
+            selectDates: 'Select dates',
+            periods: {
+                '7d': 'Last 7 days',
+                '15d': 'Last 15 days',
+                '30d': 'Last 30 days',
+                '42d': 'Last 42 days',
+                '90d': 'Last 90 days',
+                'custom': 'Custom'
+            }
         },
 
         // HR (Heart Rate Curves)

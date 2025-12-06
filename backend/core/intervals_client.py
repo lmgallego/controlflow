@@ -113,3 +113,26 @@ class IntervalsClient:
             "subMaxEfforts": sub_max_efforts
         }
         return self._get(endpoint, params)
+
+    def get_activities_zone_times(self, athlete_id, oldest, newest):
+        """ 
+        Obtiene actividades con tiempos en zona de potencia y FC.
+        
+        Args:
+            athlete_id: ID del atleta
+            oldest: Fecha inicio (YYYY-MM-DD)
+            newest: Fecha fin (YYYY-MM-DD)
+        """
+        endpoint = f"/athlete/{athlete_id}/activities"
+        params = {
+            "oldest": oldest,
+            "newest": newest
+        }
+        return self._get(endpoint, params)
+
+    def get_sport_settings(self, athlete_id):
+        """ 
+        Obtiene la configuración de deportes del atleta (zonas, nombres, etc.).
+        """
+        endpoint = f"/athlete/{athlete_id}/sport-settings"
+        return self._get(endpoint)

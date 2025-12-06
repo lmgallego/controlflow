@@ -1,4 +1,4 @@
-import { getPowerCurves, getTrainingZones } from '../apiService.js';
+import { getPowerCurves, getTrainingZones, getZoneTimes } from '../apiService.js';
 import { t } from '../i18n.js';
 
 let powerCurveChart = null;
@@ -6,6 +6,7 @@ let modalChart = null;
 let currentPeriodData = null;
 let historicalData = null;
 let currentAthleteId = null;
+let zonesData = null;
 
 /**
  * Renderiza el panel de Curva de Potencia (PDC)
@@ -63,9 +64,41 @@ export async function renderPDCPanel(container, athleteId) {
             <div class="zones-header">
                 <h3>${t('zones.title')}</h3>
             </div>
-            <div class="zones-content" id="zones-content">
-                <div class="pdc-loading">
-                    <div class="spinner"></div>
+            <div class="zones-grid">
+                <!-- Columna izquierda: Zonas configuradas -->
+                <div class="zones-config-section">
+                    <div class="zones-content" id="zones-content">
+                        <div class="pdc-loading">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Columna derecha: Tiempos en zona -->
+                <div class="zone-times-section">
+                    <div class="zone-times-header">
+                        <h4>${t('zones.timeInZone')}</h4>
+                        <div class="zone-times-controls">
+                            <select id="zone-times-period" class="pdc-select">
+                                <option value="7d">${t('zones.periods.7d')}</option>
+                                <option value="15d">${t('zones.periods.15d')}</option>
+                                <option value="30d" selected>${t('zones.periods.30d')}</option>
+                                <option value="42d">${t('zones.periods.42d')}</option>
+                                <option value="90d">${t('zones.periods.90d')}</option>
+                                <option value="custom">${t('zones.periods.custom')}</option>
+                            </select>
+                            <div id="zone-times-custom-dates" class="zone-times-custom-dates" style="display: none;">
+                                <input type="date" id="zone-times-start" class="zone-times-date-input">
+                                <span>-</span>
+                                <input type="date" id="zone-times-end" class="zone-times-date-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="zone-times-content" id="zone-times-content">
+                        <div class="pdc-loading">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -98,11 +131,25 @@ export async function renderPDCPanel(container, athleteId) {
     document.getElementById('pdc-modal')?.addEventListener('click', (e) => {
         if (e.target.id === 'pdc-modal') closePDCModal();
     });
+    
+    // Event listeners para tiempos en zona
+    document.getElementById('zone-times-period')?.addEventListener('change', (e) => {
+        const customDates = document.getElementById('zone-times-custom-dates');
+        if (e.target.value === 'custom') {
+            customDates.style.display = 'flex';
+        } else {
+            customDates.style.display = 'none';
+            loadZoneTimes(athleteId);
+        }
+    });
+    document.getElementById('zone-times-start')?.addEventListener('change', () => loadZoneTimes(athleteId));
+    document.getElementById('zone-times-end')?.addEventListener('change', () => loadZoneTimes(athleteId));
 
     // Cargar datos iniciales
     await Promise.all([
         loadPowerCurveData(athleteId),
-        loadTrainingZones(athleteId)
+        loadTrainingZones(athleteId),
+        loadZoneTimes(athleteId)
     ]);
 }
 
@@ -340,6 +387,170 @@ function renderZoneCard(data, type, title) {
             ` : ''}
         </div>
     `;
+}
+
+/**
+ * Carga los tiempos en zona para el período seleccionado
+ */
+async function loadZoneTimes(athleteId) {
+    const container = document.getElementById('zone-times-content');
+    if (!container) return;
+
+    container.innerHTML = `<div class="pdc-loading"><div class="spinner"></div></div>`;
+
+    try {
+        // Calcular fechas según el período seleccionado
+        const periodSelect = document.getElementById('zone-times-period');
+        const period = periodSelect?.value || '30d';
+        
+        let oldest, newest;
+        const today = new Date();
+        newest = today.toISOString().split('T')[0];
+        
+        if (period === 'custom') {
+            oldest = document.getElementById('zone-times-start')?.value;
+            newest = document.getElementById('zone-times-end')?.value || newest;
+            if (!oldest || !newest) {
+                container.innerHTML = `<p class="no-data">${t('zones.selectDates')}</p>`;
+                return;
+            }
+        } else {
+            const days = parseInt(period.replace('d', ''));
+            const startDate = new Date(today);
+            startDate.setDate(startDate.getDate() - days);
+            oldest = startDate.toISOString().split('T')[0];
+        }
+
+        const data = await getZoneTimes(athleteId, oldest, newest);
+        
+        // Obtener nombres de zonas
+        if (!zonesData) {
+            zonesData = await getTrainingZones(athleteId);
+        }
+        
+        renderZoneTimes(data, zonesData);
+    } catch (error) {
+        console.error('Error loading zone times:', error);
+        container.innerHTML = `<p class="error-message">${t('common.error')}</p>`;
+    }
+}
+
+/**
+ * Renderiza los tiempos en zona
+ */
+function renderZoneTimes(data, zones) {
+    const container = document.getElementById('zone-times-content');
+    if (!container) return;
+
+    const zoneColors = [
+        '#94a3b8', // Z1 - Gris
+        '#3b82f6', // Z2 - Azul
+        '#22c55e', // Z3 - Verde
+        '#eab308', // Z4 - Amarillo
+        '#f97316', // Z5 - Naranja
+        '#ef4444', // Z6 - Rojo
+        '#a855f7'  // Z7 - Púrpura
+    ];
+
+    const outdoor = zones?.outdoor || zones?.indoor;
+    const powerZoneNames = outdoor?.power_zone_names || ['Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6', 'Z7'];
+    const hrZoneNames = outdoor?.hr_zone_names || ['Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6'];
+
+    // Formatear tiempo
+    const formatTime = (seconds) => {
+        if (!seconds || seconds === 0) return '0:00';
+        const hours = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        if (hours > 0) {
+            return `${hours}h ${mins}m`;
+        }
+        return `${mins}m`;
+    };
+
+    let html = `
+        <div class="zone-times-tabs">
+            <button class="zone-times-tab active" data-tab="power">${t('zones.power')}</button>
+            <button class="zone-times-tab" data-tab="hr">${t('zones.heartRate')}</button>
+        </div>
+        <div class="zone-times-info">
+            <span>${data.activities_count} ${t('zones.activities')}</span>
+        </div>
+    `;
+
+    // Panel de Potencia
+    html += `<div class="zone-times-panel active" id="zone-times-power">`;
+    html += `<div class="zone-times-total">${t('zones.totalTime')}: <strong>${formatTime(data.power.total)}</strong></div>`;
+    html += `<div class="zone-times-bars">`;
+    
+    for (let i = 0; i < data.power.times.length; i++) {
+        if (data.power.times[i] > 0 || i < powerZoneNames.length) {
+            const percentage = data.power.percentages[i] || 0;
+            const time = formatTime(data.power.times[i]);
+            const zoneName = powerZoneNames[i] || `Z${i + 1}`;
+            const color = zoneColors[i] || zoneColors[zoneColors.length - 1];
+            
+            html += `
+                <div class="zone-time-row">
+                    <div class="zone-time-label">
+                        <span class="zone-time-color" style="background: ${color}"></span>
+                        <span class="zone-time-name">${zoneName}</span>
+                    </div>
+                    <div class="zone-time-bar-container">
+                        <div class="zone-time-bar" style="width: ${percentage}%; background: ${color}"></div>
+                    </div>
+                    <div class="zone-time-values">
+                        <span class="zone-time-duration">${time}</span>
+                        <span class="zone-time-percent">${percentage}%</span>
+                    </div>
+                </div>
+            `;
+        }
+    }
+    html += `</div></div>`;
+
+    // Panel de FC
+    html += `<div class="zone-times-panel" id="zone-times-hr">`;
+    html += `<div class="zone-times-total">${t('zones.totalTime')}: <strong>${formatTime(data.hr.total)}</strong></div>`;
+    html += `<div class="zone-times-bars">`;
+    
+    for (let i = 0; i < data.hr.times.length; i++) {
+        if (data.hr.times[i] > 0 || i < hrZoneNames.length) {
+            const percentage = data.hr.percentages[i] || 0;
+            const time = formatTime(data.hr.times[i]);
+            const zoneName = hrZoneNames[i] || `Z${i + 1}`;
+            const color = zoneColors[i] || zoneColors[zoneColors.length - 1];
+            
+            html += `
+                <div class="zone-time-row">
+                    <div class="zone-time-label">
+                        <span class="zone-time-color" style="background: ${color}"></span>
+                        <span class="zone-time-name">${zoneName}</span>
+                    </div>
+                    <div class="zone-time-bar-container">
+                        <div class="zone-time-bar" style="width: ${percentage}%; background: ${color}"></div>
+                    </div>
+                    <div class="zone-time-values">
+                        <span class="zone-time-duration">${time}</span>
+                        <span class="zone-time-percent">${percentage}%</span>
+                    </div>
+                </div>
+            `;
+        }
+    }
+    html += `</div></div>`;
+
+    container.innerHTML = html;
+
+    // Event listeners para tabs
+    container.querySelectorAll('.zone-times-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            const tabType = e.target.dataset.tab;
+            container.querySelectorAll('.zone-times-tab').forEach(t => t.classList.remove('active'));
+            container.querySelectorAll('.zone-times-panel').forEach(p => p.classList.remove('active'));
+            e.target.classList.add('active');
+            document.getElementById(`zone-times-${tabType}`)?.classList.add('active');
+        });
+    });
 }
 
 /**
