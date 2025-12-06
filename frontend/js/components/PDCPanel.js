@@ -304,6 +304,9 @@ function renderTrainingZones(zones) {
     const container = document.getElementById('zones-content');
     if (!container) return;
 
+    // Guardar zonesData para usarlo en renderZoneTimes
+    zonesData = zones;
+
     const hasOutdoor = zones.outdoor && zones.outdoor.ftp;
     const hasIndoor = zones.indoor && zones.indoor.ftp;
 
@@ -312,7 +315,7 @@ function renderTrainingZones(zones) {
         return;
     }
 
-    let html = '<div class="zones-grid">';
+    let html = '<div class="zones-cards">';
 
     // Zonas Outdoor (Ride)
     if (hasOutdoor) {

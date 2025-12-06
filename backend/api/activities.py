@@ -171,6 +171,10 @@ def get_zone_times():
         if isinstance(activities, tuple):
             return jsonify(activities[0]), activities[1]
         
+        # Verificar que activities sea una lista
+        if not isinstance(activities, list):
+            activities = []
+        
         # Inicializar acumuladores (máximo 7 zonas)
         power_zone_times = [0] * 7
         hr_zone_times = [0] * 7
