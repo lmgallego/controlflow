@@ -111,10 +111,13 @@ function renderWellnessPanelContent(container, data) {
 
         <!-- Tab 1: Métricas -->
         <div id="tab-metrics" class="wellness-tab-content ${currentActiveTab === 'metrics' ? 'active' : ''}">
-            <!-- Sección superior: Preparación (1/4) + Gráfico HRV Z-Score (3/4) -->
+            <!-- Sección superior: Preparación + DTF del día + Gráfico HRV Z-Score -->
             <div class="wellness-top-section">
                 <div class="wellness-readiness-compact">
                     ${renderReadinessCard(data)}
+                </div>
+                <div class="wellness-dtf-today">
+                    ${renderDTFTodayCard(data)}
                 </div>
                 <div class="wellness-hrv-zscore-chart">
                     ${renderHRVZScoreChart(data)}
@@ -425,10 +428,12 @@ function processWellnessData(data, activities = null) {
     const sleepSecs = data.map(d => d.sleepSecs);
     const sleepScoreValues = data.map(d => d.sleepScore);
 
-    // Procesar carga de entrenamiento si hay actividades disponibles
+    // Procesar carga de entrenamiento y RPE si hay actividades disponibles
     let trainingLoadData = null;
+    let rpeData = null;
     if (activities && activities.length > 0) {
         trainingLoadData = processTrainingLoad(dates, activities);
+        rpeData = processRPE(dates, activities);
     }
 
     // Calcular LnRMSSD para HRV
@@ -529,7 +534,8 @@ function processWellnessData(data, activities = null) {
             trend: sleepScoreTrend
         },
         readiness: readiness,
-        trainingLoad: trainingLoadData
+        trainingLoad: trainingLoadData,
+        rpe: rpeData
     };
 }
 
@@ -563,6 +569,53 @@ function processTrainingLoad(dates, activities) {
     return {
         values,
         loadByDate
+    };
+}
+
+/**
+ * Procesa el RPE (Rating of Perceived Exertion) de las actividades
+ * Si hay múltiples actividades en un día, calcula promedio ponderado por duración
+ * @param {string[]} dates - Fechas de los datos de wellness
+ * @param {Object[]} activities - Array de actividades del API
+ * @returns {Object} - Datos procesados de RPE
+ */
+function processRPE(dates, activities) {
+    // Crear mapa de RPE por fecha con ponderación por duración
+    const rpeByDate = {};
+    const durationByDate = {};
+
+    activities.forEach(activity => {
+        if (activity.start_date_local) {
+            const dateStr = activity.start_date_local.split('T')[0];
+            const rpe = activity.icu_rpe || activity.session_rpe;
+            const duration = activity.moving_time || activity.elapsed_time || 0;
+
+            if (rpe && rpe > 0) {
+                if (rpeByDate[dateStr]) {
+                    // Promedio ponderado por duración
+                    rpeByDate[dateStr] += rpe * duration;
+                    durationByDate[dateStr] += duration;
+                } else {
+                    rpeByDate[dateStr] = rpe * duration;
+                    durationByDate[dateStr] = duration;
+                }
+            }
+        }
+    });
+
+    // Calcular promedio ponderado final
+    Object.keys(rpeByDate).forEach(date => {
+        if (durationByDate[date] > 0) {
+            rpeByDate[date] = rpeByDate[date] / durationByDate[date];
+        }
+    });
+
+    // Alinear con las fechas de wellness (usar null para días sin RPE)
+    const values = dates.map(date => rpeByDate[date] || null);
+
+    return {
+        values,
+        rpeByDate
     };
 }
 
@@ -769,7 +822,7 @@ function renderHRVCVCard(data) {
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">${t('wellness.hrvCV.interpretation.general')}</span>
-                        <span class="stat-value" style="color: #f59e0b;">2-20%</span>
+                        <span class="stat-value" style="color: #f59e0b;">12-20%</span>
                     </div>
                 </div>
             </div>
@@ -988,6 +1041,122 @@ function renderReadinessCard(data) {
 }
 
 /**
+ * Card de DTF del día actual
+ * Detecta si hay métricas con cambios significativos (umbral 0.8) en el día actual
+ */
+function renderDTFTodayCard(data) {
+    const DTF_THRESHOLD = 0.8;
+    const detectedMetrics = [];
+    
+    // Obtener el último valor de cada métrica (día actual)
+    const lastIndex = data.hrv.zScores.length - 1;
+    
+    if (lastIndex >= 0) {
+        // HRV Z-Score
+        const hrvZ = data.hrv.zScores[lastIndex];
+        if (hrvZ !== null && Math.abs(hrvZ) >= DTF_THRESHOLD) {
+            detectedMetrics.push({
+                name: 'HRV',
+                value: hrvZ.toFixed(2),
+                direction: hrvZ < 0 ? 'low' : 'high',
+                color: hrvZ < 0 ? '#ef4444' : '#10b981'
+            });
+        }
+        
+        // RHR - calcular Z-Score del último valor
+        const rhrValues = data.rhr.values.filter(v => v !== null);
+        if (rhrValues.length >= 7) {
+            const rhrMean = mean(rhrValues.slice(-14));
+            const rhrStd = standardDeviation(rhrValues.slice(-14), rhrMean);
+            const lastRhr = data.rhr.values[lastIndex];
+            if (lastRhr !== null && rhrStd > 0) {
+                const rhrZ = (lastRhr - rhrMean) / rhrStd;
+                if (Math.abs(rhrZ) >= DTF_THRESHOLD) {
+                    detectedMetrics.push({
+                        name: 'RHR',
+                        value: rhrZ.toFixed(2),
+                        direction: rhrZ > 0 ? 'high' : 'low', // RHR alto es malo
+                        color: rhrZ > 0 ? '#ef4444' : '#10b981'
+                    });
+                }
+            }
+        }
+        
+        // Sleep Duration - calcular Z-Score
+        const sleepValues = data.sleepDuration.hours.filter(v => v !== null);
+        if (sleepValues.length >= 7) {
+            const sleepMean = mean(sleepValues.slice(-14));
+            const sleepStd = standardDeviation(sleepValues.slice(-14), sleepMean);
+            const lastSleep = data.sleepDuration.hours[lastIndex];
+            if (lastSleep !== null && sleepStd > 0) {
+                const sleepZ = (lastSleep - sleepMean) / sleepStd;
+                if (Math.abs(sleepZ) >= DTF_THRESHOLD) {
+                    detectedMetrics.push({
+                        name: t('wellness.sleepDuration.abbrev') || 'Sueño',
+                        value: sleepZ.toFixed(2),
+                        direction: sleepZ < 0 ? 'low' : 'high',
+                        color: sleepZ < 0 ? '#ef4444' : '#10b981'
+                    });
+                }
+            }
+        }
+        
+        // Sleep Score - calcular Z-Score
+        const scoreValues = data.sleepScore.values.filter(v => v !== null);
+        if (scoreValues.length >= 7) {
+            const scoreMean = mean(scoreValues.slice(-14));
+            const scoreStd = standardDeviation(scoreValues.slice(-14), scoreMean);
+            const lastScore = data.sleepScore.values[lastIndex];
+            if (lastScore !== null && scoreStd > 0) {
+                const scoreZ = (lastScore - scoreMean) / scoreStd;
+                if (Math.abs(scoreZ) >= DTF_THRESHOLD) {
+                    detectedMetrics.push({
+                        name: t('wellness.sleepScore.abbrev') || 'Calidad',
+                        value: scoreZ.toFixed(2),
+                        direction: scoreZ < 0 ? 'low' : 'high',
+                        color: scoreZ < 0 ? '#ef4444' : '#10b981'
+                    });
+                }
+            }
+        }
+    }
+    
+    const hasDetection = detectedMetrics.length > 0;
+    
+    return `
+        <div class="dtf-today-card ${hasDetection ? 'has-detection' : 'no-detection'}">
+            <div class="dtf-today-header">
+                <h4>${t('wellness.dtfToday.title')}</h4>
+                <span class="dtf-today-badge ${hasDetection ? 'detected' : 'normal'}">
+                    ${hasDetection ? t('wellness.dtfToday.detected') : t('wellness.dtfToday.notDetected')}
+                </span>
+            </div>
+            <div class="dtf-today-content">
+                ${hasDetection ? `
+                    <div class="dtf-today-metrics">
+                        ${detectedMetrics.map(m => `
+                            <div class="dtf-today-metric" style="border-left-color: ${m.color};">
+                                <span class="dtf-metric-name">${m.name}</span>
+                                <span class="dtf-metric-value" style="color: ${m.color};">
+                                    Z: ${m.value}
+                                    <span class="dtf-metric-arrow">${m.direction === 'low' ? '↓' : '↑'}</span>
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <p class="dtf-today-hint">${t('wellness.dtfToday.hint')}</p>
+                ` : `
+                    <div class="dtf-today-ok">
+                        <span class="dtf-ok-icon">✓</span>
+                        <p>${t('wellness.dtfToday.allNormal')}</p>
+                    </div>
+                `}
+            </div>
+        </div>
+    `;
+}
+
+/**
  * Card de resumen general
  */
 function renderSummaryCard(data) {
@@ -1110,7 +1279,7 @@ function renderHRVChart(data) {
  * Zonas según literatura científica:
  * - Élite: 2-7%
  * - Atlético: 7-12%
- * - General: 2-20%
+ * - General: 12-20%
  */
 function renderHRVCVChart(data) {
     const ctx = document.getElementById('hrv-cv-chart');
@@ -1662,7 +1831,7 @@ function showHRVCVInfo() {
                     <ul class="hrv-cv-ranges-list">
                         <li class="elite"><span class="range-badge elite">2-7%</span> ${t('wellness.hrvCV.info.rangeElite')}</li>
                         <li class="athletic"><span class="range-badge athletic">7-12%</span> ${t('wellness.hrvCV.info.rangeMid')}</li>
-                        <li class="general"><span class="range-badge general">2-20%</span> ${t('wellness.hrvCV.info.rangeGeneral')}</li>
+                        <li class="general"><span class="range-badge general">12-20%</span> ${t('wellness.hrvCV.info.rangeGeneral')}</li>
                     </ul>
                 </div>
 

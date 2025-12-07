@@ -72,6 +72,49 @@ export async function getActivityData(athleteId, oldest, newest) {
     return fetchAuth(`/activities?${params}`);
 }
 
+export async function getEventsData(athleteId, oldest, newest, category = 'WORKOUT') {
+    const params = new URLSearchParams({ athlete_id: athleteId, oldest, newest, category });
+    return fetchAuth(`/events?${params}`);
+}
+
+export async function getPowerCurves(athleteId, type = 'Ride', curves = '90d', includeRanks = true, subMaxEfforts = 3) {
+    const params = new URLSearchParams({ 
+        athlete_id: athleteId, 
+        type, 
+        curves,
+        includeRanks: includeRanks.toString(),
+        subMaxEfforts: subMaxEfforts.toString()
+    });
+    return fetchAuth(`/power-curves?${params}`);
+}
+
+export async function getTrainingZones(athleteId) {
+    const params = new URLSearchParams({ athlete_id: athleteId });
+    return fetchAuth(`/training-zones?${params}`);
+}
+
+export async function getHRCurves(athleteId, type = 'Ride', curves = '90d', subMaxEfforts = 0) {
+    const params = new URLSearchParams({ 
+        athlete_id: athleteId, 
+        type, 
+        curves,
+        subMaxEfforts: subMaxEfforts.toString()
+    });
+    return fetchAuth(`/hr-curves?${params}`);
+}
+
+/**
+ * Obtiene los tiempos agregados en cada zona de potencia y FC para un periodo.
+ */
+export async function getZoneTimes(athleteId, oldest, newest) {
+    const params = new URLSearchParams({ 
+        athlete_id: athleteId, 
+        oldest,
+        newest
+    });
+    return fetchAuth(`/zone-times?${params}`);
+}
+
 /**
  * Guarda las credenciales de Intervals.icu del usuario en el backend.
  *

@@ -69,11 +69,13 @@ const translations = {
                     hrvSleep: 'HRV vs Calidad de Sueño',
                     hrvSleepDuration: 'HRV vs Duración de Sueño',
                     hrvLoad: 'HRV vs Carga de Entrenamiento',
-                    sleepQuality: 'Duración vs Calidad de Sueño'
+                    sleepQuality: 'Duración vs Calidad de Sueño',
+                    rpeHrv: 'RPE vs HRV (Día Siguiente)'
                 },
                 axes: {
                     previousLoad: 'Carga Día Anterior (TSS)',
-                    nextDayHRV: 'HRV Día Siguiente (ms)'
+                    nextDayHRV: 'HRV Día Siguiente (ms)',
+                    rpe: 'RPE (Esfuerzo Percibido)'
                 },
                 strength: {
                     strong: 'Correlación Fuerte',
@@ -92,6 +94,9 @@ const translations = {
                     hrvLoadPositive: 'Tu cuerpo se adapta bien al entrenamiento: El HRV del día siguiente se mantiene alto incluso con carga elevada.',
                     sleepQualityStrong: 'Fuerte relación entre duración y calidad del sueño: Dormir más horas mejora tu recuperación.',
                     sleepQualityWeak: 'Baja correlación duración-calidad: La calidad del sueño importa más que la cantidad.',
+                    rpeHrvNegative: 'Correlación negativa RPE-HRV esperada: Mayor esfuerzo percibido reduce el HRV al día siguiente. Tu percepción del esfuerzo predice bien tu recuperación.',
+                    rpeHrvWeak: 'Baja correlación RPE-HRV: Tu percepción del esfuerzo no predice bien la respuesta del HRV. Considera calibrar mejor tu escala de RPE.',
+                    rpeHrvPositive: 'Correlación positiva RPE-HRV inusual: Mayor RPE asociado a mayor HRV. Podría indicar buena adaptación o subestimación del esfuerzo.',
                     noSignificant: 'No se detectaron patrones significativos con los datos actuales.'
                 }
             },
@@ -133,6 +138,7 @@ const translations = {
             // Sleep Duration Card
             sleepDuration: {
                 title: 'Duración del Sueño',
+                abbrev: 'Sueño',
                 lastNight: 'Última Noche',
                 average: 'Promedio (7d)',
                 target: 'Objetivo',
@@ -143,6 +149,7 @@ const translations = {
             // Sleep Score Card
             sleepScore: {
                 title: 'Calidad del Sueño',
+                abbrev: 'Calidad',
                 score: 'Puntuación',
                 categories: {
                     excellent: 'Excelente',
@@ -164,6 +171,15 @@ const translations = {
                     acceptable: 'Aceptable (60-79)',
                     poor: 'Deficiente (<60)'
                 }
+            },
+
+            // DTF del día
+            dtfToday: {
+                title: 'DTF del Día',
+                detected: 'DTF detectado',
+                notDetected: 'DTF no detectado',
+                hint: 'Revisa la pestaña DTF para más detalles',
+                allNormal: 'Todas las métricas dentro del rango normal'
             },
 
             // Summary Card
@@ -199,7 +215,7 @@ const translations = {
                     eliteDesc: 'Mayor estabilidad del sistema nervioso autónomo y mejor adaptación al entrenamiento.',
                     athletic: 'Atlético (7-12%)',
                     athleticDesc: 'Rango típico para atletas de nivel medio. Buena variabilidad.',
-                    general: 'General (2-20%)',
+                    general: 'General (12-20%)',
                     generalDesc: 'Rango amplio de la población general.'
                 },
                 adaptation: {
@@ -239,7 +255,7 @@ const translations = {
                     ranges: 'Rangos típicos según nivel de condición física',
                     rangeElite: 'Atletas de élite o alto nivel: CV entre 2-7%',
                     rangeMid: 'Atletas de nivel medio o menor condición: CV entre 7-12%',
-                    rangeGeneral: 'Población general: CV entre 2-20%',
+                    rangeGeneral: 'Población general: CV entre 12-20%',
                     performanceTitle: 'Interpretación según el rendimiento',
                     performanceDesc: 'Los valores más bajos de CV-HRV indican mayor estabilidad del sistema nervioso autónomo y mejor adaptación al entrenamiento. Las personas más jóvenes, sin enfermedades, con mejor composición corporal y mayor capacidad aeróbica tienden a situarse en el extremo inferior del rango (2-7%), mientras que individuos menos saludables presentan valores más altos.',
                     practicalTitle: 'Pasos Prácticos para la Implementación',
@@ -396,14 +412,111 @@ const translations = {
             type: 'Tipo',
             time: 'Tiempo',
             distance: 'Distancia (km)',
-            load: 'Carga (TSS)'
+            load: 'Carga (TSS)',
+            calendar: {
+                title: 'Calendario de Actividades',
+                today: 'Hoy',
+                previous: 'Anterior',
+                next: 'Siguiente',
+                prevMonth: 'Mes anterior',
+                nextMonth: 'Mes siguiente',
+                month: 'Mes',
+                week: 'Semana',
+                monthView: 'Vista mensual',
+                weekView: 'Vista semanal',
+                completed: 'Completado',
+                planned: 'Planificado',
+                restDay: 'Día de descanso',
+                noActivities: 'No hay actividades este día',
+                activities: 'Actividades',
+                workout: 'Entrenamiento',
+                plannedWorkouts: 'Entrenamientos Planificados',
+                completedActivities: 'Actividades Completadas',
+                months: 'Enero,Febrero,Marzo,Abril,Mayo,Junio,Julio,Agosto,Septiembre,Octubre,Noviembre,Diciembre',
+                days: 'Lun,Mar,Mié,Jue,Vie,Sáb,Dom',
+                daysLong: 'Lunes,Martes,Miércoles,Jueves,Viernes,Sábado,Domingo'
+            }
         },
 
         // Analysis tabs
         analysis: {
             loadAnalysis: 'Análisis de Carga',
-            powerAnalysis: 'Análisis de Potencia',
+            pdcAnalysis: 'Curva de Potencia',
+            hrAnalysis: 'Frecuencia Cardíaca',
             performanceAnalysis: 'Análisis de Rendimiento'
+        },
+
+        // PDC (Power Duration Curve)
+        pdc: {
+            title: 'PDC',
+            bestEfforts: 'Mejores Esfuerzos',
+            power: 'Potencia',
+            duration: 'Duración',
+            watts: 'Vatios (W)',
+            noData: 'No hay datos de potencia disponibles',
+            realCurve: 'Datos Reales',
+            modeledCurve: 'Curva Suavizada',
+            selected: 'Selección',
+            allTime: 'Histórico',
+            periods: {
+                '42d': 'Últimos 42 días',
+                '90d': 'Últimos 90 días',
+                '180d': 'Últimos 6 meses',
+                '1y': 'Último año',
+                'all': 'Todo el historial'
+            },
+            types: {
+                ride: 'Ciclismo',
+                virtualRide: 'Ciclismo Virtual',
+                run: 'Carrera'
+            }
+        },
+
+        // Training Zones
+        zones: {
+            title: 'Zonas de Entrenamiento',
+            outdoor: 'Exterior (Ride)',
+            indoor: 'Interior (VirtualRide)',
+            noData: 'No hay zonas configuradas',
+            power: 'Potencia',
+            heartRate: 'Frecuencia Cardíaca',
+            timeInZone: 'Tiempo en Zona',
+            totalTime: 'Tiempo total',
+            activities: 'actividades',
+            selectDates: 'Selecciona las fechas',
+            periods: {
+                '7d': 'Últimos 7 días',
+                '15d': 'Últimos 15 días',
+                '30d': 'Últimos 30 días',
+                '42d': 'Últimos 42 días',
+                '90d': 'Últimos 90 días',
+                'custom': 'Personalizado'
+            }
+        },
+
+        // HR (Heart Rate Curves)
+        hr: {
+            title: 'Frecuencia Cardíaca',
+            realCurve: 'Datos Reales',
+            smoothedCurve: 'Curva Suavizada',
+            bpm: 'Latidos por minuto (bpm)',
+            maxHR: 'FC Máxima',
+            lthr: 'Umbral Lactato (LTHR)',
+            aerobicThreshold: 'Umbral Aeróbico',
+            hrReserve: 'Reserva de FC',
+            keyDurations: 'Duraciones Clave',
+            hrZones: 'Zonas de Frecuencia Cardíaca',
+            zonesAnalysis: 'Distribución por Zonas',
+            distribution: 'Distribución',
+            lagWarning: 'Nota: Los valores para duraciones < 30s no son representativos debido al lag de respuesta de la FC',
+            zoneNames: {
+                recovery: 'Recuperación Activa',
+                endurance: 'Resistencia',
+                tempo: 'Tempo',
+                threshold: 'Umbral',
+                vo2max: 'VO2 Máx',
+                anaerobic: 'Anaeróbico'
+            }
         },
 
         // PMC (Performance Management Chart)
@@ -446,6 +559,7 @@ const translations = {
 
         // Common
         common: {
+            locale: 'es-ES',
             na: 'N/A',
             loading: 'Cargando...',
             error: 'Error',
@@ -455,6 +569,7 @@ const translations = {
             close: 'Cerrar',
             apply: 'Aplicar',
             reset: 'Restablecer',
+            expand: 'Expandir',
             types: 'Tipos',
             units: {
                 ms: 'ms',
@@ -532,11 +647,13 @@ const translations = {
                     hrvSleep: 'HRV vs Sleep Quality',
                     hrvSleepDuration: 'HRV vs Sleep Duration',
                     hrvLoad: 'HRV vs Training Load',
-                    sleepQuality: 'Sleep Duration vs Sleep Quality'
+                    sleepQuality: 'Sleep Duration vs Sleep Quality',
+                    rpeHrv: 'RPE vs HRV (Next Day)'
                 },
                 axes: {
                     previousLoad: 'Previous Day Load (TSS)',
-                    nextDayHRV: 'Next Day HRV (ms)'
+                    nextDayHRV: 'Next Day HRV (ms)',
+                    rpe: 'RPE (Perceived Exertion)'
                 },
                 strength: {
                     strong: 'Strong Correlation',
@@ -555,6 +672,9 @@ const translations = {
                     hrvLoadPositive: 'Your body adapts well to training: Next-day HRV remains high even with elevated load.',
                     sleepQualityStrong: 'Strong relationship between sleep duration and quality: More sleep hours improve your recovery.',
                     sleepQualityWeak: 'Low duration-quality correlation: Sleep quality matters more than quantity.',
+                    rpeHrvNegative: 'Expected negative RPE-HRV correlation: Higher perceived exertion reduces next-day HRV. Your effort perception predicts recovery well.',
+                    rpeHrvWeak: 'Low RPE-HRV correlation: Your effort perception does not predict HRV response well. Consider calibrating your RPE scale.',
+                    rpeHrvPositive: 'Unusual positive RPE-HRV correlation: Higher RPE associated with higher HRV. Could indicate good adaptation or effort underestimation.',
                     noSignificant: 'No significant patterns detected with current data.'
                 }
             },
@@ -596,6 +716,7 @@ const translations = {
             // Sleep Duration Card
             sleepDuration: {
                 title: 'Sleep Duration',
+                abbrev: 'Sleep',
                 lastNight: 'Last Night',
                 average: 'Average (7d)',
                 target: 'Target',
@@ -606,6 +727,7 @@ const translations = {
             // Sleep Score Card
             sleepScore: {
                 title: 'Sleep Quality',
+                abbrev: 'Quality',
                 score: 'Score',
                 categories: {
                     excellent: 'Excellent',
@@ -627,6 +749,15 @@ const translations = {
                     acceptable: 'Acceptable (60-79)',
                     poor: 'Poor (<60)'
                 }
+            },
+
+            // DTF Today
+            dtfToday: {
+                title: 'Today\'s DTF',
+                detected: 'DTF detected',
+                notDetected: 'DTF not detected',
+                hint: 'Check the DTF tab for more details',
+                allNormal: 'All metrics within normal range'
             },
 
             // Summary Card
@@ -662,7 +793,7 @@ const translations = {
                     eliteDesc: 'Greater autonomic nervous system stability and better training adaptation.',
                     athletic: 'Athletic (7-12%)',
                     athleticDesc: 'Typical range for mid-level athletes. Good variability.',
-                    general: 'General (2-20%)',
+                    general: 'General (12-20%)',
                     generalDesc: 'Wide range for general population.'
                 },
                 adaptation: {
@@ -702,7 +833,7 @@ const translations = {
                     ranges: 'Typical ranges by fitness level',
                     rangeElite: 'Elite or high-level athletes: CV between 2-7%',
                     rangeMid: 'Mid-level athletes or lower fitness: CV between 7-12%',
-                    rangeGeneral: 'General population: CV between 2-20%',
+                    rangeGeneral: 'General population: CV between 12-20%',
                     performanceTitle: 'Performance interpretation',
                     performanceDesc: 'Lower CV-HRV values indicate greater autonomic nervous system stability and better training adaptation. Younger individuals without diseases, with better body composition and higher aerobic capacity tend to be at the lower end of the range (2-7%), while less healthy individuals show higher values.',
                     practicalTitle: 'Practical Implementation Steps',
@@ -859,14 +990,111 @@ const translations = {
             type: 'Type',
             time: 'Time',
             distance: 'Distance (km)',
-            load: 'Load (TSS)'
+            load: 'Load (TSS)',
+            calendar: {
+                title: 'Activity Calendar',
+                today: 'Today',
+                previous: 'Previous',
+                next: 'Next',
+                prevMonth: 'Previous month',
+                nextMonth: 'Next month',
+                month: 'Month',
+                week: 'Week',
+                monthView: 'Month view',
+                weekView: 'Week view',
+                completed: 'Completed',
+                planned: 'Planned',
+                restDay: 'Rest day',
+                noActivities: 'No activities this day',
+                activities: 'Activities',
+                workout: 'Workout',
+                plannedWorkouts: 'Planned Workouts',
+                completedActivities: 'Completed Activities',
+                months: 'January,February,March,April,May,June,July,August,September,October,November,December',
+                days: 'Mon,Tue,Wed,Thu,Fri,Sat,Sun',
+                daysLong: 'Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday'
+            }
         },
 
         // Analysis tabs
         analysis: {
             loadAnalysis: 'Load Analysis',
-            powerAnalysis: 'Power Analysis',
+            pdcAnalysis: 'Power Curve',
+            hrAnalysis: 'Heart Rate',
             performanceAnalysis: 'Performance Analysis'
+        },
+
+        // PDC (Power Duration Curve)
+        pdc: {
+            title: 'PDC',
+            bestEfforts: 'Best Efforts',
+            power: 'Power',
+            duration: 'Duration',
+            watts: 'Watts (W)',
+            noData: 'No power data available',
+            realCurve: 'Real Data',
+            modeledCurve: 'Smoothed Curve',
+            selected: 'Selected',
+            allTime: 'All Time',
+            periods: {
+                '42d': 'Last 42 days',
+                '90d': 'Last 90 days',
+                '180d': 'Last 6 months',
+                '1y': 'Last year',
+                'all': 'All time'
+            },
+            types: {
+                ride: 'Cycling',
+                virtualRide: 'Virtual Cycling',
+                run: 'Running'
+            }
+        },
+
+        // Training Zones
+        zones: {
+            title: 'Training Zones',
+            outdoor: 'Outdoor (Ride)',
+            indoor: 'Indoor (VirtualRide)',
+            noData: 'No zones configured',
+            power: 'Power',
+            heartRate: 'Heart Rate',
+            timeInZone: 'Time in Zone',
+            totalTime: 'Total time',
+            activities: 'activities',
+            selectDates: 'Select dates',
+            periods: {
+                '7d': 'Last 7 days',
+                '15d': 'Last 15 days',
+                '30d': 'Last 30 days',
+                '42d': 'Last 42 days',
+                '90d': 'Last 90 days',
+                'custom': 'Custom'
+            }
+        },
+
+        // HR (Heart Rate Curves)
+        hr: {
+            title: 'Heart Rate',
+            realCurve: 'Real Data',
+            smoothedCurve: 'Smoothed Curve',
+            bpm: 'Beats per minute (bpm)',
+            maxHR: 'Max HR',
+            lthr: 'Lactate Threshold (LTHR)',
+            aerobicThreshold: 'Aerobic Threshold',
+            hrReserve: 'HR Reserve',
+            keyDurations: 'Key Durations',
+            hrZones: 'Heart Rate Zones',
+            zonesAnalysis: 'Zone Distribution',
+            distribution: 'Distribution',
+            lagWarning: 'Note: Values for durations < 30s are not representative due to HR response lag',
+            zoneNames: {
+                recovery: 'Active Recovery',
+                endurance: 'Endurance',
+                tempo: 'Tempo',
+                threshold: 'Threshold',
+                vo2max: 'VO2 Max',
+                anaerobic: 'Anaerobic'
+            }
         },
 
         // PMC (Performance Management Chart)
@@ -909,6 +1137,7 @@ const translations = {
 
         // Common
         common: {
+            locale: 'en-US',
             na: 'N/A',
             loading: 'Loading...',
             error: 'Error',
@@ -918,6 +1147,7 @@ const translations = {
             close: 'Close',
             apply: 'Apply',
             reset: 'Reset',
+            expand: 'Expand',
             types: 'Types',
             units: {
                 ms: 'ms',

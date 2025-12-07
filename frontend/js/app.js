@@ -1,6 +1,6 @@
 import { auth } from './firebase-init.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getAthletes } from './apiService.js';
+import { getAthletes, getAthleteProfile, getWellnessData } from './apiService.js';
 import { renderAthletesPanel } from './components/AthletesPanel.js';
 import { renderWellnessPanel } from './components/WellnessPanel.js';
 import { renderActivityFeed } from './components/ActivityFeed.js';
@@ -37,10 +37,21 @@ async function loadView(view, athleteId) {
 
         // Mostrar/ocultar selector de atletas según la vista
         const athleteSelectContainer = document.querySelector('.controls');
+        const headerMetrics = document.getElementById('athlete-metrics-header');
+        
         if (view === 'athletes' || view === 'settings') {
             athleteSelectContainer.style.display = 'none';
+            // Ocultar métricas del header en vistas generales
+            if (headerMetrics) headerMetrics.style.display = 'none';
         } else {
             athleteSelectContainer.style.display = 'flex';
+            // Mostrar métricas del header en vistas de atleta
+            if (headerMetrics) headerMetrics.style.display = 'flex';
+            
+            // Actualizar métricas del header si hay athleteId
+            if (athleteId) {
+                updateAthleteHeaderMetrics(athleteId);
+            }
         }
 
         // Si se proporciona un athleteId, actualizar el selector y el estado global
@@ -113,6 +124,12 @@ async function initializeApp() {
         userEmailDisplay.textContent = user.email;
         athleteSelect.innerHTML = '<option>Cargando atletas...</option>';
         athleteSelect.disabled = true;
+        
+        // Ocultar métricas del header inicialmente si la vista es athletes
+        const headerMetrics = document.getElementById('athlete-metrics-header');
+        if (headerMetrics && (currentView === 'athletes' || currentView === 'settings')) {
+            headerMetrics.style.display = 'none';
+        }
 
         const athletes = await getAthletes();
 
@@ -130,10 +147,12 @@ async function initializeApp() {
             athleteSelect.disabled = false;
             
             // Cargar la vista por defecto
-            // Si es 'athletes', no necesita athleteId
+            // Si es 'athletes', no necesita athleteId ni métricas del header
             if (currentView === 'athletes') {
                 await loadView('athletes');
             } else {
+                // Solo actualizar métricas del header si NO es vista de athletes/settings
+                await updateAthleteHeaderMetrics(currentAthleteId);
                 await loadView(currentView, currentAthleteId);
             }
         } else {
@@ -165,9 +184,81 @@ async function initializeApp() {
 
 // --- Manejadores de Eventos ---
 
+/**
+ * Actualiza las métricas del header (FTP, VO2max, W', etc.) para el atleta seleccionado
+ */
+async function updateAthleteHeaderMetrics(athleteId) {
+    const headerMetrics = document.getElementById('athlete-metrics-header');
+    if (!headerMetrics || !athleteId) return;
+
+    try {
+        // Obtener perfil del atleta
+        const profile = await getAthleteProfile(athleteId);
+        
+        // Obtener wellness para VO2max
+        const today = new Date();
+        const oldest = new Date();
+        oldest.setDate(today.getDate() - 90); // Últimos 90 días para buscar VO2max
+        const wellnessHistory = await getWellnessData(athleteId, oldest.toISOString().split('T')[0], today.toISOString().split('T')[0]);
+
+        // Mostrar el header
+        headerMetrics.style.display = 'flex';
+
+        // FTP
+        let ftp = profile.icu_ftp || profile.ftp;
+        if (profile.sportSettings) {
+            const ride = profile.sportSettings.find(s => s.types && s.types.includes('Ride'));
+            if (ride && ride.ftp) ftp = ride.ftp;
+        }
+        document.getElementById('header-ftp').textContent = ftp || 'N/A';
+
+        // W'
+        let wPrime = profile.icu_w_prime || profile.w_prime;
+        if (profile.sportSettings) {
+            const ride = profile.sportSettings.find(s => s.types && s.types.includes('Ride'));
+            if (ride && ride.w_prime) wPrime = ride.w_prime;
+        }
+        document.getElementById('header-wprime').textContent = wPrime ? Math.round(wPrime / 1000) : 'N/A';
+
+        // PMAX
+        let pMax = profile.icu_pmax || profile.pmax;
+        if (profile.sportSettings) {
+            const ride = profile.sportSettings.find(s => s.types && s.types.includes('Ride'));
+            if (ride && ride.p_max) pMax = ride.p_max;
+        }
+        document.getElementById('header-pmax').textContent = pMax || 'N/A';
+
+        // VO2MAX
+        let vo2max = null;
+        if (wellnessHistory && wellnessHistory.length > 0) {
+            for (let i = wellnessHistory.length - 1; i >= 0; i--) {
+                if (wellnessHistory[i].vo2max) {
+                    vo2max = wellnessHistory[i].vo2max;
+                    break;
+                }
+            }
+        }
+        
+        if (vo2max) {
+            const weight = profile.weight || profile.icu_weight || 70;
+            const vo2maxAbsolute = (vo2max * weight / 1000).toFixed(2);
+            document.getElementById('header-vo2max').textContent = vo2max.toFixed(1);
+            document.getElementById('header-vo2max-abs').textContent = vo2maxAbsolute;
+        } else {
+            document.getElementById('header-vo2max').textContent = 'N/A';
+            document.getElementById('header-vo2max-abs').textContent = 'N/A';
+        }
+    } catch (error) {
+        console.error('Error updating header metrics:', error);
+    }
+}
+
 // Cambiar de atleta
-athleteSelect.addEventListener('change', (e) => {
+athleteSelect.addEventListener('change', async (e) => {
     currentAthleteId = e.target.value;
+    // Actualizar métricas del header
+    updateAthleteHeaderMetrics(currentAthleteId);
+    // Cargar la vista
     loadView(currentView, currentAthleteId);
 });
 
