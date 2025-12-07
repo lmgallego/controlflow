@@ -47,6 +47,11 @@ async function loadView(view, athleteId) {
             athleteSelectContainer.style.display = 'flex';
             // Mostrar métricas del header en vistas de atleta
             if (headerMetrics) headerMetrics.style.display = 'flex';
+            
+            // Actualizar métricas del header si hay athleteId
+            if (athleteId) {
+                updateAthleteHeaderMetrics(athleteId);
+            }
         }
 
         // Si se proporciona un athleteId, actualizar el selector y el estado global
