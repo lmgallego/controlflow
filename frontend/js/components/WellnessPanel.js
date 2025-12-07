@@ -425,10 +425,12 @@ function processWellnessData(data, activities = null) {
     const sleepSecs = data.map(d => d.sleepSecs);
     const sleepScoreValues = data.map(d => d.sleepScore);
 
-    // Procesar carga de entrenamiento si hay actividades disponibles
+    // Procesar carga de entrenamiento y RPE si hay actividades disponibles
     let trainingLoadData = null;
+    let rpeData = null;
     if (activities && activities.length > 0) {
         trainingLoadData = processTrainingLoad(dates, activities);
+        rpeData = processRPE(dates, activities);
     }
 
     // Calcular LnRMSSD para HRV
@@ -529,7 +531,8 @@ function processWellnessData(data, activities = null) {
             trend: sleepScoreTrend
         },
         readiness: readiness,
-        trainingLoad: trainingLoadData
+        trainingLoad: trainingLoadData,
+        rpe: rpeData
     };
 }
 
@@ -563,6 +566,53 @@ function processTrainingLoad(dates, activities) {
     return {
         values,
         loadByDate
+    };
+}
+
+/**
+ * Procesa el RPE (Rating of Perceived Exertion) de las actividades
+ * Si hay múltiples actividades en un día, calcula promedio ponderado por duración
+ * @param {string[]} dates - Fechas de los datos de wellness
+ * @param {Object[]} activities - Array de actividades del API
+ * @returns {Object} - Datos procesados de RPE
+ */
+function processRPE(dates, activities) {
+    // Crear mapa de RPE por fecha con ponderación por duración
+    const rpeByDate = {};
+    const durationByDate = {};
+
+    activities.forEach(activity => {
+        if (activity.start_date_local) {
+            const dateStr = activity.start_date_local.split('T')[0];
+            const rpe = activity.icu_rpe || activity.session_rpe;
+            const duration = activity.moving_time || activity.elapsed_time || 0;
+
+            if (rpe && rpe > 0) {
+                if (rpeByDate[dateStr]) {
+                    // Promedio ponderado por duración
+                    rpeByDate[dateStr] += rpe * duration;
+                    durationByDate[dateStr] += duration;
+                } else {
+                    rpeByDate[dateStr] = rpe * duration;
+                    durationByDate[dateStr] = duration;
+                }
+            }
+        }
+    });
+
+    // Calcular promedio ponderado final
+    Object.keys(rpeByDate).forEach(date => {
+        if (durationByDate[date] > 0) {
+            rpeByDate[date] = rpeByDate[date] / durationByDate[date];
+        }
+    });
+
+    // Alinear con las fechas de wellness (usar null para días sin RPE)
+    const values = dates.map(date => rpeByDate[date] || null);
+
+    return {
+        values,
+        rpeByDate
     };
 }
 

@@ -48,6 +48,10 @@ export function createPatternAnalysisPanel(data) {
                 t('wellness.patterns.correlations.hrvLoad'),
                 correlations.hrvLoad || { r: null, regression: null },
                 'hrv-load-chart')}
+            ${renderCorrelationCard('rpe-hrv',
+                t('wellness.patterns.correlations.rpeHrv'),
+                correlations.rpeHrv || { r: null, regression: null },
+                'rpe-hrv-chart')}
         </div>
 
         <div class="patterns-insights">
@@ -80,6 +84,18 @@ export function createPatternAnalysisPanel(data) {
         } else {
             renderCorrelationChart('hrv-load-chart', [], [],
                 t('wellness.patterns.axes.previousLoad'), t('wellness.patterns.axes.nextDayHRV'), { r: null, regression: null });
+        }
+
+        // Renderizar RPE vs HRV con desfase de 1 día
+        // El RPE de hoy (X) afecta el HRV de mañana (Y)
+        if (data.rpe && data.rpe.values) {
+            const rpeValues = data.rpe.values.slice(0, -1); // RPE hasta penúltimo día
+            const hrvNextDay = data.hrv.raw.slice(1); // HRV desde día 2
+            renderCorrelationChart('rpe-hrv-chart', rpeValues, hrvNextDay,
+                t('wellness.patterns.axes.rpe'), t('wellness.patterns.axes.nextDayHRV'), correlations.rpeHrv || { r: null, regression: null });
+        } else {
+            renderCorrelationChart('rpe-hrv-chart', [], [],
+                t('wellness.patterns.axes.rpe'), t('wellness.patterns.axes.nextDayHRV'), { r: null, regression: null });
         }
 
         // Configurar event listeners para botones de fullscreen después de renderizar
@@ -125,6 +141,32 @@ function calculateCorrelations(data) {
             r: pearsonCorrelation(hrvShifted, loadShifted),
             regression: linearRegression(loadShifted, hrvShifted) // X=Carga, Y=HRV
         };
+    }
+
+    // Añadir correlación RPE vs HRV (día siguiente)
+    // El RPE de hoy (esfuerzo percibido) afecta el HRV de mañana (recuperación)
+    if (data.rpe && data.rpe.values) {
+        const rpeValues = data.rpe.values.slice(0, -1); // RPE hasta penúltimo día
+        const hrvNextDay = data.hrv.raw.slice(1); // HRV desde día 2
+        
+        // Filtrar pares válidos (RPE puede ser null en días sin actividad)
+        const validPairs = [];
+        for (let i = 0; i < Math.min(rpeValues.length, hrvNextDay.length); i++) {
+            if (rpeValues[i] !== null && hrvNextDay[i] !== null && 
+                !isNaN(rpeValues[i]) && !isNaN(hrvNextDay[i])) {
+                validPairs.push({ rpe: rpeValues[i], hrv: hrvNextDay[i] });
+            }
+        }
+        
+        if (validPairs.length >= 5) {
+            const rpeFiltered = validPairs.map(p => p.rpe);
+            const hrvFiltered = validPairs.map(p => p.hrv);
+            
+            correlations.rpeHrv = {
+                r: pearsonCorrelation(rpeFiltered, hrvFiltered),
+                regression: linearRegression(rpeFiltered, hrvFiltered) // X=RPE, Y=HRV
+            };
+        }
     }
 
     return correlations;
@@ -368,6 +410,27 @@ function generateInsights(correlations) {
             insights.push({
                 type: 'info',
                 text: t('wellness.patterns.insights.sleepQualityWeak')
+            });
+        }
+    }
+
+    // Insight 6: RPE vs HRV (día siguiente)
+    if (correlations.rpeHrv && correlations.rpeHrv.r !== null) {
+        const r = correlations.rpeHrv.r;
+        if (r < -0.4) {
+            insights.push({
+                type: 'info',
+                text: t('wellness.patterns.insights.rpeHrvNegative')
+            });
+        } else if (r > -0.2 && r < 0.2) {
+            insights.push({
+                type: 'warning',
+                text: t('wellness.patterns.insights.rpeHrvWeak')
+            });
+        } else if (r > 0.3) {
+            insights.push({
+                type: 'positive',
+                text: t('wellness.patterns.insights.rpeHrvPositive')
             });
         }
     }

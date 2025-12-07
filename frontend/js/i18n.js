@@ -69,11 +69,13 @@ const translations = {
                     hrvSleep: 'HRV vs Calidad de Sueño',
                     hrvSleepDuration: 'HRV vs Duración de Sueño',
                     hrvLoad: 'HRV vs Carga de Entrenamiento',
-                    sleepQuality: 'Duración vs Calidad de Sueño'
+                    sleepQuality: 'Duración vs Calidad de Sueño',
+                    rpeHrv: 'RPE vs HRV (Día Siguiente)'
                 },
                 axes: {
                     previousLoad: 'Carga Día Anterior (TSS)',
-                    nextDayHRV: 'HRV Día Siguiente (ms)'
+                    nextDayHRV: 'HRV Día Siguiente (ms)',
+                    rpe: 'RPE (Esfuerzo Percibido)'
                 },
                 strength: {
                     strong: 'Correlación Fuerte',
@@ -92,6 +94,9 @@ const translations = {
                     hrvLoadPositive: 'Tu cuerpo se adapta bien al entrenamiento: El HRV del día siguiente se mantiene alto incluso con carga elevada.',
                     sleepQualityStrong: 'Fuerte relación entre duración y calidad del sueño: Dormir más horas mejora tu recuperación.',
                     sleepQualityWeak: 'Baja correlación duración-calidad: La calidad del sueño importa más que la cantidad.',
+                    rpeHrvNegative: 'Correlación negativa RPE-HRV esperada: Mayor esfuerzo percibido reduce el HRV al día siguiente. Tu percepción del esfuerzo predice bien tu recuperación.',
+                    rpeHrvWeak: 'Baja correlación RPE-HRV: Tu percepción del esfuerzo no predice bien la respuesta del HRV. Considera calibrar mejor tu escala de RPE.',
+                    rpeHrvPositive: 'Correlación positiva RPE-HRV inusual: Mayor RPE asociado a mayor HRV. Podría indicar buena adaptación o subestimación del esfuerzo.',
                     noSignificant: 'No se detectaron patrones significativos con los datos actuales.'
                 }
             },
@@ -631,11 +636,13 @@ const translations = {
                     hrvSleep: 'HRV vs Sleep Quality',
                     hrvSleepDuration: 'HRV vs Sleep Duration',
                     hrvLoad: 'HRV vs Training Load',
-                    sleepQuality: 'Sleep Duration vs Sleep Quality'
+                    sleepQuality: 'Sleep Duration vs Sleep Quality',
+                    rpeHrv: 'RPE vs HRV (Next Day)'
                 },
                 axes: {
                     previousLoad: 'Previous Day Load (TSS)',
-                    nextDayHRV: 'Next Day HRV (ms)'
+                    nextDayHRV: 'Next Day HRV (ms)',
+                    rpe: 'RPE (Perceived Exertion)'
                 },
                 strength: {
                     strong: 'Strong Correlation',
@@ -654,6 +661,9 @@ const translations = {
                     hrvLoadPositive: 'Your body adapts well to training: Next-day HRV remains high even with elevated load.',
                     sleepQualityStrong: 'Strong relationship between sleep duration and quality: More sleep hours improve your recovery.',
                     sleepQualityWeak: 'Low duration-quality correlation: Sleep quality matters more than quantity.',
+                    rpeHrvNegative: 'Expected negative RPE-HRV correlation: Higher perceived exertion reduces next-day HRV. Your effort perception predicts recovery well.',
+                    rpeHrvWeak: 'Low RPE-HRV correlation: Your effort perception does not predict HRV response well. Consider calibrating your RPE scale.',
+                    rpeHrvPositive: 'Unusual positive RPE-HRV correlation: Higher RPE associated with higher HRV. Could indicate good adaptation or effort underestimation.',
                     noSignificant: 'No significant patterns detected with current data.'
                 }
             },
