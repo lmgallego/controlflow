@@ -111,10 +111,13 @@ function renderWellnessPanelContent(container, data) {
 
         <!-- Tab 1: Métricas -->
         <div id="tab-metrics" class="wellness-tab-content ${currentActiveTab === 'metrics' ? 'active' : ''}">
-            <!-- Sección superior: Preparación (1/4) + Gráfico HRV Z-Score (3/4) -->
+            <!-- Sección superior: Preparación + DTF del día + Gráfico HRV Z-Score -->
             <div class="wellness-top-section">
                 <div class="wellness-readiness-compact">
                     ${renderReadinessCard(data)}
+                </div>
+                <div class="wellness-dtf-today">
+                    ${renderDTFTodayCard(data)}
                 </div>
                 <div class="wellness-hrv-zscore-chart">
                     ${renderHRVZScoreChart(data)}
@@ -1032,6 +1035,122 @@ function renderReadinessCard(data) {
                         </div>
                     `}
                 </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Card de DTF del día actual
+ * Detecta si hay métricas con cambios significativos (umbral 0.8) en el día actual
+ */
+function renderDTFTodayCard(data) {
+    const DTF_THRESHOLD = 0.8;
+    const detectedMetrics = [];
+    
+    // Obtener el último valor de cada métrica (día actual)
+    const lastIndex = data.hrv.zScores.length - 1;
+    
+    if (lastIndex >= 0) {
+        // HRV Z-Score
+        const hrvZ = data.hrv.zScores[lastIndex];
+        if (hrvZ !== null && Math.abs(hrvZ) >= DTF_THRESHOLD) {
+            detectedMetrics.push({
+                name: 'HRV',
+                value: hrvZ.toFixed(2),
+                direction: hrvZ < 0 ? 'low' : 'high',
+                color: hrvZ < 0 ? '#ef4444' : '#10b981'
+            });
+        }
+        
+        // RHR - calcular Z-Score del último valor
+        const rhrValues = data.rhr.values.filter(v => v !== null);
+        if (rhrValues.length >= 7) {
+            const rhrMean = mean(rhrValues.slice(-14));
+            const rhrStd = standardDeviation(rhrValues.slice(-14), rhrMean);
+            const lastRhr = data.rhr.values[lastIndex];
+            if (lastRhr !== null && rhrStd > 0) {
+                const rhrZ = (lastRhr - rhrMean) / rhrStd;
+                if (Math.abs(rhrZ) >= DTF_THRESHOLD) {
+                    detectedMetrics.push({
+                        name: 'RHR',
+                        value: rhrZ.toFixed(2),
+                        direction: rhrZ > 0 ? 'high' : 'low', // RHR alto es malo
+                        color: rhrZ > 0 ? '#ef4444' : '#10b981'
+                    });
+                }
+            }
+        }
+        
+        // Sleep Duration - calcular Z-Score
+        const sleepValues = data.sleepDuration.hours.filter(v => v !== null);
+        if (sleepValues.length >= 7) {
+            const sleepMean = mean(sleepValues.slice(-14));
+            const sleepStd = standardDeviation(sleepValues.slice(-14), sleepMean);
+            const lastSleep = data.sleepDuration.hours[lastIndex];
+            if (lastSleep !== null && sleepStd > 0) {
+                const sleepZ = (lastSleep - sleepMean) / sleepStd;
+                if (Math.abs(sleepZ) >= DTF_THRESHOLD) {
+                    detectedMetrics.push({
+                        name: t('wellness.sleepDuration.abbrev') || 'Sueño',
+                        value: sleepZ.toFixed(2),
+                        direction: sleepZ < 0 ? 'low' : 'high',
+                        color: sleepZ < 0 ? '#ef4444' : '#10b981'
+                    });
+                }
+            }
+        }
+        
+        // Sleep Score - calcular Z-Score
+        const scoreValues = data.sleepScore.values.filter(v => v !== null);
+        if (scoreValues.length >= 7) {
+            const scoreMean = mean(scoreValues.slice(-14));
+            const scoreStd = standardDeviation(scoreValues.slice(-14), scoreMean);
+            const lastScore = data.sleepScore.values[lastIndex];
+            if (lastScore !== null && scoreStd > 0) {
+                const scoreZ = (lastScore - scoreMean) / scoreStd;
+                if (Math.abs(scoreZ) >= DTF_THRESHOLD) {
+                    detectedMetrics.push({
+                        name: t('wellness.sleepScore.abbrev') || 'Calidad',
+                        value: scoreZ.toFixed(2),
+                        direction: scoreZ < 0 ? 'low' : 'high',
+                        color: scoreZ < 0 ? '#ef4444' : '#10b981'
+                    });
+                }
+            }
+        }
+    }
+    
+    const hasDetection = detectedMetrics.length > 0;
+    
+    return `
+        <div class="dtf-today-card ${hasDetection ? 'has-detection' : 'no-detection'}">
+            <div class="dtf-today-header">
+                <h4>${t('wellness.dtfToday.title')}</h4>
+                <span class="dtf-today-badge ${hasDetection ? 'detected' : 'normal'}">
+                    ${hasDetection ? t('wellness.dtfToday.detected') : t('wellness.dtfToday.notDetected')}
+                </span>
+            </div>
+            <div class="dtf-today-content">
+                ${hasDetection ? `
+                    <div class="dtf-today-metrics">
+                        ${detectedMetrics.map(m => `
+                            <div class="dtf-today-metric" style="border-left-color: ${m.color};">
+                                <span class="dtf-metric-name">${m.name}</span>
+                                <span class="dtf-metric-value" style="color: ${m.color};">
+                                    Z: ${m.value}
+                                    <span class="dtf-metric-arrow">${m.direction === 'low' ? '↓' : '↑'}</span>
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <p class="dtf-today-hint">${t('wellness.dtfToday.hint')}</p>
+                ` : `
+                    <div class="dtf-today-ok">
+                        <span class="dtf-ok-icon">✓</span>
+                        <p>${t('wellness.dtfToday.allNormal')}</p>
+                    </div>
+                `}
             </div>
         </div>
     `;

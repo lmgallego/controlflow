@@ -138,6 +138,7 @@ const translations = {
             // Sleep Duration Card
             sleepDuration: {
                 title: 'Duración del Sueño',
+                abbrev: 'Sueño',
                 lastNight: 'Última Noche',
                 average: 'Promedio (7d)',
                 target: 'Objetivo',
@@ -148,6 +149,7 @@ const translations = {
             // Sleep Score Card
             sleepScore: {
                 title: 'Calidad del Sueño',
+                abbrev: 'Calidad',
                 score: 'Puntuación',
                 categories: {
                     excellent: 'Excelente',
@@ -169,6 +171,15 @@ const translations = {
                     acceptable: 'Aceptable (60-79)',
                     poor: 'Deficiente (<60)'
                 }
+            },
+
+            // DTF del día
+            dtfToday: {
+                title: 'DTF del Día',
+                detected: 'DTF detectado',
+                notDetected: 'DTF no detectado',
+                hint: 'Revisa la pestaña DTF para más detalles',
+                allNormal: 'Todas las métricas dentro del rango normal'
             },
 
             // Summary Card
@@ -705,6 +716,7 @@ const translations = {
             // Sleep Duration Card
             sleepDuration: {
                 title: 'Sleep Duration',
+                abbrev: 'Sleep',
                 lastNight: 'Last Night',
                 average: 'Average (7d)',
                 target: 'Target',
@@ -715,6 +727,7 @@ const translations = {
             // Sleep Score Card
             sleepScore: {
                 title: 'Sleep Quality',
+                abbrev: 'Quality',
                 score: 'Score',
                 categories: {
                     excellent: 'Excellent',
@@ -736,6 +749,15 @@ const translations = {
                     acceptable: 'Acceptable (60-79)',
                     poor: 'Poor (<60)'
                 }
+            },
+
+            // DTF Today
+            dtfToday: {
+                title: 'Today\'s DTF',
+                detected: 'DTF detected',
+                notDetected: 'DTF not detected',
+                hint: 'Check the DTF tab for more details',
+                allNormal: 'All metrics within normal range'
             },
 
             // Summary Card
