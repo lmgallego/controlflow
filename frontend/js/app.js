@@ -147,7 +147,7 @@ async function initializeApp() {
                 await loadView('athletes');
             } else {
                 // Solo actualizar métricas del header si NO es vista de athletes/settings
-                updateAthleteHeaderMetrics(currentAthleteId);
+                await updateAthleteHeaderMetrics(currentAthleteId);
                 await loadView(currentView, currentAthleteId);
             }
         } else {
